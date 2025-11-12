@@ -1,0 +1,26 @@
+{
+  "name": "mulaos",
+  "version": "1.0.0",
+  "description": "Automation tools and workflows for Mula operations",
+  "private": true,
+  "scripts": {
+    "lint": "eslint workflows/**/*.js",
+    "format": "prettier --write workflows/**/*.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "automation",
+    "pipedream",
+    "workflows"
+  ],
+  "author": "Mula",
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "eslint": "^8.0.0",
+    "prettier": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
+
