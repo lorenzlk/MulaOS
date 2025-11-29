@@ -1,0 +1,61 @@
+<div class="container mt-4">
+  <h1 class="mb-3">Pages</h1>
+
+  <!-- Form for adding new pages -->
+  <form action="/pages" method="POST" class="mb-4">
+    <div class="row">
+      <div class="col-md-6">
+        <div class="input-group input-group-lg">
+          <input 
+            type="url" 
+            name="url" 
+            class="form-control" 
+            placeholder="Paste a URL here..." 
+            required 
+            aria-label="Page URL"
+          >
+        </div>
+      </div>
+      <div class="col-md-4">
+        <select name="credentialId" class="form-select form-select-lg" required>
+          <option value="">Select credentials...</option>
+          <optgroup label="Amazon Credentials">
+            {{#each amazonCredentials}}
+              <option value="{{this.id}}">{{this.name}}</option>
+            {{/each}}
+          </optgroup>
+          <optgroup label="Impact Credentials">
+            {{#each impactCredentials}}
+              <option value="{{this.id}}">{{this.name}}</option>
+            {{/each}}
+          </optgroup>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <button type="submit" class="btn btn-primary btn-lg w-100">Add Page</button>
+      </div>
+    </div>
+  </form>
+
+  {{#if groupedPages.length}}
+    {{#each groupedPages}}
+      <h2 id="{{hostname}}">{{hostname}}</h2>
+      <ul class="list-group">
+        {{#each pages}}
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <a href="/pages/{{this.id}}" class="text-decoration-none">{{this.url}}</a>
+            <a href="{{this.url}}" target="_blank" rel="noopener noreferrer" class="ms-3">
+              <i class="bi bi-box-arrow-up-right text-dark"></i>
+            </a>
+          </li>
+        {{/each}}
+      </ul>
+      <hr/>
+    {{/each}}
+  {{else}}
+    <div class="alert alert-info text-center p-4">
+      <h4 class="mb-3">No Pages Available</h4>
+      <p class="mb-0">Once you add a page, it'll appear here.</p>
+    </div>
+  {{/if}}
+</div>

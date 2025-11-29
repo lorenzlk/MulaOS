@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minimal Carousel Demo</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            background: #f5f5f7;
+        }
+        .container {
+            max-width: 500px;
+            width: 100%;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-top: 0;
+        }
+        .carousel {
+            background: #000;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        .carousel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .carousel-title {
+            color: white;
+            font-weight: 600;
+        }
+        .carousel-subtitle {
+            color: rgba(255,255,255,0.7);
+            font-size: 12px;
+            margin-top: 4px;
+        }
+        .view-all-btn {
+            background: rgba(255,50,90,0.1);
+            color: #ff325a;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .carousel-track {
+            display: flex;
+            overflow-x: auto;
+            padding: 15px;
+            gap: 12px;
+            -webkit-overflow-scrolling: touch;
+        }
+        .carousel-track::-webkit-scrollbar {
+            display: none;
+        }
+        .product-card {
+            flex: 0 0 auto;
+            width: 140px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .product-image {
+            height: 140px;
+            background-color: #333;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        .product-label {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.6);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 8px;
+            font-size: 10px;
+        }
+        .product-info {
+            padding: 12px;
+        }
+        .product-name {
+            color: white;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        .product-price {
+            color: rgba(255,255,255,0.7);
+            font-size: 12px;
+        }
+        .buy-button {
+            background: #ff325a;
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 8px 0;
+            font-weight: 600;
+            font-size: 12px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Minimal Carousel Demo</h1>
+        
+        <div class="carousel">
+            <div class="carousel-header">
+                <div>
+                    <div class="carousel-title">Related Products</div>
+                    <div class="carousel-subtitle">You might also like</div>
+                </div>
+                <button class="view-all-btn">View All</button>
+            </div>
+            
+            <div class="carousel-track">
+                <!-- Hard-coded product cards for maximum reliability -->
+                <div class="product-card">
+                    <div class="product-image" style="background-image: url('https://images.unsplash.com/photo-1520367691844-3df6788d16fd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80')">
+                        <div class="product-label">Premium</div>
+                    </div>
+                    <div class="product-info">
+                        <div class="product-name">Cashmere Scarf</div>
+                        <div class="product-price">$89.99</div>
+                    </div>
+                    <button class="buy-button">Buy</button>
+                </div>
+                
+                <div class="product-card">
+                    <div class="product-image" style="background-image: url('https://images.unsplash.com/photo-1576871337622-98d48d1cf531?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80')">
+                        <div class="product-label">Best Seller</div>
+                    </div>
+                    <div class="product-info">
+                        <div class="product-name">Wool Knit Cap</div>
+                        <div class="product-price">$29.99</div>
+                    </div>
+                    <button class="buy-button">Buy</button>
+                </div>
+                
+                <div class="product-card">
+                    <div class="product-image" style="background-image: url('https://images.unsplash.com/photo-1519568470290-c0c1fbfff16f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80')">
+                        <div class="product-label">New</div>
+                    </div>
+                    <div class="product-info">
+                        <div class="product-name">Leather Gloves</div>
+                        <div class="product-price">$49.99</div>
+                    </div>
+                    <button class="buy-button">Buy</button>
+                </div>
+            </div>
+        </div>
+        
+        <p><strong>Note:</strong> This is a simple hard-coded version of the carousel with no JavaScript dependencies. If you can see this but not the main widget, there might be JavaScript execution issues in the main implementation.</p>
+    </div>
+</body>
+</html> 

@@ -1,0 +1,86 @@
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Searches</h1>
+    <a href="/searches/new" class="btn btn-primary">New Search</a>
+  </div>
+
+  <div class="list-group">
+    {{#each searches}}
+      <div class="list-group-item">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h5 class="mb-1">
+              {{phrase}}
+              {{#if platform}}
+                <span class="badge bg-primary ms-2">{{platform}}</span>
+              {{/if}}
+              {{#if platformConfig.searchIndex}}
+                <span class="badge bg-secondary ms-2">{{platformConfig.searchIndex}}</span>
+              {{/if}}
+              {{#if credentialName}}
+                <span class="badge bg-info ms-2">creds: {{credentialName}}</span>
+              {{/if}}
+            </h5>
+            <small class="text-muted">Created: {{formatDate createdAt}}</small>
+          </div>
+          <div>
+            <a href="/searches/{{id}}" class="btn btn-sm btn-info">View</a>
+            {{#if phraseID}}
+              {{#if hasTempResults}}
+                <a href="{{tempResultsUrl}}" target="_blank" class="btn btn-sm btn-warning">Product Preview</a>
+                <button type="button" class="btn btn-sm btn-success" onclick="checkFinalResults('{{phraseID}}', '{{resultsJsonUrl}}')">Check Final Results</button>
+              {{/if}}
+            {{/if}}
+            <button type="button" class="btn btn-sm btn-danger" onclick="deleteSearch('{{id}}')">Delete</button>
+          </div>
+        </div>
+      </div>
+    {{else}}
+      <div class="list-group-item">
+        <p class="text-center mb-0">No searches found. <a href="/searches/new">Create one!</a></p>
+      </div>
+    {{/each}}
+  </div>
+</div>
+
+<script>
+async function deleteSearch(id) {
+  if (!confirm('Are you sure you want to delete this search?')) {
+    return;
+  }
+  
+  try {
+    const response = await fetch(`/searches/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    if (response.ok) {
+      window.location.reload();
+    } else {
+      alert('Failed to delete search');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    alert('An error occurred while deleting the search');
+  }
+}
+
+async function checkFinalResults(phraseID, resultsUrl) {
+  try {
+    const response = await fetch(resultsUrl);
+    if (response.ok) {
+      // Final results exist, open them
+      window.open(resultsUrl, '_blank');
+    } else {
+      // Final results don't exist yet
+      alert('Final results are not yet available. The search may still be pending approval.');
+    }
+  } catch (error) {
+    console.error('Error checking final results:', error);
+    alert('Error checking final results. Please try again.');
+  }
+}
+</script> 

@@ -1,0 +1,45 @@
+{
+  "domain": "bleacherreport.com",
+  "analyzed_at": "2025-11-29T00:35:03.165Z",
+  "health_check": {
+    "sdk_present": false,
+    "sdk_version": null,
+    "cdn_url": null,
+    "load_time_ms": null,
+    "checked_pages": [
+      {
+        "url": "https://bleacherreport.com",
+        "type": "homepage"
+      },
+      {
+        "url": "https://shop.bleacherreport.com/?utm_source=NAV&utm_medium=WEB&utm_campaign=EVERGREEN&utm_id=LAUNCH%3Ffrom%3Dmain",
+        "type": "article"
+      }
+    ],
+    "detection_method": "not_found",
+    "deployment_date": null,
+    "errors": [
+      "Mula SDK script tag not found on homepage or article pages"
+    ],
+    "warnings": [
+      "SDK might be deployed via GTM (dynamic loading) - not detectable with static HTML parsing"
+    ]
+  },
+  "traffic_estimate": {
+    "status": "failed",
+    "message": "No data sources available"
+  },
+  "url_patterns": {
+    "status": "failed",
+    "message": "No URLs available"
+  },
+  "deployment_ready": false,
+  "recommendations": [
+    {
+      "priority": "🔴 CRITICAL",
+      "category": "SDK Deployment",
+      "message": "Mula SDK is not deployed. Cannot proceed with targeting configuration.",
+      "action": "Deploy SDK via GTM or direct script tag"
+    }
+  ]
+}

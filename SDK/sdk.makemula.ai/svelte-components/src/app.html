@@ -1,0 +1,35 @@
+<html>
+    <head>
+      %sveltekit.head%
+      <meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+
+    </head>
+    <body>
+      <script id="mula-js-sdk" data-tagId="8933ade8-91ac-42ac-b59c-72ee31072dc3">
+        window.MULA_VERSION = 'edge';
+        window.Mula = {
+          adTag: {
+            type: 'placehold.co',
+            class: 'mula-ad-placeholder'
+          },
+          revContent: {
+            pubId: '198204',
+            widgetId: '287642'
+          },
+          mockHost: 'brit.co',
+          version: "edge",
+          sdkEnvironment: 'development',
+          logLevel: 1,
+          cdnHost: 'http://localhost:3000',
+          sdkVersionRoot: () => {
+            return `${Mula.cdnHost}/sdk/${Mula.version}`;
+          },
+          url: 'https://www.engadget.com/home/smart-home/best-smart-scale-160033523.html'
+        };
+      </script>
+      <div>
+        %sveltekit.body%
+      </div>
+    </body>
+</html>

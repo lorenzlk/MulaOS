@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Widget 12 Standalone - Immersive Product Carousel</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", sans-serif;
+            background-color: #f5f5f7;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        h1 {
+            margin-bottom: 30px;
+            text-align: center;
+            font-weight: 500;
+            color: #1d1d1f;
+        }
+        
+        .container {
+            max-width: 550px;
+            width: 100%;
+        }
+        
+        /* Widget 12 - Immersive Product Carousel */
+        .mula-widget-12 {
+            position: relative;
+            width: 100%;
+            margin: 25px auto;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", sans-serif;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        
+        .mula-header {
+            background: linear-gradient(to right, #121212, #1a1a1a);
+            padding: 20px;
+            color: white;
+            border-radius: 16px 16px 0 0;
+        }
+        
+        .mula-title {
+            margin: 0;
+            font-size: 22px;
+            font-weight: 600;
+            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+        
+        .mula-subtitle {
+            margin: 5px 0 0;
+            font-size: 14px;
+            font-weight: 400;
+            opacity: 0.8;
+        }
+        
+        .mula-immersive-carousel {
+            background: linear-gradient(to bottom, #121212, #1a1a1a);
+            border-radius: 0 0 16px 16px;
+            overflow-x: auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            margin: 0 auto;
+            max-width: 100%;
+            position: relative;
+            padding: 0 20px 20px;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        
+        .mula-immersive-carousel::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .mula-immersive-track {
+            display: flex;
+            gap: 20px;
+            padding: 25px 0;
+            min-width: min-content;
+        }
+        
+        .arrows-container {
+            display: flex;
+            gap: 8px;
+            position: absolute;
+            right: 18px;
+            top: 16px;
+            z-index: 10;
+        }
+        
+        .scroll-indicator {
+            width: 32px;
+            height: 32px;
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 1;
+            transition: all 0.25s cubic-bezier(0.19, 1, 0.22, 1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .scroll-indicator:hover {
+            opacity: 1;
+            transform: scale(1.05);
+            background: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+        }
+        
+        .scroll-indicator:active {
+            transform: scale(0.95);
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .scroll-indicator svg {
+            width: 15px;
+            height: 15px;
+            fill: rgba(255, 255, 255, 0.95);
+        }
+        
+        /* Immersive Card Upgrades */
+        .mula-immersive-card {
+            flex: 0 0 auto;
+            width: 160px;
+            background: rgba(30, 30, 30, 0.6);
+            border-radius: 14px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            position: relative;
+            transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            transform-style: preserve-3d;
+            will-change: transform;
+            transform: translateZ(0);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        .mula-immersive-card:hover {
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3), 0 0 20px rgba(255, 255, 255, 0.1);
+            transform: scale(1.03) translateY(-5px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .mula-immersive-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 14px;
+            padding: 1px;
+            background: linear-gradient(
+                45deg,
+                transparent 0%,
+                rgba(255, 255, 255, 0.1) 45%,
+                rgba(255, 255, 255, 0.3) 50%,
+                rgba(255, 255, 255, 0.1) 55%,
+                transparent 100%
+            );
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: it;
+            transition: opacity 0.4s ease;
+        }
+        
+        .mula-immersive-card:hover::before {
+            opacity: 1;
+            animation: borderGlow 2s linear infinite;
+        }
+        
+        @keyframes borderGlow {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 200% 0%; }
+        }
+        
+        .mula-immersive-image {
+            height: 160px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            transition: all 0.5s ease;
+            border: none;
+        }
+        
+        /* Enhanced image overlay gradient */
+        .mula-immersive-image::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 80%;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.5) 50%, rgba(0, 0, 0, 0) 100%);
+            z-index: 1;
+        }
+        
+        .mula-immersive-label {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background: rgba(0, 0, 0, 0.6);
+            color: rgba(255, 255, 255, 0.95);
+            padding: 5px 10px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            z-index: 2;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .mula-like-button {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            z-index: 2;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .mula-like-button:hover {
+            background: rgba(255, 55, 95, 0.4);
+            transform: scale(1.1);
+        }
+        
+        .mula-like-button svg {
+            width: 15px;
+            height: 15px;
+            fill: transparent;
+            stroke: white;
+            stroke-width: 1.5;
+            transition: all 0.3s ease;
+        }
+        
+        .mula-like-button.active {
+            background: rgba(255, 55, 95, 0.8);
+            transform: scale(1.1);
+        }
+        
+        .mula-like-button.active svg {
+            fill: white;
+        }
+        
+        .mula-immersive-info {
+            padding: 16px 14px 14px;
+            flex-grow: 1;
+            background-color: rgba(20, 20, 20, 0.9);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            position: relative;
+            z-index: 2;
+        }
+        
+        .mula-immersive-name {
+            color: white;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 4px;
+            line-height: 1.3;
+            letter-spacing: -0.01em;
+        }
+        
+        .mula-immersive-price {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 13px;
+            font-weight: 400;
+            letter-spacing: 0.02em;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .mula-immersive-price::before {
+            content: '';
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #30d158;
+            border-radius: 50%;
+        }
+        
+        .mula-buy-button {
+            color: white;
+            font-size: 13px;
+            font-weight: 500;
+            letter-spacing: 0.02em;
+            padding: 12px 0;
+            width: 100%;
+            text-align: center;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+            overflow: hidden;
+            position: relative;
+            border-radius: 0 0 14px 14px;
+            background: linear-gradient(to right, #FF375F, #FF4D4D);
+        }
+        
+        .mula-buy-button:hover {
+            background: linear-gradient(to right, #FF4D4D, #FF375F);
+            box-shadow: 0 0 20px rgba(255, 55, 95, 0.4);
+        }
+        
+        .mula-buy-button::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.4) 0%, transparent 50%);
+            opacity: 0;
+            transform: scale(1);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+        
+        .mula-buy-button:active::after {
+            opacity: 1;
+            transform: scale(0);
+            transition: transform 0.2s ease-out;
+        }
+        
+        /* Product Rating Stars */
+        .mula-product-rating {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin: 5px 0;
+        }
+        
+        .rating-stars {
+            display: flex;
+        }
+        
+        .star {
+            color: #FFD700;
+            font-size: 10px;
+        }
+        
+        .star.half {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .star.half::after {
+            content: '★';
+            color: rgba(255, 255, 255, 0.3);
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 50%;
+            overflow: hidden;
+        }
+        
+        .star.empty {
+            color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .rating-count {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        /* Category Badge Colors */
+        .mula-immersive-label[data-category="Premium"] {
+            background: linear-gradient(135deg, rgba(138, 43, 226, 0.7), rgba(148, 0, 211, 0.7));
+        }
+        
+        .mula-immersive-label[data-category="New"] {
+            background: linear-gradient(135deg, rgba(0, 122, 255, 0.7), rgba(10, 132, 255, 0.7));
+        }
+        
+        .mula-immersive-label[data-category="Limited"] {
+            background: linear-gradient(135deg, rgba(255, 149, 0, 0.7), rgba(255, 159, 10, 0.7));
+        }
+        
+        .mula-immersive-label[data-category="Sale"] {
+            background: linear-gradient(135deg, rgba(255, 45, 85, 0.7), rgba(255, 55, 95, 0.7));
+        }
+        
+        .mula-immersive-label[data-category="Popular"] {
+            background: linear-gradient(135deg, rgba(48, 209, 88, 0.7), rgba(52, 199, 89, 0.7));
+        }
+        
+        /* Quick View Modal Styles */
+        .quick-view-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        
+        .quick-view-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .quick-view-content {
+            background: rgba(20, 20, 20, 0.95);
+            border-radius: 16px;
+            width: 85%;
+            max-width: 900px;
+            max-height: 85vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            transform: scale(0.9);
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .quick-view-modal.active .quick-view-content {
+            transform: scale(1);
+            opacity: 1;
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(0, 0, 0, 0.5);
+            border: none;
+            color: white;
+            font-size: 24px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+        
+        .close-modal:hover {
+            background: rgba(255, 55, 95, 0.7);
+            transform: scale(1.1);
+        }
+        
+        @media (min-width: 768px) {
+            .quick-view-content {
+                flex-direction: row;
+                overflow: hidden;
+            }
+            
+            .product-image {
+                width: 50%;
+                height: auto;
+            }
+            
+            .product-details {
+                width: 50%;
+                overflow-y: auto;
+            }
+        }
+        
+        .product-image {
+            height: 250px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        
+        .product-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: linear-gradient(135deg, rgba(0, 122, 255, 0.7), rgba(10, 132, 255, 0.7));
+            color: white;
+            padding: 5px 10px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            z-index: 2;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .product-badge[data-category="Premium"] {
+            background: linear-gradient(135deg, rgba(138, 43, 226, 0.7), rgba(148, 0, 211, 0.7));
+        }
+        
+        .product-badge[data-category="New"] {
+            background: linear-gradient(135deg, rgba(0, 122, 255, 0.7), rgba(10, 132, 255, 0.7));
+        }
+        
+        .product-badge[data-category="Limited"] {
+            background: linear-gradient(135deg, rgba(255, 149, 0, 0.7), rgba(255, 159, 10, 0.7));
+        }
+        
+        .product-badge[data-category="Sale"] {
+            background: linear-gradient(135deg, rgba(255, 45, 85, 0.7), rgba(255, 55, 95, 0.7));
+        }
+        
+        .product-badge[data-category="Popular"] {
+            background: linear-gradient(135deg, rgba(48, 209, 88, 0.7), rgba(52, 199, 89, 0.7));
+        }
+        
+        .product-details {
+            padding: 25px;
+            color: white;
+        }
+        
+        .product-name {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            letter-spacing: -0.01em;
+        }
+        
+        .product-rating {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .product-rating .star {
+            font-size: 14px;
+        }
+        
+        .rating-count {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .product-price {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #30d158;
+        }
+        
+        .product-description {
+            font-size: 16px;
+            line-height: 1.5;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 25px;
+        }
+        
+        .product-actions {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .add-to-cart-btn, .buy-now-btn {
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+        
+        .add-to-cart-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .add-to-cart-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .buy-now-btn {
+            background: linear-gradient(to right, #FF375F, #FF4D4D);
+            color: white;
+            box-shadow: 0 4px 10px rgba(255, 55, 95, 0.3);
+        }
+        
+        .buy-now-btn:hover {
+            background: linear-gradient(to right, #FF4D4D, #FF375F);
+            box-shadow: 0 6px 15px rgba(255, 55, 95, 0.4);
+            transform: translateY(-2px);
+        }
+        
+        @media (max-width: 767px) {
+            .product-actions {
+                flex-direction: column;
+            }
+            
+            .product-name {
+                font-size: 20px;
+            }
+            
+            .product-price {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="mula-widget-12">
+            <div class="mula-header">
+                <div class="mula-title-container">
+                    <h1 class="mula-title">Immersive Product Showcase</h1>
+                    <h2 class="mula-subtitle">Premium tech essentials with 3D effects</h2>
+                </div>
+                <div class="arrows-container">
+                    <div class="scroll-indicator prev-indicator">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="scroll-indicator next-indicator">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9 6L15 12L9 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            <div class="mula-immersive-carousel">
+                <div class="mula-immersive-track">
+                    <!-- Product cards will be dynamically inserted here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Product data for the carousel
+            const products = [
+                {
+                    id: 1,
+                    name: "Sony WH-1000XM5",
+                    price: "$349",
+                    imageUrl: "https://placehold.co/600x400/000000/ffffff?text=Sony+Headphones",
+                    category: "Premium",
+                    rating: 4.8,
+                    reviews: 2453
+                },
+                {
+                    id: 2,
+                    name: "Apple Watch Ultra",
+                    price: "$799",
+                    imageUrl: "https://placehold.co/600x400/000000/ffffff?text=Apple+Watch",
+                    category: "New",
+                    rating: 4.9,
+                    reviews: 1872
+                },
+                {
+                    id: 3,
+                    name: "Sony ZV-1 II Camera",
+                    price: "$899",
+                    imageUrl: "https://placehold.co/600x400/000000/ffffff?text=Sony+Camera",
+                    category: "Limited",
+                    rating: 4.7,
+                    reviews: 1356
+                },
+                {
+                    id: 4,
+                    name: "Sonos Era 300",
+                    price: "$449",
+                    imageUrl: "https://placehold.co/600x400/000000/ffffff?text=Sonos+Speaker",
+                    category: "Popular",
+                    rating: 4.6,
+                    reviews: 987
+                },
+                {
+                    id: 5,
+                    name: "MacBook Pro M3",
+                    price: "$1999",
+                    imageUrl: "https://placehold.co/600x400/000000/ffffff?text=MacBook+Pro",
+                    category: "Premium",
+                    rating: 4.9,
+                    reviews: 3241
+                },
+                {
+                    id: 6,
+                    name: "DJI Mavic 3 Pro",
+                    price: "$1599",
+                    imageUrl: "https://placehold.co/600x400/000000/ffffff?text=DJI+Drone",
+                    category: "Limited",
+                    rating: 4.8,
+                    reviews: 752
+                }
+            ];
+
+            // Helper function to create star rating HTML
+            function createStarRating(rating) {
+                const fullStars = Math.floor(rating);
+                const hasHalfStar = rating % 1 >= 0.5;
+                const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+                
+                let starsHTML = '';
+                for (let i = 0; i < fullStars; i++) {
+                    starsHTML += '<span class="star">★</span>';
+                }
+                if (hasHalfStar) {
+                    starsHTML += '<span class="star half">★</span>';
+                }
+                for (let i = 0; i < emptyStars; i++) {
+                    starsHTML += '<span class="star empty">★</span>';
+                }
+                
+                return starsHTML;
+            }
+
+            // Initialize the carousel
+            const track = document.querySelector('.mula-immersive-track');
+            const prevBtn = document.querySelector('.prev-indicator');
+            const nextBtn = document.querySelector('.next-indicator');
+            
+            // Create and render product cards
+            products.forEach(product => {
+                const card = document.createElement('div');
+                card.className = 'mula-immersive-card';
+                card.dataset.productId = product.id;
+                
+                card.innerHTML = `
+                    <div class="mula-immersive-image" style="background-image: url('${product.imageUrl}')">
+                        <div class="mula-immersive-label" data-category="${product.category}">${product.category}</div>
+                        <button class="mula-like-button">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="mula-immersive-info">
+                        <div class="mula-immersive-name">${product.name}</div>
+                        <div class="mula-product-rating">
+                            <div class="rating-stars">
+                                ${createStarRating(product.rating)}
+                            </div>
+                            <div class="rating-count">(${product.reviews})</div>
+                        </div>
+                        <div class="mula-immersive-price">${product.price}</div>
+                    </div>
+                    <button class="mula-buy-button">Buy Now</button>
+                `;
+                
+                track.appendChild(card);
+            });
+            
+            // Setup scroll buttons
+            nextBtn.addEventListener('click', () => {
+                const carousel = document.querySelector('.mula-immersive-carousel');
+                carousel.scrollBy({ left: 200, behavior: 'smooth' });
+            });
+            
+            prevBtn.addEventListener('click', () => {
+                const carousel = document.querySelector('.mula-immersive-carousel');
+                carousel.scrollBy({ left: -200, behavior: 'smooth' });
+            });
+            
+            // Setup card interaction
+            const cards = document.querySelectorAll('.mula-immersive-card');
+            
+            cards.forEach(card => {
+                // 3D tilt effect
+                card.addEventListener('mousemove', e => {
+                    const cardRect = card.getBoundingClientRect();
+                    const cardCenterX = cardRect.left + cardRect.width / 2;
+                    const cardCenterY = cardRect.top + cardRect.height / 2;
+                    
+                    const mouseX = e.clientX - cardCenterX;
+                    const mouseY = e.clientY - cardCenterY;
+                    
+                    const rotateY = mouseX * 0.05;
+                    const rotateX = -mouseY * 0.05;
+                    
+                    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+                });
+                
+                card.addEventListener('mouseleave', () => {
+                    card.style.transform = '';
+                });
+                
+                // Like button functionality
+                const likeButton = card.querySelector('.mula-like-button');
+                likeButton.addEventListener('click', e => {
+                    e.stopPropagation();
+                    likeButton.classList.toggle('active');
+                });
+                
+                // Buy button functionality
+                const buyButton = card.querySelector('.mula-buy-button');
+                buyButton.addEventListener('click', e => {
+                    e.stopPropagation();
+                    const productId = card.dataset.productId;
+                    const product = products.find(p => p.id == productId);
+                    alert(`Added ${product.name} to cart!`);
+                });
+                
+                // Card click for quick view
+                card.addEventListener('click', () => {
+                    const productId = card.dataset.productId;
+                    const product = products.find(p => p.id == productId);
+                    openQuickView(product);
+                });
+            });
+            
+            // Quick view functionality
+            function openQuickView(product) {
+                let modal = document.getElementById('quick-view-modal');
+                if (!modal) {
+                    modal = document.createElement('div');
+                    modal.id = 'quick-view-modal';
+                    modal.className = 'quick-view-modal';
+                    document.body.appendChild(modal);
+                }
+                
+                modal.innerHTML = `
+                    <div class="quick-view-content">
+                        <button class="close-modal">&times;</button>
+                        <div class="product-image" style="background-image: url('${product.imageUrl}')">
+                            <div class="product-badge" data-category="${product.category}">${product.category}</div>
+                        </div>
+                        <div class="product-details">
+                            <h2 class="product-name">${product.name}</h2>
+                            <div class="product-rating">
+                                <div class="rating-stars">${createStarRating(product.rating)}</div>
+                                <div class="rating-count">${product.reviews} reviews</div>
+                            </div>
+                            <div class="product-price">${product.price}</div>
+                            <p class="product-description">Experience the ultimate in technology with the ${product.name}. This premium product offers exceptional performance and innovative features to enhance your daily life.</p>
+                            <div class="product-actions">
+                                <button class="add-to-cart-btn">Add to Cart</button>
+                                <button class="buy-now-btn">Buy Now</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Add event listeners
+                modal.querySelector('.close-modal').addEventListener('click', () => {
+                    closeQuickView();
+                });
+                
+                modal.querySelector('.add-to-cart-btn').addEventListener('click', () => {
+                    alert(`Added ${product.name} to cart!`);
+                });
+                
+                modal.querySelector('.buy-now-btn').addEventListener('click', () => {
+                    alert(`Proceeding to checkout for ${product.name}`);
+                });
+                
+                // Close when clicking outside the modal content
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        closeQuickView();
+                    }
+                });
+                
+                // Show modal with animation
+                document.body.appendChild(modal);
+                setTimeout(() => {
+                    modal.classList.add('active');
+                }, 10);
+                
+                // Add keyboard event listener for ESC key
+                document.addEventListener('keydown', handleEscKey);
+            }
+            
+            function closeQuickView() {
+                const modal = document.getElementById('quick-view-modal');
+                if (modal) {
+                    modal.classList.remove('active');
+                    setTimeout(() => {
+                        modal.remove();
+                    }, 300);
+                }
+                
+                // Remove keyboard event listener
+                document.removeEventListener('keydown', handleEscKey);
+            }
+            
+            function handleEscKey(e) {
+                if (e.key === 'Escape') {
+                    closeQuickView();
+                }
+            }
+        });
+    </script>
+</body>
+</html>

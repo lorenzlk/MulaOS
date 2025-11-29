@@ -1,0 +1,40 @@
+{
+  "cfb": {
+    "ohio-state": {
+      "name": "Ohio State",
+      "nickname": "Buckeyes",
+      "rivals": ["Michigan", "Penn State", "Michigan State"]
+    },
+    "michigan": {
+      "name": "Michigan",
+      "nickname": "Wolverines",
+      "rivals": ["Ohio State", "Michigan State", "Notre Dame"]
+    },
+    "alabama": {
+      "name": "Alabama",
+      "nickname": "Crimson Tide",
+      "rivals": ["Auburn", "LSU", "Tennessee"]
+    },
+    "georgia": {
+      "name": "Georgia",
+      "nickname": "Bulldogs",
+      "rivals": ["Florida", "Auburn", "Georgia Tech"]
+    },
+    "auburn": {
+      "name": "Auburn",
+      "nickname": "Tigers",
+      "rivals": ["Alabama", "Georgia"]
+    },
+    "lsu": {
+      "name": "LSU",
+      "nickname": "Tigers",
+      "rivals": ["Alabama", "Ole Miss"]
+    },
+    "penn-state": {
+      "name": "Penn State",
+      "nickname": "Nittany Lions",
+      "rivals": ["Ohio State", "Michigan"]
+    }
+  }
+}
+

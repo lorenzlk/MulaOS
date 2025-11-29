@@ -1,0 +1,9 @@
+.DS_Store
+/node_modules/
+dist/
+.env
+*.key
+*.pem
+demo-dist/
+data/*
+.aider*

@@ -1,0 +1,8 @@
+node_modules/
+.env
+data/
+.DS_Store
+
+# exceptions
+!data/www.engadget.com/pages/0b1a1e239a561a0fb344d546089309d6fa09fbad9d4379e55773585dd7d4260a/
+

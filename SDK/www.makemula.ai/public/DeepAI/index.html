@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Mula Widget Frame</title>
+  <script src="https://cdn.makemula.ai/js/mula.js" defer></script>
+  <script>
+    window.Mula = Object.assign(window.Mula || {}, {
+        auto: true,
+        organicConfig: {
+            searchPhrases: ["trendy sunglasses"]
+        }
+    });
+    const checkMulaInterval = setInterval(() => {
+      if (window.Mula && typeof window.Mula.boot === 'function') {
+        clearInterval(checkMulaInterval);
+        window.Mula.boot().then(() => {
+          document.body.appendChild(document.createElement('mula-topshelf'));
+        });
+      }
+    }, 1000);
+  </script>
+</head>
+
+<body>
+  <h1>Make Mula example usage</h1>
+  <article>
+    <p>This is paragraph one. Where to buy shoes and fantasy games.</p>
+    <p>This is paragraph two. Some engaging content lives here.</p>
+    <p>This is the end of the article.</p>
+  </article>
+  
+</body>
+</html>

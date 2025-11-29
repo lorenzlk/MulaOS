@@ -1,0 +1,11 @@
+{
+  "name": "daily-store-clicks",
+  "description": "Daily store click analytics report",
+  "cron": "0 9 * * *",
+  "query": "store-clicks",
+  "parameters": {
+    "days_back": 1
+  },
+  "output_location": "s3://prod.makemula.ai/athena-results/store-clicks/",
+  "created_at": "2024-01-01T00:00:00.000Z"
+} 

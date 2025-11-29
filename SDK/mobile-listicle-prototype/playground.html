@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Widget Playground</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", sans-serif;
+            background-color: #f5f5f7;
+            margin: 0;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        h1 {
+            margin-bottom: 10px;
+            text-align: center;
+            font-weight: 400;
+            font-size: 48px;
+            color: #333;
+        }
+        
+        .subtitle {
+            margin-bottom: 40px;
+            text-align: center;
+            color: #666;
+            font-size: 18px;
+            font-weight: 300;
+        }
+        
+        .navigation-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 30px;
+        }
+        
+        .nav-tab {
+            padding: 8px 16px 8px 28px;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: "SF Pro Text", -apple-system, BlinkMacSystemFont, sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        
+        .nav-tab::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            width: 6px;
+            height: 6px;
+            background: #ff3b30;
+            border-radius: 50%;
+            transform: translateY(-50%);
+            transition: background-color 0.2s ease;
+        }
+        
+        .nav-tab:hover {
+            background: rgba(0, 0, 0, 0.8);
+            transform: translateY(-1px);
+        }
+        
+        .nav-tab.active {
+            background: rgba(0, 0, 0, 0.9);
+        }
+        
+        .nav-tab.active::before {
+            background: #30d158;
+        }
+        
+        .widgets-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+            width: 100%;
+            max-width: 1400px;
+        }
+        
+        .widget-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+        }
+        
+        .widget-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+        }
+        
+        .widget-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .widget-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .widget-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .widget-button {
+            background: #f5f5f7;
+            border: none;
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #555;
+            z-index: 2;
+        }
+        
+        .widget-button:hover {
+            background: #e5e5ea;
+        }
+        
+        .widget-content {
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            min-height: 300px;
+        }
+        
+        .widget-iframe {
+            border: none;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+        }
+        
+        .widget-iframe::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+        
+        .widget-description {
+            font-size: 14px;
+            color: #666;
+            margin-top: 10px;
+            line-height: 1.4;
+            padding: 0 20px 20px;
+        }
+        
+        /* Styling for the iframe container of widget 10 to match others */
+        .widget-iframe-container {
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            min-height: 300px;
+        }
+        
+        /* Make sure any iframe has consistent styling */
+        iframe {
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+        }
+        
+        iframe::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+        
+        /* Widget 11 - Interactive Product Showcase styles */
+        .showcase-preview {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+        }
+        
+        .showcase-preview h3 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: #333;
+            font-weight: 500;
+        }
+        
+        .showcase-container {
+            width: 100%;
+            max-width: 320px;
+            position: relative;
+        }
+        
+        .product-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px) rotateX(2deg) rotateY(-2deg);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+        }
+        
+        .product-relevance {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background: rgba(0, 122, 255, 0.9);
+            color: white;
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 500;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 2;
+            transform: translateZ(5px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .product-image {
+            height: 200px;
+            background-image: url('https://source.unsplash.com/random/400x400/?headphones');
+            background-size: cover;
+            background-position: center;
+            transition: transform 0.5s ease;
+            position: relative;
+        }
+        
+        .product-card:hover .product-image {
+            transform: scale(1.05);
+        }
+        
+        .product-details {
+            padding: 15px;
+            background: white;
+        }
+        
+        .product-details h4 {
+            margin: 0 0 8px 0;
+            font-weight: 500;
+            font-size: 16px;
+            color: #333;
+        }
+        
+        .product-rating {
+            color: #ff9500;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        
+        .product-rating span {
+            color: #999;
+            font-size: 12px;
+        }
+        
+        .product-price {
+            font-weight: 600;
+            color: #333;
+            font-size: 16px;
+        }
+        
+        .product-actions {
+            display: flex;
+            padding: 0 15px 15px;
+            gap: 10px;
+        }
+        
+        .product-actions button {
+            flex: 1;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .view-btn {
+            background: #007aff;
+            color: white;
+        }
+        
+        .view-btn:hover {
+            background: #0066d6;
+        }
+        
+        .save-btn {
+            background: #f2f2f7;
+            color: #555;
+        }
+        
+        .save-btn:hover {
+            background: #e2e2e7;
+        }
+        
+        .scroll-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 20px;
+        }
+        
+        .scroll-indicator span {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ccc;
+            transition: all 0.3s ease;
+        }
+        
+        .scroll-indicator span.active {
+            background: #007aff;
+            width: 20px;
+            border-radius: 10px;
+        }
+        
+        /* Modal overlay styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+        
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-container {
+            background-color: white;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 1200px;
+            height: 85vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transform: scale(0.95);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        }
+        
+        .modal-overlay.active .modal-container {
+            transform: scale(1);
+            opacity: 1;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .modal-title {
+            font-size: 20px;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .modal-button {
+            background: #f5f5f7;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #555;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .modal-button:hover {
+            background: #e5e5ea;
+        }
+        
+        .modal-button.close {
+            background: #ff3b30;
+            color: white;
+        }
+        
+        .modal-button.close:hover {
+            background: #ff2d20;
+        }
+        
+        .modal-content {
+            flex-grow: 1;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .modal-iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        .placeholder-content {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-size: 18px;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        /* For buttons that shouldn't trigger card click */
+        .stop-propagation {
+            position: relative;
+            z-index: 2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Widget Playground</h1>
+    <p class="subtitle">Explore standalone widget prototypes without the phone mockup context</p>
+    
+    <div class="navigation-tabs">
+        <button class="nav-tab" data-page="sandbox">Sandbox</button>
+        <button class="nav-tab" data-page="metrics">Behavior Metrics</button>
+        <button class="nav-tab" data-page="strategies">Content Engagement Strategies</button>
+        <button class="nav-tab active" data-page="playground">Playground</button>
+    </div>
+    
+    <div class="widgets-grid">
+        <!-- Widget 7 - Sticky Carousel -->
+        <div class="widget-card" data-widget-src="widget7-standalone.html">
+            <div class="widget-header">
+                <div class="widget-title">Widget 7 - Sticky Carousel</div>
+                <div class="widget-actions">
+                    <button class="widget-button stop-propagation" onclick="window.open('widget7-standalone.html', '_blank'); event.stopPropagation();">Demo</button>
+                </div>
+            </div>
+            <div class="widget-content">
+                <iframe class="widget-iframe" src="widget7-standalone.html"></iframe>
+            </div>
+            <div class="widget-description">
+                A horizontal scrolling carousel with smooth animations and interactive card elements.
+            </div>
+        </div>
+        
+        <!-- Widget 7B - Flip Card Carousel -->
+        <div class="widget-card" data-widget-src="widget7B-standalone.html">
+            <div class="widget-header">
+                <div class="widget-title">Widget 7B - Flip Card Carousel</div>
+                <div class="widget-actions">
+                    <button class="widget-button stop-propagation" onclick="window.open('widget7B-standalone.html', '_blank'); event.stopPropagation();">Demo</button>
+                </div>
+            </div>
+            <div class="widget-content">
+                <iframe class="widget-iframe" src="widget7B-standalone.html"></iframe>
+            </div>
+            <div class="widget-description">
+                A carousel with flippable cards that reveal discount offers with confetti animation.
+            </div>
+        </div>
+        
+        <!-- Widget 8 - Interactive Poll -->
+        <div class="widget-card" data-widget-src="widget8-standalone.html">
+            <div class="widget-header">
+                <div class="widget-title">Widget 8 - Interactive Poll</div>
+                <div class="widget-actions">
+                    <button class="widget-button stop-propagation" onclick="window.open('widget8-standalone.html', '_blank'); event.stopPropagation();">Demo</button>
+                </div>
+            </div>
+            <div class="widget-content">
+                <iframe class="widget-iframe" src="widget8-standalone.html"></iframe>
+            </div>
+            <div class="widget-description">
+                A simple voting interface with real-time results visualization and animated feedback.
+            </div>
+        </div>
+        
+        <!-- Widget 9 - Expandable Article Preview -->
+        <div class="widget-card" data-widget-src="widget9-standalone.html">
+            <div class="widget-header">
+                <div class="widget-title">Widget 9 - Expandable Article Preview</div>
+                <div class="widget-actions">
+                    <button class="widget-button stop-propagation" onclick="window.open('widget9-standalone.html', '_blank'); event.stopPropagation();">Demo</button>
+                </div>
+            </div>
+            <div class="widget-content">
+                <iframe class="widget-iframe" src="widget9-standalone.html"></iframe>
+            </div>
+            <div class="widget-description">
+                A collapsible article preview that reveals additional content with smooth transitions.
+            </div>
+        </div>
+        
+        <!-- Widget 10 - Single Article Preview -->
+        <div class="widget-card" data-widget-src="widget10-standalone.html">
+            <div class="widget-header">
+                <div class="widget-title">Widget 10 - Single Article Preview</div>
+                <div class="widget-actions">
+                    <button class="widget-button stop-propagation" onclick="window.open('widget10-standalone.html', '_blank'); event.stopPropagation();">Demo</button>
+                </div>
+            </div>
+            <div class="widget-content">
+                <iframe class="widget-iframe" src="widget10-standalone.html"></iframe>
+            </div>
+            <div class="widget-description">
+                A compact content card with an expandable view for displaying article summaries.
+            </div>
+        </div>
+        
+        <!-- Widget 11 - Interactive Product Showcase -->
+        <div class="widget-card" data-widget-src="widget11-standalone.html">
+            <div class="widget-header">
+                <div class="widget-title">Widget 11 - Interactive Product Showcase</div>
+                <div class="widget-actions">
+                    <button class="widget-button stop-propagation" onclick="window.open('widget11-standalone.html', '_blank'); event.stopPropagation();">Demo</button>
+                </div>
+            </div>
+            <div class="widget-content">
+                <div class="placeholder-content">
+                    <div class="showcase-preview">
+                        <h3>Contextual Product Discovery</h3>
+                        <div class="showcase-container">
+                            <div class="product-card">
+                                <div class="product-relevance">Mentioned in article</div>
+                                <div class="product-image"></div>
+                                <div class="product-details">
+                                    <h4>Sony WH-1000XM5</h4>
+                                    <div class="product-rating">★★★★★ <span>(4.8/5)</span></div>
+                                    <div class="product-price">$348.00</div>
+                                </div>
+                                <div class="product-actions">
+                                    <button class="view-btn">Quick View</button>
+                                    <button class="save-btn">Save</button>
+                                </div>
+                            </div>
+                            <div class="scroll-indicator">
+                                <span class="active"></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="widget-description">
+                An interactive product display with quick-view functionality and purchase options.
+            </div>
+        </div>
+        
+        <!-- Widget 15 - Vertical Product Feed -->
+        <div class="widget-card" data-widget-src="widget15-standalone.html">
+            <div class="widget-header">
+                <div class="widget-title">Widget 15 - Vertical Product Feed</div>
+                <div class="widget-actions">
+                    <button class="widget-button stop-propagation" onclick="window.open('widget15-standalone.html', '_blank'); event.stopPropagation();">Demo</button>
+                </div>
+            </div>
+            <div class="widget-content">
+                <iframe class="widget-iframe" src="widget15-standalone.html"></iframe>
+            </div>
+            <div class="widget-description">
+                A responsive vertical feed of product cards with grid/list toggle, hover animations, and interactive save/view options.
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Overlay for Widget Expansion -->
+    <div class="modal-overlay" id="widgetModal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <div class="modal-title" id="modalTitle">Widget Preview</div>
+                <div class="modal-actions">
+                    <button class="modal-button" id="openFullscreen">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"></path>
+                        </svg>
+                        Demo
+                    </button>
+                    <button class="modal-button close" id="closeModal">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                        Close
+                    </button>
+                </div>
+            </div>
+            <div class="modal-content">
+                <iframe class="modal-iframe" id="modalIframe" src="about:blank"></iframe>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Add navigation tab functionality
+        const navTabs = document.querySelectorAll('.nav-tab');
+        navTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const page = tab.dataset.page;
+                
+                if (page === 'sandbox') {
+                    window.location.href = '/';
+                } else if (page === 'metrics') {
+                    window.location.href = './src/behavior-metrics.html';
+                } else if (page === 'strategies') {
+                    window.location.href = './src/content-engagement.html';
+                } else if (page === 'playground') {
+                    window.location.href = './playground.html';
+                }
+            });
+        });
+        
+        // Modal functionality
+        const modal = document.getElementById('widgetModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalIframe = document.getElementById('modalIframe');
+        const openFullscreenBtn = document.getElementById('openFullscreen');
+        const closeModalBtn = document.getElementById('closeModal');
+        
+        // Function to open the modal with a specific widget
+        function openWidgetModal(title, src) {
+            modalTitle.textContent = title;
+            modalIframe.src = src;
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden'; // Prevent scrolling behind modal
+            
+            // Update fullscreen button
+            openFullscreenBtn.onclick = () => window.open(src, '_blank');
+        }
+        
+        // Close modal function
+        function closeWidgetModal() {
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+            
+            // Give time for the animation before resetting iframe
+            setTimeout(() => {
+                modalIframe.src = 'about:blank';
+            }, 300);
+        }
+        
+        // Add event listeners for widget cards
+        const widgetCards = document.querySelectorAll('.widget-card:not(.placeholder-card)');
+        widgetCards.forEach(card => {
+            card.addEventListener('click', function(e) {
+                // Don't open modal if clicking on a stop-propagation element
+                if (e.target.closest('.stop-propagation')) {
+                    return;
+                }
+                
+                const title = this.querySelector('.widget-title').textContent;
+                const src = this.dataset.widgetSrc;
+                
+                if (src) {
+                    openWidgetModal(title, src);
+                }
+            });
+        });
+        
+        // Close modal when clicking the close button
+        closeModalBtn.addEventListener('click', closeWidgetModal);
+        
+        // Close modal when clicking outside the modal content
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                closeWidgetModal();
+            }
+        });
+        
+        // Close modal with escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && modal.classList.contains('active')) {
+                closeWidgetModal();
+            }
+        });
+    </script>
+</body>
+</html> 

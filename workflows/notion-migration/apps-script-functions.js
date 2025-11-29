@@ -585,7 +585,121 @@ function showAddContactDialog() {
 }
 
 function showAddProjectDialog() {
-  SpreadsheetApp.getUi().alert('Add Project dialog - To be implemented');
+  /**
+   * Shows the Add Project dialog
+   */
+  const html = HtmlService.createHtmlOutputFromFile('AddProjectDialog')
+    .setWidth(500)
+    .setHeight(600);
+  SpreadsheetApp.getUi().showModalDialog(html, 'Add New Project');
+}
+
+function getAccountsForDialog() {
+  /**
+   * Gets accounts for the dialog dropdown
+   * @return {Array} Array of {id, name} objects
+   */
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName('Accounts');
+  if (!sheet) return [];
+  
+  const data = sheet.getDataRange().getValues();
+  const accounts = [];
+  
+  // Skip header row
+  for (let i = 1; i < data.length; i++) {
+    const accountID = data[i][0]; // Column A (ID)
+    const accountName = data[i][1]; // Column B (Account Name)
+    
+    if (accountID && accountName) {
+      accounts.push({
+        id: accountID,
+        name: accountName
+      });
+    }
+  }
+  
+  return accounts;
+}
+
+function addProject(formData) {
+  /**
+   * Adds a new project from the dialog form
+   * @param {Object} formData - Form data from dialog
+   * @return {Object} Result object with success/error
+   */
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const sheet = ss.getSheetByName('Projects');
+    if (!sheet) {
+      return { success: false, error: 'Projects sheet not found' };
+    }
+    
+    // Validate required fields
+    if (!formData.projectName || formData.projectName.trim() === '') {
+      return { success: false, error: 'Project name is required' };
+    }
+    
+    if (!formData.status) {
+      return { success: false, error: 'Status is required' };
+    }
+    
+    if (!formData.priority) {
+      return { success: false, error: 'Priority is required' };
+    }
+    
+    // Generate Project ID
+    const projectID = generateProjectID(formData.projectName);
+    
+    // Get current date
+    const today = new Date();
+    
+    // Prepare account IDs (comma-separated)
+    const accountIDs = formData.accountIds && formData.accountIds.length > 0
+      ? formData.accountIds.join(',')
+      : '';
+    
+    // Prepare row data (matching Projects sheet columns)
+    const values = [
+      projectID,                                    // ID
+      formData.projectName.trim(),                   // Project Name
+      formData.summary || '',                       // Summary
+      formData.status,                              // Status
+      formData.owner || '',                         // Owner
+      formData.priority,                            // Priority
+      '',                                           // Completion (calculated later)
+      formData.dates || '',                         // Dates
+      today,                                        // Last Updated
+      accountIDs,                                   // Related Account IDs
+      today,                                        // Created Date
+      formData.notes || ''                          // Notes
+    ];
+    
+    // Add row to sheet
+    sheet.appendRow(values);
+    
+    // Log activity
+    logActivity(
+      'Project',
+      projectID,
+      'Created',
+      Session.getActiveUser().getEmail(),
+      'Project Name',
+      '',
+      formData.projectName,
+      `New project created: ${formData.projectName}`
+    );
+    
+    return { 
+      success: true, 
+      projectID: projectID,
+      message: `Project "${formData.projectName}" added successfully`
+    };
+    
+  } catch (error) {
+    Logger.log('Error adding project: ' + error.toString());
+    return { success: false, error: error.toString() };
+  }
 }
 
 function showAddTaskDialog() {

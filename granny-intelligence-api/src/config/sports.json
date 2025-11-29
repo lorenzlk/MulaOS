@@ -1,0 +1,46 @@
+{
+  "cfb": {
+    "season_start": "2025-08-28",
+    "season_end": "2026-01-20",
+    "rivalry_week": {
+      "start": "2025-11-20",
+      "end": "2025-11-30"
+    },
+    "conference_championships": {
+      "start": "2025-12-01",
+      "end": "2025-12-07"
+    },
+    "playoffs": {
+      "start": "2025-12-20",
+      "end": "2026-01-20"
+    }
+  },
+  "nfl": {
+    "season_start": "2025-09-05",
+    "season_end": "2026-02-09",
+    "playoffs": {
+      "start": "2026-01-11",
+      "end": "2026-01-31"
+    },
+    "super_bowl": {
+      "date": "2026-02-09"
+    }
+  },
+  "nba": {
+    "season_start": "2025-10-22",
+    "season_end": "2026-06-21",
+    "playoffs": {
+      "start": "2026-04-18",
+      "end": "2026-06-21"
+    }
+  },
+  "college-basketball": {
+    "season_start": "2025-11-01",
+    "season_end": "2026-04-07",
+    "march_madness": {
+      "start": "2026-03-17",
+      "end": "2026-04-07"
+    }
+  }
+}
+

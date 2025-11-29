@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mula Sales Enablement Tool Demo</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            background: #fafafa;
+        }
+        .section h2 {
+            color: #007bff;
+            margin-top: 0;
+        }
+        .demo-content {
+            background: #fff;
+            padding: 15px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            margin: 10px 0;
+        }
+        .instructions {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .instructions h3 {
+            margin-top: 0;
+            color: #1976d2;
+        }
+        .code {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            border: 1px solid #ddd;
+        }
+        .button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        .button:hover {
+            background: #0056b3;
+        }
+        .button.secondary {
+            background: #6c757d;
+        }
+        .button.secondary:hover {
+            background: #545b62;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Mula Sales Enablement Tool Demo</h1>
+        
+        <div class="instructions">
+            <h3>How to Use the Sales Enablement Tool</h3>
+            <p>This demo shows how the Mula Sales Enablement Tool works. The tool allows you to visually place TopShelf and SmartScroll widgets on any page element.</p>
+        </div>
+
+        <div class="section">
+            <h2>Step 1: Activate the Tool</h2>
+            <p>Click the button below to activate the sales enablement tool:</p>
+            <button class="button" onclick="activateSalesEnablement()">Activate Sales Enablement Tool</button>
+            <button class="button secondary" onclick="deactivateSalesEnablement()">Deactivate Tool</button>
+            <div id="activation-status" class="status info" style="display: none;">
+                Tool activation status will appear here
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Step 2: Demo Content Areas</h2>
+            <p>Hover over any of these content areas to see the highlighting effect, then click to insert a widget:</p>
+            
+            <div class="demo-content" id="content-area-1">
+                <h3>Article Header Section</h3>
+                <p>This is a sample article header where you might want to place a TopShelf widget to show related products.</p>
+            </div>
+
+            <div class="demo-content" id="content-area-2">
+                <h3>Main Content Area</h3>
+                <p>This is the main content area where readers spend most of their time. A SmartScroll widget here could show products as users scroll through the content.</p>
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+            </div>
+
+            <div class="demo-content" id="content-area-3">
+                <h3>Sidebar Section</h3>
+                <p>This sidebar area could be perfect for a TopShelf widget to display featured products without interfering with the main content.</p>
+            </div>
+
+            <div class="demo-content" id="content-area-4">
+                <h3>Footer Area</h3>
+                <p>This footer section could host a SmartScroll widget to capture users' attention as they finish reading the article.</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>How It Works</h2>
+            <div class="code">
+// 1. Set the activation flag before Mula loads
+window.Mula = {
+    activateSalesEnablements: true
+};
+
+// 2. Load the Mula SDK
+// The BootLoader will detect the flag and activate the tool
+
+// 3. The tool provides:
+// - Visual element highlighting on hover
+// - Widget type selection (TopShelf/SmartScroll)
+// - Click-to-insert functionality
+// - Automatic product fetching via window.Mula.boot()
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Features</h2>
+            <ul>
+                <li><strong>Visual Placement:</strong> Hover over any element to highlight it</li>
+                <li><strong>Widget Selection:</strong> Choose between TopShelf or SmartScroll widgets</li>
+                <li><strong>Click to Insert:</strong> Click on highlighted elements to insert widgets</li>
+                <li><strong>Product Fetching:</strong> Automatically calls window.Mula.boot() to fetch products</li>
+                <li><strong>Clean UI:</strong> Professional interface with status messages</li>
+                <li><strong>Memory Management:</strong> Proper cleanup when deactivated</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Mock Mula object for demo purposes
+        window.Mula = {
+            activateSalesEnablements: false,
+            boot: function() {
+                console.log('Mula.boot() called - fetching products...');
+                showStatus('Mula.boot() called successfully! Products are being fetched.', 'success');
+            }
+        };
+
+        function activateSalesEnablement() {
+            window.Mula.activateSalesEnablements = true;
+            showStatus('Sales Enablement Tool activated! You can now hover over elements and select widgets.', 'success');
+            
+            // Simulate the tool activation (in real implementation, this would be handled by BootLoader)
+            if (window.SalesEnablementTool) {
+                const salesTool = new window.SalesEnablementTool();
+                salesTool.init();
+                window.Mula.salesEnablementTool = salesTool;
+            } else {
+                showStatus('SalesEnablementTool not loaded. In a real implementation, this would be loaded by the Mula SDK.', 'info');
+            }
+        }
+
+        function deactivateSalesEnablement() {
+            window.Mula.activateSalesEnablements = false;
+            if (window.Mula.salesEnablementTool) {
+                window.Mula.salesEnablementTool.destroy();
+                window.Mula.salesEnablementTool = null;
+            }
+            showStatus('Sales Enablement Tool deactivated.', 'info');
+        }
+
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('activation-status');
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${type}`;
+            statusDiv.style.display = 'block';
+            
+            // Hide status after 5 seconds
+            setTimeout(() => {
+                statusDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        // Load the SalesEnablementTool for demo purposes
+        // In a real implementation, this would be loaded by the Mula SDK
+        window.Mula = {
+            activateSalesEnablements: true
+        };
+        const script = document.createElement('script');
+        script.src = './svelte-components/src/lib/BootLoader.js';
+        script.onload = function() {
+            console.log('SalesEnablementTool loaded for demo');
+        };
+        script.onerror = function() {
+            console.log('SalesEnablementTool not found - this is expected in demo mode');
+        };
+        document.head.appendChild(script);
+    </script>
+</body>
+</html> 

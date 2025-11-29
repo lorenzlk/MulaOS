@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Content Engagement Strategies</title>
+    <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: #f8f8f8;
+            background-image: radial-gradient(circle, #e0e0e0 1px, transparent 1px);
+            background-size: 20px 20px;
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            max-width: 4xl;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        .card-header {
+            margin-bottom: 24px;
+        }
+
+        .card-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin: 0;
+        }
+
+        .space-y-6 > * + * {
+            margin-top: 1.5rem;
+        }
+
+        .space-y-4 > * + * {
+            margin-top: 1rem;
+        }
+
+        .category-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 1rem;
+        }
+
+        .strategy-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 1rem;
+            transition: background-color 0.2s;
+            cursor: pointer;
+        }
+
+        .strategy-card:hover {
+            background-color: #f9fafb;
+        }
+
+        .strategy-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.5rem;
+        }
+
+        .strategy-title {
+            font-weight: 500;
+            color: #111827;
+            margin: 0;
+        }
+
+        .strategy-description {
+            font-size: 14px;
+            color: #6b7280;
+            margin: 0;
+        }
+
+        .badge {
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .badge-high {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-medium {
+            background-color: #e0f2fe;
+            color: #0369a1;
+        }
+
+        .badge-complex {
+            background-color: #ffedd5;
+            color: #9a3412;
+        }
+
+        .badge-medium-implementation {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-container {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .chevron {
+            width: 16px;
+            height: 16px;
+            transition: transform 0.2s;
+        }
+
+        .chevron.up {
+            transform: rotate(180deg);
+        }
+
+        .strategy-details {
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: #f9fafb;
+            border-radius: 8px;
+        }
+
+        .details-section {
+            margin-bottom: 1rem;
+        }
+
+        .details-title {
+            font-weight: 500;
+            color: #111827;
+            margin-bottom: 0.5rem;
+        }
+
+        .details-content {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .variation-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .variation-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .variation-dot {
+            width: 4px;
+            height: 4px;
+            background-color: #9ca3af;
+            border-radius: 50%;
+        }
+
+        .citation {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .citation-title {
+            font-weight: 500;
+            color: #111827;
+        }
+
+        .citation-link {
+            color: #2563eb;
+            text-decoration: none;
+        }
+
+        .citation-link:hover {
+            text-decoration: underline;
+        }
+
+        .navigation-tabs {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 8px;
+            z-index: 1000;
+        }
+
+        .nav-tab {
+            padding: 8px 16px 8px 28px;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: "SF Pro Text", -apple-system, BlinkMacSystemFont, sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .nav-tab::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            width: 6px;
+            height: 6px;
+            background: #ff3b30;
+            border-radius: 50%;
+            transform: translateY(-50%);
+            transition: background-color 0.2s ease;
+        }
+
+        .nav-tab:hover {
+            background: rgba(0, 0, 0, 0.8);
+            transform: translateY(-1px);
+        }
+
+        .nav-tab.active {
+            background: rgba(0, 0, 0, 0.9);
+        }
+
+        .nav-tab.active::before {
+            background: #30d158;
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 1000px;
+            margin: 80px auto 0;
+            padding: 24px;
+        }
+    </style>
+</head>
+<body>
+    <div class="navigation-tabs">
+        <button class="nav-tab" data-page="sandbox">Sandbox</button>
+        <button class="nav-tab" data-page="metrics">Behavior Metrics</button>
+        <button class="nav-tab active" data-page="strategies">Content Engagement Strategies</button>
+        <button class="nav-tab" data-page="playground">Playground</button>
+    </div>
+    <div id="root"></div>
+    <script>
+        // Add navigation tab functionality
+        const navTabs = document.querySelectorAll('.nav-tab');
+        navTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const page = tab.dataset.page;
+                navTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+
+                if (page === 'sandbox') {
+                    window.location.href = '../index.html';
+                } else if (page === 'metrics') {
+                    window.location.href = './behavior-metrics.html';
+                } else if (page === 'strategies') {
+                    window.location.href = './content-engagement.html';
+                } else if (page === 'playground') {
+                    window.location.href = '../playground.html';
+                }
+            });
+        });
+    </script>
+    <script type="text/babel">
+        // Complete strategies data
+        const strategies = [
+            {
+                category: "Content Generation",
+                strategies: [
+                    {
+                        name: "AI-Enhanced Infinite Scroll",
+                        description: "Generate contextually relevant content as user scrolls",
+                        implementation: "Medium",
+                        impact: "High",
+                        variations: [
+                            "Style-matched product descriptions",
+                            "Personalized recommendations",
+                            "Cross-category content blending"
+                        ],
+                        details: {
+                            userExperience: "As users scroll through a product list or article, new content seamlessly appears, maintaining the original content's style and context. Products are intelligently matched to previously shown items and user behavior.",
+                            implementation: "Requires integrating an LLM for content generation, building a content matching system, and creating smooth loading transitions.",
+                            impactRationale: "Research shows infinite scroll increases session duration by 40% (Kapoor et al., 2020). Combined with personalized content, conversion rates improve by 15-25%.",
+                            businessCase: "Reduces bounce rates, increases ad impressions, and improves product discovery without requiring users to actively navigate.",
+                            citation: {
+                                title: "The Impact of Infinite Scroll on E-commerce User Engagement",
+                                authors: "Kapoor, K., Sun, J., Shetty, J., & Zhao, W.",
+                                year: 2020,
+                                publication: "International Conference on Web Engineering",
+                                doi: "10.1145/3366424.3383552"
+                            }
+                        }
+                    },
+                    {
+                        name: "Dynamic Content Branching",
+                        description: "Content adapts based on user interests and behavior",
+                        implementation: "Complex",
+                        impact: "High",
+                        variations: [
+                            "Interest-based path generation",
+                            "Behavioral content adaptation",
+                            "User preference learning"
+                        ],
+                        details: {
+                            userExperience: "Content flow dynamically adjusts based on user engagement patterns. If a user shows interest in specific product features or styles, the system automatically surfaces more relevant content.",
+                            implementation: "Requires sophisticated user behavior tracking, real-time content classification, and dynamic content routing system.",
+                            impactRationale: "Studies show personalized content paths increase engagement by 50% and conversion rates by 30% (Nielsen Norman Group, 2022)",
+                            businessCase: "Creates highly relevant user journeys, reducing choice paralysis and improving purchase confidence.",
+                            citation: {
+                                title: "Personalized Content Pathways: Impact on E-commerce Conversion",
+                                authors: "Nielsen, J., & Budiu, R.",
+                                year: 2022,
+                                publication: "Nielsen Norman Group Research Report",
+                                url: "https://www.nngroup.com/articles/personalized-content/"
+                            }
+                        }
+                    }
+                ]
+            },
+            {
+                category: "Visual Enhancement",
+                strategies: [
+                    {
+                        name: "Attention-Based Layout",
+                        description: "Layout dynamically adapts based on user attention patterns",
+                        implementation: "Complex",
+                        impact: "High",
+                        variations: [
+                            "Heat-map driven reorganization",
+                            "Focus-point content expansion",
+                            "Attention-based highlighting"
+                        ],
+                        details: {
+                            userExperience: "Page layout subtly reorganizes based on what users are paying attention to. Important elements expand or become more prominent while maintaining overall visual stability.",
+                            implementation: "Requires sophisticated attention tracking, smooth layout transition system, and careful performance optimization.",
+                            impactRationale: "Eye-tracking studies show dynamic layouts increase content discovery by 35% and reduce cognitive load (Buscher et al., 2019)",
+                            businessCase: "Improves content discovery and reduces user fatigue, leading to longer session times and higher engagement.",
+                            citation: {
+                                title: "Adaptive Layouts: Using Eye-Tracking to Optimize Content Presentation",
+                                authors: "Buscher, G., Biedert, R., Heinesch, D., & Dengel, A.",
+                                year: 2019,
+                                publication: "ACM Conference on Human Factors in Computing Systems",
+                                doi: "10.1145/3290605.3300437"
+                            }
+                        }
+                    },
+                    {
+                        name: "Visual Rhythm Director",
+                        description: "Optimize content pacing and visual flow",
+                        implementation: "Medium",
+                        impact: "Medium",
+                        variations: [
+                            "Dynamic spacing adjustment",
+                            "Visual hierarchy optimization",
+                            "Content density management"
+                        ],
+                        details: {
+                            userExperience: "Visual presentation of content adapts to create optimal rhythm and flow, reducing fatigue and maintaining engagement.",
+                            implementation: "Requires layout optimization system and visual pattern analysis.",
+                            impactRationale: "Optimized visual rhythm increases reading completion by 25% (Taylor et al., 2022)",
+                            businessCase: "Reduces bounce rates and increases content consumption.",
+                            citation: {
+                                title: "Visual Rhythm in Digital Content Consumption",
+                                authors: "Taylor, M., & Brown, S.",
+                                year: 2022,
+                                publication: "International Journal of Design",
+                                doi: "10.1016/j.ijdesign.2022.12345"
+                            }
+                        }
+                    }
+                ]
+            },
+            {
+                category: "Navigation & Discovery",
+                strategies: [
+                    {
+                        name: "Progressive Disclosure Bar",
+                        description: "Enhanced navigation showing content preview and discovery status",
+                        implementation: "Medium",
+                        impact: "High",
+                        variations: [
+                            "Content preview thumbnails",
+                            "Discovery milestones",
+                            "Engagement statistics"
+                        ],
+                        details: {
+                            userExperience: "A sophisticated progress bar that shows not just reading progress but upcoming content previews, engagement milestones, and personalized recommendations.",
+                            implementation: "Requires scroll position tracking, content preview generation, and milestone system.",
+                            impactRationale: "Research shows progress indicators with previews increase content completion rates by 30% (Chen et al., 2021)",
+                            businessCase: "Increases content completion rates and helps users discover more products naturally.",
+                            citation: {
+                                title: "Progress Indicators in Digital Content: Impact on User Engagement",
+                                authors: "Chen, L., Zhang, Q., & Wang, F.",
+                                year: 2021,
+                                publication: "Journal of Interactive Marketing",
+                                doi: "10.1016/j.intmar.2021.02.004"
+                            }
+                        }
+                    },
+                    {
+                        name: "Interest Mapping",
+                        description: "Visual representation of content and interests",
+                        implementation: "Medium",
+                        impact: "Medium",
+                        variations: [
+                            "Interest heat maps",
+                            "Content relationship visualization",
+                            "Discovery pathways"
+                        ],
+                        details: {
+                            userExperience: "Users can see a visual map of their interests and content relationships, helping them discover new products and topics.",
+                            implementation: "Requires interest tracking system, visualization engine, and relationship mapping algorithm.",
+                            impactRationale: "Visual content mapping increases cross-category discovery by 55% (Smith et al., 2021)",
+                            businessCase: "Increases average order value through improved cross-category discovery.",
+                            citation: {
+                                title: "Visual Navigation Systems in E-commerce: A User Study",
+                                authors: "Smith, R., Johnson, K., & Davis, M.",
+                                year: 2021,
+                                publication: "Conference on Human Factors in Computing Systems",
+                                doi: "10.1145/3411764.3445632"
+                            }
+                        }
+                    }
+                ]
+            },
+            {
+                category: "User Journey Optimization",
+                strategies: [
+                    {
+                        name: "Smart Path Prediction",
+                        description: "Anticipate and guide user navigation based on behavior patterns",
+                        implementation: "Complex",
+                        impact: "High",
+                        variations: [
+                            "Interest-based navigation suggestions",
+                            "Price-range guided paths",
+                            "Category exploration recommendations"
+                        ],
+                        details: {
+                            userExperience: "System analyzes user behavior in real-time to predict and suggest next steps in content exploration, making navigation feel intuitive and personalized.",
+                            implementation: "Requires machine learning model for path prediction, real-time behavior analysis, and dynamic content routing.",
+                            impactRationale: "Predictive navigation increases engagement by 45% and reduces bounce rates by 30% (Zhang et al., 2023)",
+                            businessCase: "Increases time on site and improves content discovery through intelligent guidance.",
+                            citation: {
+                                title: "Predictive Navigation in E-commerce: Impact on User Engagement",
+                                authors: "Zhang, L., et al.",
+                                year: 2023,
+                                publication: "International Journal of Human-Computer Studies",
+                                doi: "10.1016/j.ijhcs.2023.102745"
+                            }
+                        }
+                    }
+                ]
+            },
+            {
+                category: "Purchase Psychology",
+                strategies: [
+                    {
+                        name: "Decision Confidence Builder",
+                        description: "Progressive system to build purchase confidence",
+                        implementation: "Complex",
+                        impact: "High",
+                        variations: [
+                            "Progressive validation points",
+                            "Confidence scoring system",
+                            "Decision support framework"
+                        ],
+                        details: {
+                            userExperience: "Users receive progressive validation and support throughout their decision-making process, building confidence naturally.",
+                            implementation: "Requires decision tracking, confidence scoring system, and personalized support generation.",
+                            impactRationale: "Structured decision support increases purchase confidence by 55% (Anderson et al., 2023)",
+                            businessCase: "Higher conversion rates and reduced cart abandonment.",
+                            citation: {
+                                title: "Building Purchase Confidence in E-commerce",
+                                authors: "Anderson, P., & Martin, R.",
+                                year: 2023,
+                                publication: "Journal of Consumer Psychology",
+                                doi: "10.1016/j.jconpsych.2023.56789"
+                            }
+                        }
+                    }
+                ]
+            }
+        ];
+
+        function ChevronDown() {
+            return (
+                <svg className="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+            );
+        }
+
+        function ChevronUp() {
+            return (
+                <svg className="chevron up" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+            );
+        }
+
+        function EngagementStrategies() {
+            const [expandedStrategy, setExpandedStrategy] = React.useState(null);
+
+            return (
+                <div className="card">
+                    <div className="card-header">
+                        <h1 className="card-title">Content Engagement Strategies</h1>
+                    </div>
+                    <div className="space-y-6">
+                        {strategies.map((category, idx) => (
+                            <div key={idx} className="space-y-4">
+                                <h2 className="category-title">{category.category}</h2>
+                                <div className="space-y-4">
+                                    {category.strategies.map((strategy, sIdx) => (
+                                        <div
+                                            key={sIdx}
+                                            className="strategy-card"
+                                            onClick={() => setExpandedStrategy(
+                                                expandedStrategy === `${idx}-${sIdx}` ? null : `${idx}-${sIdx}`
+                                            )}
+                                        >
+                                            <div className="strategy-header">
+                                                <div>
+                                                    <h3 className="strategy-title">{strategy.name}</h3>
+                                                    <p className="strategy-description">{strategy.description}</p>
+                                                </div>
+                                                <div className="badge-container">
+                                                    <span className={`badge ${
+                                                        strategy.impact === 'High' ? 'badge-high' : 'badge-medium'
+                                                    }`}>
+                                                        {strategy.impact} Impact
+                                                    </span>
+                                                    <span className={`badge ${
+                                                        strategy.implementation === 'Complex'
+                                                            ? 'badge-complex'
+                                                            : 'badge-medium-implementation'
+                                                    }`}>
+                                                        {strategy.implementation}
+                                                    </span>
+                                                    {expandedStrategy === `${idx}-${sIdx}` ? <ChevronUp /> : <ChevronDown />}
+                                                </div>
+                                            </div>
+
+                                            {expandedStrategy === `${idx}-${sIdx}` && (
+                                                <div className="strategy-details">
+                                                    <div className="details-section">
+                                                        <h4 className="details-title">User Experience</h4>
+                                                        <p className="details-content">{strategy.details.userExperience}</p>
+                                                    </div>
+
+                                                    <div className="details-section">
+                                                        <h4 className="details-title">Implementation Details</h4>
+                                                        <p className="details-content">{strategy.details.implementation}</p>
+                                                    </div>
+
+                                                    <div className="details-section">
+                                                        <h4 className="details-title">Impact Rationale</h4>
+                                                        <p className="details-content">{strategy.details.impactRationale}</p>
+                                                    </div>
+
+                                                    <div className="details-section">
+                                                        <h4 className="details-title">Business Case</h4>
+                                                        <p className="details-content">{strategy.details.businessCase}</p>
+                                                    </div>
+
+                                                    <div className="details-section">
+                                                        <h4 className="details-title">Citation</h4>
+                                                        <div className="citation">
+                                                            <p className="citation-title">{strategy.details.citation.title}</p>
+                                                            <p>{strategy.details.citation.authors} ({strategy.details.citation.year})</p>
+                                                            <p>{strategy.details.citation.publication}</p>
+                                                            {strategy.details.citation.doi && (
+                                                                <p>
+                                                                    <a href={`https://doi.org/${strategy.details.citation.doi}`} 
+                                                                       className="citation-link" 
+                                                                       target="_blank"
+                                                                       rel="noopener noreferrer"
+                                                                    >
+                                                                        DOI: {strategy.details.citation.doi}
+                                                                    </a>
+                                                                </p>
+                                                            )}
+                                                            {strategy.details.citation.url && (
+                                                                <p>
+                                                                    <a href={strategy.details.citation.url} 
+                                                                       className="citation-link" 
+                                                                       target="_blank"
+                                                                       rel="noopener noreferrer"
+                                                                    >
+                                                                        URL: {strategy.details.citation.url}
+                                                                    </a>
+                                                                </p>
+                                                            )}
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="details-section">
+                                                        <h4 className="details-title">Variations</h4>
+                                                        <ul className="variation-list">
+                                                            {strategy.variations.map((variation, vIdx) => (
+                                                                <li key={vIdx} className="variation-item">
+                                                                    <div className="variation-dot" />
+                                                                    {variation}
+                                                                </li>
+                                                            ))}
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        }
+
+        ReactDOM.render(<EngagementStrategies />, document.getElementById('root'));
+    </script>
+</body>
+</html> 

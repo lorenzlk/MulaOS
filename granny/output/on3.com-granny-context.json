@@ -1,0 +1,260 @@
+{
+  "domain": "on3.com",
+  "analyzed_at": "2025-11-29T02:09:44.371Z",
+  "business_intelligence": {
+    "publisher_type": [
+      "sports_focused",
+      "content_publisher"
+    ],
+    "revenue_model": [
+      "display_ads",
+      "affiliate",
+      "subscription"
+    ],
+    "content_focus": [
+      "sports",
+      "college sports",
+      "recruiting"
+    ],
+    "audience_type": "college sports fans",
+    "tech_stack": [
+      "Custom CMS",
+      "Google Tag Manager",
+      "GAM"
+    ]
+  },
+  "competitive_intelligence": {
+    "content_recommendation": [],
+    "ad_networks": [],
+    "affiliate_platforms": [],
+    "analytics": [
+      "Google Tag Manager",
+      "Google Analytics 4"
+    ],
+    "optimization": [],
+    "total_competitors": 0,
+    "density": "opportunity",
+    "mula_positioning": "Prime opportunity - low competitive density, high potential for affiliate revenue"
+  },
+  "monetization_maturity": {
+    "score": 4,
+    "max_score": 10,
+    "level": "Beginner",
+    "factors": [
+      "⚠️ Display ads present but not detected",
+      "⚠️ Affiliate present but not detected",
+      "✅ Tag management deployed",
+      "❌ No A/B testing detected",
+      "💡 No content recommendation widgets - opportunity for Mula"
+    ],
+    "insights": [
+      "Basic setup - deployment timeline: 2-4 weeks",
+      "More hand-holding required for success",
+      "Focus on education and quick wins",
+      "Missing A/B testing - Mula can provide data-driven optimization"
+    ]
+  },
+  "deployment_readiness": null,
+  "contextual_intelligence": {
+    "primary_sports": [
+      "cfb",
+      "college-basketball",
+      "recruiting"
+    ],
+    "audience": "college sports fans",
+    "focus": "team-specific coverage",
+    "key_teams": [
+      {
+        "name": "Ohio State",
+        "sport": "cfb",
+        "rivals": [
+          "Michigan",
+          "Penn State"
+        ]
+      },
+      {
+        "name": "Alabama",
+        "sport": "cfb",
+        "rivals": [
+          "Auburn",
+          "LSU",
+          "Tennessee"
+        ]
+      },
+      {
+        "name": "Michigan",
+        "sport": "cfb",
+        "rivals": [
+          "Ohio State",
+          "Michigan State"
+        ]
+      },
+      {
+        "name": "Georgia",
+        "sport": "cfb",
+        "rivals": [
+          "Florida",
+          "Auburn"
+        ]
+      }
+    ],
+    "seasonal_peaks": [
+      "football-season",
+      "rivalry-week",
+      "playoffs",
+      "recruiting-periods"
+    ],
+    "sports_context": [
+      {
+        "sport": "cfb",
+        "season": "active",
+        "phase": "regular-season",
+        "opportunities": [
+          {
+            "type": "rivalry-week",
+            "urgency": "high",
+            "recommendation": "Switch to rivalry-specific merchandise (e.g., \"Beat Michigan\", \"Beat Auburn\")",
+            "expected_lift": "2-4x CTR vs. generic team merchandise",
+            "duration": "7 days"
+          }
+        ]
+      },
+      {
+        "sport": "college-basketball",
+        "season": "active",
+        "phase": "early-season",
+        "opportunities": [
+          "game-day-gear",
+          "playoff-merchandise"
+        ]
+      }
+    ],
+    "opportunities": [
+      {
+        "type": "rivalry-week",
+        "urgency": "high",
+        "recommendation": "Switch to rivalry-specific merchandise (e.g., \"Beat Michigan\", \"Beat Auburn\")",
+        "expected_lift": "2-4x CTR vs. generic team merchandise",
+        "duration": "7 days",
+        "sport": "cfb",
+        "phase": "regular-season"
+      },
+      {
+        "type": "team-rivalry-detection",
+        "team": "Ohio State",
+        "rivals": [
+          "Michigan",
+          "Penn State"
+        ],
+        "recommendation": "Create rivalry-specific feeds when Ohio State plays Michigan or Penn State",
+        "urgency": "high",
+        "expected_lift": "2-4x CTR during rivalry games"
+      },
+      {
+        "type": "team-rivalry-detection",
+        "team": "Alabama",
+        "rivals": [
+          "Auburn",
+          "LSU",
+          "Tennessee"
+        ],
+        "recommendation": "Create rivalry-specific feeds when Alabama plays Auburn or LSU or Tennessee",
+        "urgency": "high",
+        "expected_lift": "2-4x CTR during rivalry games"
+      },
+      {
+        "type": "team-rivalry-detection",
+        "team": "Michigan",
+        "rivals": [
+          "Ohio State",
+          "Michigan State"
+        ],
+        "recommendation": "Create rivalry-specific feeds when Michigan plays Ohio State or Michigan State",
+        "urgency": "high",
+        "expected_lift": "2-4x CTR during rivalry games"
+      },
+      {
+        "type": "team-rivalry-detection",
+        "team": "Georgia",
+        "rivals": [
+          "Florida",
+          "Auburn"
+        ],
+        "recommendation": "Create rivalry-specific feeds when Georgia plays Florida or Auburn",
+        "urgency": "high",
+        "expected_lift": "2-4x CTR during rivalry games"
+      }
+    ]
+  },
+  "temporal_intelligence": {
+    "status": "placeholder",
+    "message": "Opportunity calendar, seasonal peaks, event detection - to be built"
+  },
+  "recommendations": [
+    {
+      "priority": "✅ ALIGNED",
+      "category": "Revenue Model",
+      "message": "Publisher already uses affiliate links - Mula is a natural fit",
+      "action": "Position as \"smarter affiliate strategy\""
+    },
+    {
+      "priority": "✅ ALIGNED",
+      "category": "Content Focus",
+      "message": "Sports-focused publisher - perfect fit for Granny contextual intelligence",
+      "action": "Leverage sports calendar and rivalry detection"
+    }
+  ],
+  "search_strategies": {
+    "fanatics": {
+      "primary_search": "Beat Michigan",
+      "secondary_search": "Ohio State Rivalry",
+      "filters": {
+        "sport": "cfb",
+        "team": "ohio-state",
+        "tags": [
+          "rivalry",
+          "michigan"
+        ]
+      },
+      "boost_keywords": [
+        "beat",
+        "rivalry",
+        "game day"
+      ],
+      "reasoning": "Fanatics has specific rivalry merchandise collections",
+      "expected_products": "15-25"
+    },
+    "amazon": {
+      "primary_search": "Ohio State beat Michigan rivalry shirt",
+      "secondary_search": "Ohio State Michigan game day apparel",
+      "keywords": [
+        "ohio state",
+        "beat michigan",
+        "rivalry",
+        "buckeyes",
+        "shirt",
+        "apparel",
+        "fan gear"
+      ],
+      "category_hints": [
+        "sports fan shop",
+        "clothing",
+        "novelty"
+      ],
+      "reasoning": "Amazon search requires descriptive, keyword-rich queries",
+      "expected_products": "20-40"
+    },
+    "fallback": {
+      "fanatics": {
+        "search": "Sports Merchandise",
+        "filters": {
+          "sport": "cfb"
+        }
+      },
+      "amazon": {
+        "search": "sports fan gear",
+        "category": "sports fan shop"
+      }
+    }
+  }
+}

@@ -1,0 +1,1112 @@
+{
+  "dashboard": {
+    "annotations": {
+      "list": [
+        {
+          "builtIn": 1,
+          "datasource": {
+            "type": "grafana",
+            "uid": "-- Grafana --"
+          },
+          "enable": true,
+          "hide": true,
+          "iconColor": "rgba(0, 211, 255, 1)",
+          "name": "Annotations & Alerts",
+          "type": "dashboard"
+        }
+      ]
+    },
+    "editable": true,
+    "fiscalYearStartMonth": 0,
+    "graphTooltip": 0,
+    "id": 6,
+    "links": [],
+    "refresh": "30s",
+    "schemaVersion": 39,
+    "tags": [
+      "mula",
+      "search-phrases",
+      "working"
+    ],
+    "templating": {
+      "list": []
+    },
+    "time": {
+      "from": "now-24h",
+      "to": "now"
+    },
+    "timepicker": {},
+    "timezone": "browser",
+    "title": "Mula Search Phrases - Working Tiles",
+    "uid": "aez8t5wxrwkqof",
+    "version": 1,
+    "weekStart": "",
+    "panels": [
+      {
+        "datasource": {
+          "type": "cloudwatch",
+          "uid": "cloudwatch"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 6,
+          "w": 6,
+          "x": 0,
+          "y": 0
+        },
+        "id": 1,
+        "options": {
+          "colorMode": "value",
+          "graphMode": "area",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "showPercentChange": false,
+          "textMode": "auto",
+          "wideLayout": true
+        },
+        "pluginVersion": "10.4.1",
+        "targets": [
+          {
+            "datasource": {
+              "type": "cloudwatch",
+              "uid": "cloudwatch"
+            },
+            "dimensions": {
+              "Host": "www.on3.com",
+              "SearchPhrase": "notre dame fighting irish football fall halloween"
+            },
+            "metricEditorMode": 0,
+            "metricName": "SearchPhraseCount",
+            "metricQueryType": 0,
+            "namespace": "Mula/SearchPhrases",
+            "period": "300",
+            "refId": "A",
+            "region": "us-east-1",
+            "statistic": "Sum"
+          }
+        ],
+        "title": "notre dame fighting irish football fall halloween (www.on3.com)",
+        "type": "stat"
+      },
+      {
+        "datasource": {
+          "type": "cloudwatch",
+          "uid": "cloudwatch"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 6,
+          "w": 6,
+          "x": 6,
+          "y": 0
+        },
+        "id": 2,
+        "options": {
+          "colorMode": "value",
+          "graphMode": "area",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "showPercentChange": false,
+          "textMode": "auto",
+          "wideLayout": true
+        },
+        "pluginVersion": "10.4.1",
+        "targets": [
+          {
+            "datasource": {
+              "type": "cloudwatch",
+              "uid": "cloudwatch"
+            },
+            "dimensions": {
+              "Host": "www.on3.com",
+              "SearchPhrase": "auburn tigers fan merch fall cold"
+            },
+            "metricEditorMode": 0,
+            "metricName": "SearchPhraseCount",
+            "metricQueryType": 0,
+            "namespace": "Mula/SearchPhrases",
+            "period": "300",
+            "refId": "B",
+            "region": "us-east-1",
+            "statistic": "Sum"
+          }
+        ],
+        "title": "auburn tigers fan merch fall cold (www.on3.com)",
+        "type": "stat"
+      },
+      {
+        "datasource": {
+          "type": "cloudwatch",
+          "uid": "cloudwatch"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 6,
+          "w": 6,
+          "x": 12,
+          "y": 0
+        },
+        "id": 3,
+        "options": {
+          "colorMode": "value",
+          "graphMode": "area",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "showPercentChange": false,
+          "textMode": "auto",
+          "wideLayout": true
+        },
+        "pluginVersion": "10.4.1",
+        "targets": [
+          {
+            "datasource": {
+              "type": "cloudwatch",
+              "uid": "cloudwatch"
+            },
+            "dimensions": {
+              "Host": "www.on3.com",
+              "SearchPhrase": "Ohio State Football Buckeyes fan merch"
+            },
+            "metricEditorMode": 0,
+            "metricName": "SearchPhraseCount",
+            "metricQueryType": 0,
+            "namespace": "Mula/SearchPhrases",
+            "period": "300",
+            "refId": "C",
+            "region": "us-east-1",
+            "statistic": "Sum"
+          }
+        ],
+        "title": "Ohio State Football Buckeyes fan merch (www.on3.com)",
+        "type": "stat"
+      },
+      {
+        "datasource": {
+          "type": "cloudwatch",
+          "uid": "cloudwatch"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 6,
+          "w": 6,
+          "x": 18,
+          "y": 0
+        },
+        "id": 4,
+        "options": {
+          "colorMode": "value",
+          "graphMode": "area",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "showPercentChange": false,
+          "textMode": "auto",
+          "wideLayout": true
+        },
+        "pluginVersion": "10.4.1",
+        "targets": [
+          {
+            "datasource": {
+              "type": "cloudwatch",
+              "uid": "cloudwatch"
+            },
+            "dimensions": {
+              "Host": "www.on3.com",
+              "SearchPhrase": "michigan wolverines merch"
+            },
+            "metricEditorMode": 0,
+            "metricName": "SearchPhraseCount",
+            "metricQueryType": 0,
+            "namespace": "Mula/SearchPhrases",
+            "period": "300",
+            "refId": "D",
+            "region": "us-east-1",
+            "statistic": "Sum"
+          }
+        ],
+        "title": "michigan wolverines merch (www.on3.com)",
+        "type": "stat"
+      },
+      {
+        "datasource": {
+          "type": "cloudwatch",
+          "uid": "cloudwatch"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 6,
+          "w": 6,
+          "x": 0,
+          "y": 6
+        },
+        "id": 5,
+        "options": {
+          "colorMode": "value",
+          "graphMode": "area",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "showPercentChange": false,
+          "textMode": "auto",
+          "wideLayout": true
+        },
+        "pluginVersion": "10.4.1",
+        "targets": [
+          {
+            "datasource": {
+              "type": "cloudwatch",
+              "uid": "cloudwatch"
+            },
+            "dimensions": {
+              "Host": "www.athlonsports.com",
+              "SearchPhrase": "oklahoma sooners football merch"
+            },
+            "metricEditorMode": 0,
+            "metricName": "SearchPhraseCount",
+            "metricQueryType": 0,
+            "namespace": "Mula/SearchPhrases",
+            "period": "300",
+            "refId": "E",
+            "region": "us-east-1",
+            "statistic": "Sum"
+          }
+        ],
+        "title": "oklahoma sooners football merch (www.athlonsports.com)",
+        "type": "stat"
+      },
+      {
+        "datasource": {
+          "type": "cloudwatch",
+          "uid": "cloudwatch"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 6,
+          "w": 6,
+          "x": 6,
+          "y": 6
+        },
+        "id": 6,
+        "options": {
+          "colorMode": "value",
+          "graphMode": "area",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "showPercentChange": false,
+          "textMode": "auto",
+          "wideLayout": true
+        },
+        "pluginVersion": "10.4.1",
+        "targets": [
+          {
+            "datasource": {
+              "type": "cloudwatch",
+              "uid": "cloudwatch"
+            },
+            "dimensions": {
+              "Host": "www.dev.on3.com",
+              "SearchPhrase": "notre dame fighting irish football"
+            },
+            "metricEditorMode": 0,
+            "metricName": "SearchPhraseCount",
+            "metricQueryType": 0,
+            "namespace": "Mula/SearchPhrases",
+            "period": "300",
+            "refId": "F",
+            "region": "us-east-1",
+            "statistic": "Sum"
+          }
+        ],
+        "title": "notre dame fighting irish football (www.dev.on3.com)",
+        "type": "stat"
+      },
+      {
+        "datasource": {
+          "type": "cloudwatch",
+          "uid": "cloudwatch"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 6,
+          "w": 6,
+          "x": 12,
+          "y": 6
+        },
+        "id": 7,
+        "options": {
+          "colorMode": "value",
+          "graphMode": "area",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "showPercentChange": false,
+          "textMode": "auto",
+          "wideLayout": true
+        },
+        "pluginVersion": "10.4.1",
+        "targets": [
+          {
+            "datasource": {
+              "type": "cloudwatch",
+              "uid": "cloudwatch"
+            },
+            "dimensions": {
+              "Host": "www.dev.on3.com",
+              "SearchPhrase": "auburn tigers fan gear merch"
+            },
+            "metricEditorMode": 0,
+            "metricName": "SearchPhraseCount",
+            "metricQueryType": 0,
+            "namespace": "Mula/SearchPhrases",
+            "period": "300",
+            "refId": "G",
+            "region": "us-east-1",
+            "statistic": "Sum"
+          }
+        ],
+        "title": "auburn tigers fan gear merch (www.dev.on3.com)",
+        "type": "stat"
+      },
+      {
+        "datasource": {
+          "type": "cloudwatch",
+          "uid": "cloudwatch"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 6,
+          "w": 6,
+          "x": 18,
+          "y": 6
+        },
+        "id": 8,
+        "options": {
+          "colorMode": "value",
+          "graphMode": "area",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "showPercentChange": false,
+          "textMode": "auto",
+          "wideLayout": true
+        },
+        "pluginVersion": "10.4.1",
+        "targets": [
+          {
+            "datasource": {
+              "type": "cloudwatch",
+              "uid": "cloudwatch"
+            },
+            "dimensions": {
+              "Host": "www.brit.co",
+              "SearchPhrase": "healthy eating clean eating organic snacks"
+            },
+            "metricEditorMode": 0,
+            "metricName": "SearchPhraseCount",
+            "metricQueryType": 0,
+            "namespace": "Mula/SearchPhrases",
+            "period": "300",
+            "refId": "H",
+            "region": "us-east-1",
+            "statistic": "Sum"
+          }
+        ],
+        "title": "healthy eating clean eating organic snacks (www.brit.co)",
+        "type": "stat"
+      },
+      {
+        "datasource": {
+          "type": "cloudwatch",
+          "uid": "cloudwatch"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 6,
+          "w": 6,
+          "x": 0,
+          "y": 12
+        },
+        "id": 9,
+        "options": {
+          "colorMode": "value",
+          "graphMode": "area",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "showPercentChange": false,
+          "textMode": "auto",
+          "wideLayout": true
+        },
+        "pluginVersion": "10.4.1",
+        "targets": [
+          {
+            "datasource": {
+              "type": "cloudwatch",
+              "uid": "cloudwatch"
+            },
+            "dimensions": {
+              "Host": "www.brit.co",
+              "SearchPhrase": "kitchen tools essentials cooking baking"
+            },
+            "metricEditorMode": 0,
+            "metricName": "SearchPhraseCount",
+            "metricQueryType": 0,
+            "namespace": "Mula/SearchPhrases",
+            "period": "300",
+            "refId": "I",
+            "region": "us-east-1",
+            "statistic": "Sum"
+          }
+        ],
+        "title": "kitchen tools essentials cooking baking (www.brit.co)",
+        "type": "stat"
+      },
+      {
+        "datasource": {
+          "type": "cloudwatch",
+          "uid": "cloudwatch"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 6,
+          "w": 6,
+          "x": 6,
+          "y": 12
+        },
+        "id": 10,
+        "options": {
+          "colorMode": "value",
+          "graphMode": "area",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "showPercentChange": false,
+          "textMode": "auto",
+          "wideLayout": true
+        },
+        "pluginVersion": "10.4.1",
+        "targets": [
+          {
+            "datasource": {
+              "type": "cloudwatch",
+              "uid": "cloudwatch"
+            },
+            "dimensions": {
+              "Host": "www.brit.co",
+              "SearchPhrase": "Couples Halloween costumes funny themed"
+            },
+            "metricEditorMode": 0,
+            "metricName": "SearchPhraseCount",
+            "metricQueryType": 0,
+            "namespace": "Mula/SearchPhrases",
+            "period": "300",
+            "refId": "J",
+            "region": "us-east-1",
+            "statistic": "Sum"
+          }
+        ],
+        "title": "Couples Halloween costumes funny themed (www.brit.co)",
+        "type": "stat"
+      },
+      {
+        "datasource": {
+          "type": "cloudwatch",
+          "uid": "cloudwatch"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 6,
+          "w": 6,
+          "x": 12,
+          "y": 12
+        },
+        "id": 11,
+        "options": {
+          "colorMode": "value",
+          "graphMode": "area",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "showPercentChange": false,
+          "textMode": "auto",
+          "wideLayout": true
+        },
+        "pluginVersion": "10.4.1",
+        "targets": [
+          {
+            "datasource": {
+              "type": "cloudwatch",
+              "uid": "cloudwatch"
+            },
+            "dimensions": {
+              "Host": "www.swimmingworldmagazine.com",
+              "SearchPhrase": "swim gear sports pool ocean"
+            },
+            "metricEditorMode": 0,
+            "metricName": "SearchPhraseCount",
+            "metricQueryType": 0,
+            "namespace": "Mula/SearchPhrases",
+            "period": "300",
+            "refId": "K",
+            "region": "us-east-1",
+            "statistic": "Sum"
+          }
+        ],
+        "title": "swim gear sports pool ocean (www.swimmingworldmagazine.com)",
+        "type": "stat"
+      },
+      {
+        "datasource": {
+          "type": "cloudwatch",
+          "uid": "cloudwatch"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 6,
+          "w": 6,
+          "x": 18,
+          "y": 12
+        },
+        "id": 12,
+        "options": {
+          "colorMode": "value",
+          "graphMode": "area",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "showPercentChange": false,
+          "textMode": "auto",
+          "wideLayout": true
+        },
+        "pluginVersion": "10.4.1",
+        "targets": [
+          {
+            "datasource": {
+              "type": "cloudwatch",
+              "uid": "cloudwatch"
+            },
+            "dimensions": {
+              "Host": "www.brit.com",
+              "SearchPhrase": "& Healthy Eating healthy eating clean eating organic snacks"
+            },
+            "metricEditorMode": 0,
+            "metricName": "SearchPhraseCount",
+            "metricQueryType": 0,
+            "namespace": "Mula/SearchPhrases",
+            "period": "300",
+            "refId": "L",
+            "region": "us-east-1",
+            "statistic": "Sum"
+          }
+        ],
+        "title": "& Healthy Eating healthy eating clean eating organic snacks (www.brit.com)",
+        "type": "stat"
+      },
+      {
+        "datasource": {
+          "type": "cloudwatch",
+          "uid": "cloudwatch"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 6,
+          "w": 6,
+          "x": 0,
+          "y": 18
+        },
+        "id": 13,
+        "options": {
+          "colorMode": "value",
+          "graphMode": "area",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "showPercentChange": false,
+          "textMode": "auto",
+          "wideLayout": true
+        },
+        "pluginVersion": "10.4.1",
+        "targets": [
+          {
+            "datasource": {
+              "type": "cloudwatch",
+              "uid": "cloudwatch"
+            },
+            "dimensions": {
+              "Host": "www.brit.com",
+              "SearchPhrase": "kitchen tools essentials cooking baking"
+            },
+            "metricEditorMode": 0,
+            "metricName": "SearchPhraseCount",
+            "metricQueryType": 0,
+            "namespace": "Mula/SearchPhrases",
+            "period": "300",
+            "refId": "M",
+            "region": "us-east-1",
+            "statistic": "Sum"
+          }
+        ],
+        "title": "kitchen tools essentials cooking baking (www.brit.com)",
+        "type": "stat"
+      },
+      {
+        "datasource": {
+          "type": "cloudwatch",
+          "uid": "cloudwatch"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 6,
+          "w": 6,
+          "x": 6,
+          "y": 18
+        },
+        "id": 14,
+        "options": {
+          "colorMode": "value",
+          "graphMode": "area",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "showPercentChange": false,
+          "textMode": "auto",
+          "wideLayout": true
+        },
+        "pluginVersion": "10.4.1",
+        "targets": [
+          {
+            "datasource": {
+              "type": "cloudwatch",
+              "uid": "cloudwatch"
+            },
+            "dimensions": {
+              "Host": "defpen.com",
+              "SearchPhrase": "Trendy Sneakers"
+            },
+            "metricEditorMode": 0,
+            "metricName": "SearchPhraseCount",
+            "metricQueryType": 0,
+            "namespace": "Mula/SearchPhrases",
+            "period": "300",
+            "refId": "N",
+            "region": "us-east-1",
+            "statistic": "Sum"
+          }
+        ],
+        "title": "Trendy Sneakers (defpen.com)",
+        "type": "stat"
+      },
+      {
+        "datasource": {
+          "type": "cloudwatch",
+          "uid": "cloudwatch"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 6,
+          "w": 6,
+          "x": 12,
+          "y": 18
+        },
+        "id": 15,
+        "options": {
+          "colorMode": "value",
+          "graphMode": "area",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "showPercentChange": false,
+          "textMode": "auto",
+          "wideLayout": true
+        },
+        "pluginVersion": "10.4.1",
+        "targets": [
+          {
+            "datasource": {
+              "type": "cloudwatch",
+              "uid": "cloudwatch"
+            },
+            "dimensions": {
+              "Host": "defpen.com",
+              "SearchPhrase": "Coldplay merch"
+            },
+            "metricEditorMode": 0,
+            "metricName": "SearchPhraseCount",
+            "metricQueryType": 0,
+            "namespace": "Mula/SearchPhrases",
+            "period": "300",
+            "refId": "O",
+            "region": "us-east-1",
+            "statistic": "Sum"
+          }
+        ],
+        "title": "Coldplay merch (defpen.com)",
+        "type": "stat"
+      }
+    ]
+  }
+}

@@ -1,0 +1,79 @@
+{
+  "domain": "on3.com",
+  "analyzed_at": "2025-11-29T02:09:41.253Z",
+  "health_check": {
+    "sdk_present": false,
+    "sdk_version": null,
+    "cdn_url": null,
+    "load_time_ms": null,
+    "checked_pages": [
+      {
+        "url": "https://on3.com",
+        "type": "homepage"
+      },
+      {
+        "url": "https://www.on3.com/sites/maize-blue-review/news/michigan-vs-ohio-state-preview-on-hail-to-the-podcast/",
+        "type": "article"
+      },
+      {
+        "url": "https://www.on3.com/college/georgia-bulldogs/news/kirby-smart-blasts-idea-teams-should-fear-injury-risk-skip-conference-championship/",
+        "type": "article"
+      },
+      {
+        "url": "https://www.on3.com/rivals/news/smu-flips-2026-ot-max-wright-away-from-the-longhorns/",
+        "type": "article"
+      }
+    ],
+    "detection_method": "not_found",
+    "deployment_date": null,
+    "errors": [
+      "Mula SDK script tag not found on homepage or article pages"
+    ],
+    "warnings": [
+      "SDK might be deployed via GTM (dynamic loading) - not detectable with static HTML parsing"
+    ]
+  },
+  "traffic_estimate": {
+    "total_urls": 0,
+    "distribution": {},
+    "sources": [
+      "sitemap",
+      "rss"
+    ],
+    "confidence": 60
+  },
+  "url_patterns": [],
+  "deployment_ready": false,
+  "recommendations": [
+    {
+      "priority": "🔴 CRITICAL",
+      "category": "SDK Deployment",
+      "message": "Mula SDK is not deployed. Cannot proceed with targeting configuration.",
+      "action": "Deploy SDK via GTM or direct script tag"
+    }
+  ],
+  "deployment_readiness": {
+    "score": 50,
+    "percentage": 50,
+    "level": "Needs Work",
+    "timeline": "2-4 weeks",
+    "checks": {
+      "sdk_deployment": 0,
+      "url_patterns": 0,
+      "traffic_data": 10,
+      "tech_stack": 15,
+      "content_structure": 10,
+      "competitive_landscape": 10,
+      "mobile_responsive": 5
+    },
+    "blockers": [
+      "🔴 SDK not deployed (1-2 days to deploy)",
+      "🔴 No URL patterns detected - manual pattern input required"
+    ],
+    "quick_wins": [],
+    "critical_path": [
+      "1. Deploy Mula SDK via GTM or direct script tag (1-2 days)",
+      "2. Add manual URL patterns or refine pattern detection (2-4 hours)"
+    ]
+  }
+}

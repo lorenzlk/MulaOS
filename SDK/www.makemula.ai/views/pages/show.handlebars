@@ -1,0 +1,348 @@
+<script>
+  window.Mula = window.Mula || {};
+  window.Mula.mockHost = '{{tld}}';
+  {{#if feed}}
+  window.Mula.feed = {{{feed}}};
+  {{/if}}
+  {{#if tempFeed}}
+  window.Mula.feed = {{{tempFeed}}};
+  {{/if}}
+</script>
+<style>
+  h3 {
+    margin-top: 18px;
+  }
+  .temp-recommendations {
+    background-color: #fff3cd;
+    border: 1px solid #ffeaa7;
+    border-radius: 0.375rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+  .temp-recommendations h4 {
+    color: #856404;
+    margin-bottom: 0.5rem;
+  }
+</style>
+<div class="d-flex justify-content-between align-items-center m-3" style="margin-left:0 !important;">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb mb-0">
+      <li class="breadcrumb-item"><a href="/pages#{{domain}}">All Pages</a></li>
+      <li class="breadcrumb-item active" aria-current="page">
+        {{page.url}}
+        <a href="{{page.url}}" target="_blank" rel="noopener noreferrer" class="ms-3">
+          <i class="bi bi-box-arrow-up-right text-dark"></i>
+        </a>
+      </li>
+    </ol>
+  </nav>
+  
+  <div class="dropdown">
+    <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="pageActionsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+      <i class="bi bi-three-dots-vertical me-1"></i>Actions
+    </button>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="pageActionsDropdown">
+      {{#if (eq state 'approved')}}
+        <li>
+          <button class="dropdown-item" id="force-new-search-btn">
+            <i class="bi bi-arrow-clockwise me-2"></i>Force New Search
+          </button>
+        </li>
+        <li><hr class="dropdown-divider"></li>
+      {{/if}}
+      {{#if (eq state 'error')}}
+        <li>
+          <button class="dropdown-item" id="force-new-search-btn">
+            <i class="bi bi-arrow-clockwise me-2"></i>Force New Search
+          </button>
+        </li>
+        <li><hr class="dropdown-divider"></li>
+      {{/if}}
+      <li>
+        <a class="dropdown-item" href="/sales-enablement/page?url={{page.url}}" target="_blank" rel="noopener noreferrer">
+          <i class="bi bi-tools me-2"></i>Test Sales Enablement
+        </a>
+      </li>
+      <li><hr class="dropdown-divider"></li>
+      <li>
+        <button class="dropdown-item text-danger" id="delete-page-btn">
+          <i class="bi bi-trash me-2"></i>Delete Page
+        </button>
+      </li>
+    </ul>
+  </div>
+</div>
+
+{{#if keywords}}
+  <div class="alert alert-success d-flex align-items-center" role="alert">
+    <i class="bi bi-check-circle-fill me-2"></i> 
+    Keywords: {{keywords}}
+    {{#if search}}
+      {{#if search.platform}}
+        <span class="ms-3 badge bg-primary">{{search.platform}}</span>
+      {{/if}}
+    {{/if}}
+    {{#if searchIndex}}
+      <span class="ms-3 badge bg-secondary">Search Index: {{searchIndex}}</span>
+    {{/if}}
+  </div>
+{{/if}}
+  
+{{#if (eq state 'searching')}}
+  <div class="alert alert-info d-flex align-items-center" role="alert">
+    <i class="bi bi-hourglass-split me-2"></i>
+    Searching for products... Please wait.
+  </div>
+{{/if}}
+
+{{#if (eq state 'awaiting_approval')}}
+  <div class="temp-recommendations">
+    <h4><i class="bi bi-clock me-2"></i>Temporary Recommendations (Pending Approval)</h4>
+    <p class="mb-3">These are temporary product recommendations that have been generated but not yet approved for final deployment.</p>
+    {{#if tempProductCount}}
+      <p class="mb-3"><strong>Products Found:</strong> {{tempProductCount}}</p>
+    {{/if}}
+    <div class="d-flex gap-2 mb-3">
+      <button id="approve-products-btn" class="btn btn-success">
+        <i class="bi bi-check-circle me-2"></i>Approve Products
+      </button>
+      <button id="reject-products-btn" class="btn btn-danger">
+        <i class="bi bi-x-circle me-2"></i>Reject Products
+      </button>
+    </div>
+    <div id="product-feedback-form" class="mt-3 d-none">
+      <div class="mb-3">
+        <label for="productFeedback" class="form-label">Please provide feedback for the rejected products:</label>
+        <textarea class="form-control" id="productFeedback" rows="3" placeholder="Enter your feedback here..."></textarea>
+      </div>
+      <button id="submit-product-feedback-btn" class="btn btn-primary">Submit Feedback</button>
+    </div>
+    <h3>Top Shelf (Temporary)</h3>
+    <mula-topshelf cdn_url="{{cdnUrl}}" feed_url="{{tempRecommendationsUrl}}"></mula-topshelf>
+    <h3>Smart Scroll (Temporary)</h3>
+    <mula-smartscroll cdn_url="{{cdnUrl}}" feed_url="{{tempRecommendationsUrl}}"></mula-smartscroll>
+  </div>
+{{/if}}
+
+{{#if (eq state 'approved')}}
+  <div class="alert alert-success d-flex align-items-center" role="alert">
+    <i class="bi bi-check-circle-fill me-2"></i>
+    Products have been approved and are now live!
+  </div>
+  <h3>Top Shelf</h3>
+  <mula-topshelf cdn_url="{{cdnUrl}}" feed_url="{{mulaRecommendationsUrl}}"></mula-topshelf>
+  <h3>Smart Scroll</h3>
+  <mula-smartscroll cdn_url="{{cdnUrl}}" feed_url="{{mulaRecommendationsUrl}}"></mula-smartscroll>
+{{/if}}
+
+{{#if (eq state 'error')}}
+  <div class="alert alert-danger d-flex align-items-center" role="alert">
+    <i class="bi bi-x-circle-fill me-2"></i>
+    No products found or an error occurred during search. Please try again or provide feedback.
+  </div>
+{{/if}}
+
+{{!-- <h3 id="qa">Mula Q & A</h3>
+<mula-qa cdn-url="{{cdnUrl}}" page-url={{page.url}}></mula-qa> --}}
+
+<script>
+  const pageId = "{{page.id}}"; // Replace with actual page ID dynamically
+
+  const pollingInterval = 3000; // 3 seconds
+  const maxDuration = 300000; // 5 minutes
+  let elapsedTime = 0;
+
+  const pollForPage = (url) => {
+    const intervalId = setInterval(async () => {
+      try {
+        const response = await fetch(url);
+        if (response.ok) {
+          // Response is OK, refresh the page
+          clearInterval(intervalId);
+          location.reload();
+        } else {
+          // Response not OK, continue polling
+          elapsedTime += pollingInterval;
+          if (elapsedTime >= maxDuration) {
+            // Timeout exceeded, alert failure
+            clearInterval(intervalId);
+            alert('Failed to load the resource after 5 minutes.');
+          }
+        }
+      } catch (error) {
+        clearInterval(intervalId)
+        console.error('An error occurred during polling:', error);
+        // Optionally handle fetch errors (e.g., network issues)
+      }
+    }, pollingInterval);
+  };
+
+  const pollForStatus = () => {
+    const intervalId = setInterval(async () => {
+      try {
+        const response = await fetch(`/pages/${pageId}/status`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.state !== 'searching') {
+            // Status changed, refresh the page
+            clearInterval(intervalId);
+            location.reload();
+          }
+        } else {
+          // Response not OK, continue polling
+          elapsedTime += pollingInterval;
+          if (elapsedTime >= maxDuration) {
+            // Timeout exceeded, alert failure
+            clearInterval(intervalId);
+            alert('Failed to get status update after 5 minutes.');
+          }
+        }
+      } catch (error) {
+        clearInterval(intervalId);
+        console.error('An error occurred during status polling:', error);
+      }
+    }, pollingInterval);
+  };
+  
+  document.addEventListener('DOMContentLoaded', function () {
+    // Start status polling if page is in searching state
+    {{#if (eq state 'searching')}}
+      pollForStatus();
+    {{/if}}
+
+
+    const deletePageBtn = document.getElementById('delete-page-btn');
+    if(deletePageBtn) {
+      deletePageBtn.addEventListener('click', function() {
+        if (confirm('Are you sure you want to delete this page? This action cannot be undone.')) {
+          fetch(`/pages/${pageId}`, {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json',
+            }
+          })
+          .then(response => {
+            if (response.ok) {
+              window.location.href = '/pages#{{domain}}';
+            } else {
+              throw new Error('Failed to delete page');
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to delete page. Please try again.');
+          });
+        }
+      });
+    }
+
+    // Product approval/rejection handlers
+    const approveProductsBtn = document.getElementById('approve-products-btn');
+    const rejectProductsBtn = document.getElementById('reject-products-btn');
+    const productFeedbackForm = document.getElementById('product-feedback-form');
+    const submitProductFeedbackBtn = document.getElementById('submit-product-feedback-btn');
+
+    // Force new search handler
+    const forceNewSearchBtn = document.getElementById('force-new-search-btn');
+    if (forceNewSearchBtn) {
+      forceNewSearchBtn.addEventListener('click', async function() {
+        if (confirm('Are you sure you want to force a new search? This will clear the current search and start fresh with new keywords and products.')) {
+          try {
+            const response = await fetch(`/pages/${pageId}/remulaize`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              }
+            });
+
+            if (response.ok) {
+              location.reload();
+            } else {
+              throw new Error('Failed to force new search');
+            }
+          } catch (error) {
+            console.error('Error:', error);
+            alert('Failed to force new search. Please try again.');
+          }
+        }
+      });
+    }
+
+    if (approveProductsBtn) {
+      approveProductsBtn.addEventListener('click', async function() {
+        try {
+          const response = await fetch(`/pages/${pageId}/products/approve`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            }
+          });
+
+          if (response.ok) {
+            location.reload();
+          } else {
+            throw new Error('Failed to approve products');
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          alert('Failed to approve products. Please try again.');
+        }
+      });
+    }
+
+    if (rejectProductsBtn) {
+      rejectProductsBtn.addEventListener('click', function() {
+        productFeedbackForm.classList.remove('d-none');
+        rejectProductsBtn.disabled = true;
+        approveProductsBtn.disabled = true;
+      });
+    }
+
+    if (submitProductFeedbackBtn) {
+      submitProductFeedbackBtn.addEventListener('click', async function() {
+        const feedback = document.getElementById('productFeedback').value.trim();
+        if (!feedback) {
+          alert('Please provide feedback before submitting.');
+          return;
+        }
+
+        try {
+          const response = await fetch(`/pages/${pageId}/products/reject`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ feedback })
+          });
+
+          if (response.ok) {
+            location.reload();
+          } else {
+            throw new Error('Failed to submit feedback');
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          alert('Failed to submit feedback. Please try again.');
+        }
+      });
+    }
+
+
+  });
+</script>
+
+{{#if missingEncore}}
+  {{#if tempRecommendationsUrl}}
+    
+  {{else if mulaRecommendationsUrl}}
+    <script>
+      pollForPage('{{mulaRecommendationsUrl}}');
+    </script>
+  {{else}}
+    <br/>
+    <div class="alert alert-warning d-flex align-items-center" role="alert">
+      <i class="bi bi-exclamation-circle-fill me-2"></i> 
+      Pending recommendations generation.
+    </div>
+  {{/if}}
+{{/if}}

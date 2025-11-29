@@ -1,0 +1,157 @@
+# Quick CircleCI configuration that builds your JS, runs tests, and prepares to deploy to a bucket.
+# With your manual approval, you can then deploy to your S3 bucket AND invalidate your cloudfront cache.
+#
+
+
+version: 2.1
+
+orbs:
+  browser-tools: circleci/browser-tools@1.4.7
+
+
+commands:
+  compile:
+    description: "Compile the SDK"
+    steps:
+        - checkout
+        - attach_workspace:
+            at: ~/sdk.makemula.ai
+        # Download and cache dependencies
+        - restore_cache:
+            keys:
+            - v1-dependencies-{{ checksum "package.json" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
+
+        - run: npm install
+        - run: cd svelte-components && npm install && cp environments/.env.production ./.env
+        - run: cd ..
+        - save_cache:
+            paths:
+              - node_modules
+              - svelte-components/node_modules
+            key: v1-dependencies-{{ checksum "package.json" }}
+        - run: npm run build
+        - persist_to_workspace:
+            root: .
+            paths: .
+
+  test:
+    description: "Run tests"
+    steps:
+      - browser-tools/install-chrome
+      - browser-tools/install-chromedriver
+      - run: npm test
+
+jobs:
+  build:
+    docker:
+      # specify the version you desire here
+      - image: cimg/node:18.17.0-browsers
+    working_directory: ~/sdk.makemula.ai
+    steps:
+      - compile
+      - test
+  
+  deploy-release-candidate:
+    docker:
+      - image: cimg/aws:2023.09.1
+    parameters:
+      env:
+        type: string
+        default: staging
+    working_directory: ~/sdk.makemula.ai
+    steps:
+      - attach_workspace:
+          at: ~/sdk.makemula.ai
+      - deploy:
+          name: Deploy the release candidate
+          command: |
+            aws s3 sync dist/sdk s3://<< parameters.env >>.makemula.ai/sdk --region us-east-1 --acl public-read
+            LIB_VERSION=$(npm pkg get version --workspaces=false | tr -d \")
+            aws s3 cp s3://<< parameters.env >>.makemula.ai/sdk/$LIB_VERSION s3://<< parameters.env >>.makemula.ai/sdk/$LIB_VERSION --exclude '*' --include '*.js' --no-guess-mime-type --content-type="application/javascript" --metadata-directive="REPLACE" --recursive --region us-east-1 --acl public-read
+
+  deploy:
+    docker:
+      - image: cimg/aws:2023.09.1
+    parameters:
+      env:
+        type: string
+        default: staging
+      distro:
+        type: string
+        default: E1UUPI9PU1YFNC
+    working_directory: ~/sdk.makemula.ai
+    steps:
+      - attach_workspace:
+          at: ~/sdk.makemula.ai
+      - deploy:
+          name: Deploy mula.js
+          command: |
+            aws s3 sync dist/js s3://<< parameters.env >>.makemula.ai/js --region us-east-1 --acl public-read
+            aws cloudfront create-invalidation --distribution-id << parameters.distro >> --paths "/js/mula.js"
+
+staging_only: &staging_only
+  context: staging
+  filters:
+    branches:
+      only:
+        /^(release|hotfix).*/
+
+production_only: &production_only
+  context: production
+  filters:
+    tags:
+      only: /^v.*/
+    branches:
+      ignore:
+        /.*/
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - build:
+          filters:
+            branches:
+              only:
+                /^(main|feature|techdebt).*/
+
+  deploy-staging:
+    jobs:
+      - build:
+          <<: *staging_only
+      - deploy-release-candidate:
+          <<: *staging_only
+          requires:
+            - build
+      - hold:
+          type: approval
+          <<: *staging_only
+          requires:
+            - deploy-release-candidate
+      - deploy:
+          <<: *staging_only
+          requires:
+            - hold
+
+  deploy-production:
+    jobs:
+      - build:
+          <<: *production_only
+      - deploy-release-candidate:
+          <<: *production_only
+          env: prod
+          requires:
+            - build
+      - hold:
+          type: approval
+          <<: *production_only
+          requires:
+            - deploy-release-candidate
+      - deploy:
+          <<: *production_only
+          env: prod
+          distro: E1RRG9TJNFNES4
+          requires:
+            - hold

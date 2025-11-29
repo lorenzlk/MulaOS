@@ -1,0 +1,91 @@
+name: Deploy SDK to AWS
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_deploy:
+        description: 'Confirm deployment to production'
+        required: true
+        type: boolean
+        default: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            sdk.makemula.ai/node_modules
+            sdk.makemula.ai/svelte-components/node_modules
+          key: deps-${{ runner.os }}-${{ hashFiles('sdk.makemula.ai/package.json') }}
+          restore-keys: deps-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: |
+          cd sdk.makemula.ai
+          npm install
+
+      - name: Install dependencies for Svelte components
+        run: |
+          cd sdk.makemula.ai/svelte-components
+          npm install
+          cp environments/.env.production ./.env
+
+      - name: Build SDK
+        env:
+          ENVIRONMENT: production
+        run: |
+          cd sdk.makemula.ai
+          npm run build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: sdk-build
+          path: sdk.makemula.ai/dist
+
+  deploy-production:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/sdk-v')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: sdk-build
+          path: sdk.makemula.ai/dist
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-region: us-east-1
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Deploy Release Candidate to S3
+        run: |
+          cd sdk.makemula.ai
+          aws s3 sync dist/sdk s3://prod.makemula.ai/sdk --region us-east-1 --acl public-read
+          LIB_VERSION=$(npm pkg get version --workspaces=false | tr -d \")
+          aws s3 cp s3://prod.makemula.ai/sdk/$LIB_VERSION s3://prod.makemula.ai/sdk/$LIB_VERSION --exclude '*' --include '*.js' --no-guess-mime-type --content-type="application/javascript" --metadata-directive="REPLACE" --recursive --region us-east-1 --acl public-read
+          aws s3 cp s3://prod.makemula.ai/sdk/$LIB_VERSION s3://prod.makemula.ai/sdk/$LIB_VERSION --exclude '*' --include '*.css' --no-guess-mime-type --content-type="text/css" --metadata-directive="REPLACE" --recursive --region us-east-1 --acl public-read
+          aws s3 cp s3://prod.makemula.ai/sdk/$LIB_VERSION s3://prod.makemula.ai/sdk/$LIB_VERSION --exclude '*' --include '*.json' --no-guess-mime-type --content-type="application/json" --metadata-directive="REPLACE" --recursive --region us-east-1 --acl public-read
+
+      - name: Check Deployment Confirmation
+        if: inputs.confirm_deploy != true
+        run: |
+          echo "❌ Deployment not confirmed. Please set confirm_deploy to true to proceed."
+          exit 1
+
+      - name: Deploy to Production and Invalidate Cache
+        run: |
+          aws s3 sync sdk.makemula.ai/dist/js s3://prod.makemula.ai/js --region us-east-1 --acl public-read --cache-control "public, s-maxage=3600, no-cache, must-revalidate, max-age=0" --expires "1970-01-01T00:00:00Z"
+          aws cloudfront create-invalidation --distribution-id E1RRG9TJNFNES4 --paths "/js/mula.js"

@@ -1,0 +1,34 @@
+{
+    "position": 9,
+    "title": "Levi's Men's 501 Original Shrink-to-Fit Jeans",
+    "product_link": "https://www.google.com/shopping/product/4251541561201364961?gl=us",
+    "product_id": "4251541561201364961",
+    "serpapi_product_api": "https://serpapi.com/search.json?engine=google_product&gl=us&google_domain=google.com&hl=en&location=United+States&product_id=4251541561201364961",
+    "immersive_product_page_token": "eyJlaSI6IjVfTVVhSkhzTXBxTHdia1A3ZkdUOEFZIiwicHJvZHVjdGlkIjoiIiwiY2F0YWxvZ2lkIjoiNDI1MTU0MTU2MTIwMTM2NDk2MSIsImhlYWRsaW5lT2ZmZXJEb2NpZCI6IjYzNjA3MjAzNDAyMjQ4NTQ2NjIiLCJpbWFnZURvY2lkIjoiMzUzOTMxNTI4OTYzMTA2MTk3OCIsInJkcyI6IlBDXzE3MzIwNzAxOTk4NzY1NTU1MjI5fFBST0RfUENfMTczMjA3MDE5OTg3NjU1NTUyMjkiLCJxdWVyeSI6ImNlbGVicml0eStzdHlsZStlc3NlbnRpYWxzIiwiZ3BjaWQiOiIxNzMyMDcwMTk5ODc2NTU1NTIyOSIsIm1pZCI6IjU3NjQ2MjgxNDc4ODg1NjYyMCIsInB2dCI6ImEiLCJ1dWxlIjoidytDQUlRSUNJTlZXNXBkR1ZrSUZOMFlYUmxjdyJ9",
+    "serpapi_immersive_product_api": "https://serpapi.com/search.json?engine=google_immersive_product&page_token=eyJlaSI6IjVfTVVhSkhzTXBxTHdia1A3ZkdUOEFZIiwicHJvZHVjdGlkIjoiIiwiY2F0YWxvZ2lkIjoiNDI1MTU0MTU2MTIwMTM2NDk2MSIsImhlYWRsaW5lT2ZmZXJEb2NpZCI6IjYzNjA3MjAzNDAyMjQ4NTQ2NjIiLCJpbWFnZURvY2lkIjoiMzUzOTMxNTI4OTYzMTA2MTk3OCIsInJkcyI6IlBDXzE3MzIwNzAxOTk4NzY1NTU1MjI5fFBST0RfUENfMTczMjA3MDE5OTg3NjU1NTUyMjkiLCJxdWVyeSI6ImNlbGVicml0eStzdHlsZStlc3NlbnRpYWxzIiwiZ3BjaWQiOiIxNzMyMDcwMTk5ODc2NTU1NTIyOSIsIm1pZCI6IjU3NjQ2MjgxNDc4ODg1NjYyMCIsInB2dCI6ImEiLCJ1dWxlIjoidytDQUlRSUNJTlZXNXBkR1ZrSUZOMFlYUmxjdyJ9",
+    "source": "Macy's",
+    "source_icon": "https://serpapi.com/searches/6814f3e7c76184f740bc314b/images/5046dd57bd8267f3ebcea2c918e591b038d2e055ba610e67d938f057675102da.png",
+    "multiple_sources": true,
+    "price": "$55.65",
+    "extracted_price": 55.65,
+    "old_price": "$80",
+    "extracted_old_price": 80,
+    "rating": 4.3,
+    "reviews": 5300,
+    "extensions": [
+        "Try-on",
+        "30% OFF"
+    ],
+    "thumbnail": "https://serpapi.com/searches/6814f3e7c76184f740bc314b/images/5046dd57bd8267f3ebcea2c918e591b03ee064f847b46a17ed1afcfd159803c0.webp",
+    "thumbnails": [
+        "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTyjfXWPXio7Sy3tFJ9ZbDQKI_PuOxeZrhx85X1n45GJiK5-7Hqblh-GU5ICBfnq-I1COp3VIcZSVcVMS1ElWHOP4IjXGUVdjWX1EnYNQqY"
+    ],
+    "serpapi_thumbnails": [
+        "https://serpapi.com/images/url/rykK7nicDcnbCoIwAADQL5piKqYQUWY6JS-YOn2JnHdsbrpAf6e_6m_qvJ7vp-OcLoYo1gTPG-V1BXhJdkK78CfvsYCnl7h0E6U9aY_s8D_j5Fe6je_b0KAsRP2kxZvMr65elJfIg4_wHax1MXfrXkUSUVTb7T0VaA4rxw7YiQrNc0MYgJIZUDmFuIhTnN5iyRozJwgVOCA7SashQ5JFcj9i-Q8grjiT"
+    ],
+    "tag": "30% OFF",
+    "delivery": "Get it by May 8 (Free)",
+    "description": "A timeless classic, these shrink-to-fit jeans provide a perfect fit and unmatched durability.",
+    "immersive_url": "https://cdn.makemula.ai/products/4251541561201364961/immersive.json",
+    "id": "4251541561201364961"
+}

@@ -1,0 +1,132 @@
+# Next Page Manifest Refresh Cron Job
+# 
+# This file contains example cron configurations for running the next-page manifest refresh script.
+# Choose the configuration that best fits your deployment setup.
+#
+# The script refreshes next-page manifest files for all active publishers by:
+# 1. Finding all active domains from the SiteTargeting table
+# 2. Fetching existing manifests from CDN
+# 3. Re-uploading them to S3 with fresh cache headers
+# 4. Ensuring optimal performance and cache invalidation
+
+# =============================================================================
+# OPTION 1: Heroku Scheduler (Recommended for Heroku deployments)
+# =============================================================================
+# 
+# In your Heroku dashboard:
+# 1. Go to your app → Resources → Heroku Scheduler
+# 2. Add a new job with:
+#    Command: cd /app && npm run refresh-next-page-manifests
+#    Frequency: Daily at 2:00 AM UTC
+#
+# Or via CLI:
+# heroku addons:create scheduler:standard
+# heroku addons:open scheduler
+# Then add: "cd /app && npm run refresh-next-page-manifests" (Daily at 2:00 AM UTC)
+
+# =============================================================================
+# OPTION 2: System Cron (For VPS/Server deployments)
+# =============================================================================
+#
+# Add this line to your crontab (run `crontab -e`):
+# 0 2 * * * cd /path/to/mula/www.makemula.ai && NODE_ENV=production node scripts/next-page-manifest-refresh.js >> /var/log/mula-manifest-refresh.log 2>&1
+#
+# This runs daily at 2:00 AM and logs output to /var/log/mula-manifest-refresh.log
+#
+# To view logs: tail -f /var/log/mula-manifest-refresh.log
+
+# =============================================================================
+# OPTION 3: Docker Cron (For containerized deployments)
+# =============================================================================
+#
+# Add to your Dockerfile or docker-compose.yml:
+# 
+# # In Dockerfile:
+# RUN echo "0 2 * * * cd /app && NODE_ENV=production node scripts/next-page-manifest-refresh.js >> /var/log/mula-manifest-refresh.log 2>&1" | crontab -
+# 
+# # In docker-compose.yml:
+# services:
+#   mula-cron:
+#     build: .
+#     command: crond -f
+#     volumes:
+#       - ./logs:/var/log
+#     environment:
+#       - NODE_ENV=production
+#       - DATABASE_URL=${DATABASE_URL}
+#       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+#       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+
+# =============================================================================
+# OPTION 4: AWS EventBridge (For AWS deployments)
+# =============================================================================
+#
+# Create an EventBridge rule with:
+# - Schedule expression: cron(0 2 * * ? *)
+# - Target: Lambda function or ECS task
+# - Lambda function code:
+#   exports.handler = async (event) => {
+#     const { exec } = require('child_process');
+#     const { promisify } = require('util');
+#     const execAsync = promisify(exec);
+#     
+#     try {
+#       const { stdout, stderr } = await execAsync('cd /var/task && node scripts/next-page-manifest-refresh.js');
+#       console.log('Manifest refresh completed:', stdout);
+#       if (stderr) console.error('Stderr:', stderr);
+#       return { statusCode: 200, body: 'Success' };
+#     } catch (error) {
+#       console.error('Error:', error);
+#       return { statusCode: 500, body: 'Error' };
+#     }
+#   };
+
+# =============================================================================
+# ENVIRONMENT VARIABLES REQUIRED
+# =============================================================================
+#
+# Make sure these environment variables are set in your deployment:
+# - NODE_ENV=production (to actually upload to S3)
+# - DATABASE_URL=postgresql://... (PostgreSQL connection string)
+# - AWS_ACCESS_KEY_ID=... (AWS credentials)
+# - AWS_SECRET_ACCESS_KEY=... (AWS credentials)
+#
+# For Heroku, set them with:
+# heroku config:set NODE_ENV=production
+# heroku config:set DATABASE_URL=postgresql://...
+# heroku config:set AWS_ACCESS_KEY_ID=...
+# heroku config:set AWS_SECRET_ACCESS_KEY=...
+
+# =============================================================================
+# MONITORING AND ALERTING
+# =============================================================================
+#
+# The script exits with code 1 if any manifests fail to refresh.
+# You can use this for monitoring:
+#
+# # Check exit code in cron
+# 0 2 * * * cd /path/to/mula && node scripts/next-page-manifest-refresh.js || echo "Manifest refresh failed" | mail -s "Mula Manifest Refresh Failed" admin@example.com
+#
+# # Or with Slack webhook
+# 0 2 * * * cd /path/to/mula && node scripts/next-page-manifest-refresh.js || curl -X POST -H 'Content-type: application/json' --data '{"text":"❌ Mula manifest refresh failed"}' YOUR_SLACK_WEBHOOK_URL
+
+# =============================================================================
+# TESTING
+# =============================================================================
+#
+# Test the script manually before setting up cron:
+# cd /path/to/mula/www.makemula.ai
+# 
+# # Dry run (default - safe for testing, saves JSON to ./dry-run-manifests/)
+# npm run refresh-next-page-manifests
+# 
+# # Or with explicit dry-run flag
+# npm run refresh-next-page-manifests -- --dry-run
+# 
+# # Force production mode (actually uploads to S3)
+# npm run refresh-next-page-manifests -- --force
+# 
+# # Or with NODE_ENV=production
+# NODE_ENV=production npm run refresh-next-page-manifests
+#
+# Dry-run mode shows what would be written to S3 and saves JSON files for inspection.

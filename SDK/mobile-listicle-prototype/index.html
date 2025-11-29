@@ -1,0 +1,4075 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Listicle Prototype</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: #f8f8f8;
+            background-image: radial-gradient(circle, #e0e0e0 1px, transparent 1px);
+            background-size: 20px 20px;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        .sandbox-title {
+            position: fixed;
+            top: 40px;
+            left: 40px;
+            font-family: "SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif;
+            font-weight: 100;
+            font-size: 52px;
+            color: #666;
+            margin: 0;
+        }
+        .widget-description {
+            display: none; /* Remove old description */
+        }
+        .widget-toggles {
+            position: fixed;
+            top: 120px;
+            left: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .widget-group {
+            display: flex;
+            flex-direction: column;
+            max-width: 240px;
+        }
+        .widget-info {
+            margin-left: 28px;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+            opacity: 0;
+            transform: translateY(-8px);
+        }
+        .widget-group.active .widget-info {
+            max-height: 200px;
+            opacity: 1;
+            transform: translateY(0);
+            margin-top: 12px;
+            margin-bottom: 20px;
+        }
+        .widget-info-content {
+            color: #666;
+            font-size: 13px;
+            line-height: 1.5;
+            transform: translateY(-4px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+            transition-delay: 0.1s;
+        }
+        .widget-group.active .widget-info-content {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .widget-info-content strong {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .widget-info-content ul {
+            margin: 8px 0 0 0;
+            padding-left: 16px;
+            color: #666;
+        }
+        .widget-info-content li {
+            margin: 4px 0;
+            font-size: 12px;
+        }
+        .widget-toggle {
+            align-self: flex-start;
+            padding: 12px 24px 12px 28px;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-family: "SF Pro Text", -apple-system, BlinkMacSystemFont, sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            letter-spacing: 0.3px;
+            position: relative;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        .widget-toggle::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            width: 6px;
+            height: 6px;
+            background: #ff3b30;
+            border-radius: 50%;
+            transform: translateY(-50%);
+            transition: background-color 0.2s ease;
+        }
+        .widget-toggle:hover {
+            background: rgba(0, 0, 0, 0.8);
+            transform: translateY(-1px);
+        }
+        .widget-toggle.active {
+            background: rgba(0, 0, 0, 0.9);
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+            transform: none;
+        }
+        .widget-toggle.active::before {
+            background: #30d158;
+        }
+        .mobile-container {
+            width: 375px;
+            height: 812px;
+            background: #000;
+            border-radius: 40px;
+            border: 2px solid #000;
+            padding: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: white;
+            border-radius: 25px;
+        }
+        #widget-container {
+            position: fixed;
+            /* Widget positioning will be added as we develop them */
+        }
+        /* Remove the glare effect */
+        .mobile-container::before {
+            display: none;
+        }
+        /* Navigation Tabs */
+        .navigation-tabs {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 8px;
+            z-index: 1000;
+        }
+        .nav-tab {
+            padding: 8px 16px 8px 28px;  /* Increased left padding for the circle */
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: "SF Pro Text", -apple-system, BlinkMacSystemFont, sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            position: relative;  /* For absolute positioning of circle */
+        }
+        .nav-tab::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            width: 6px;
+            height: 6px;
+            background: #ff3b30;  /* Red circle by default */
+            border-radius: 50%;
+            transform: translateY(-50%);
+            transition: background-color 0.2s ease;
+        }
+        .nav-tab:hover {
+            background: rgba(0, 0, 0, 0.8);
+            transform: translateY(-1px);
+        }
+        .nav-tab.active {
+            background: rgba(0, 0, 0, 0.9);
+        }
+        .nav-tab.active::before {
+            background: #30d158;  /* Green circle when active */
+        }
+        /* Widget 1 Styles */
+        .mula-widget-1 {
+            position: absolute;
+            top: 100px;
+            left: 15px;
+            right: 29px;
+            z-index: 9999;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+            border-radius: 2px;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+            pointer-events: auto;
+        }
+        .mula-progress-bar {
+            height: 2px;
+            background: #FF3366;
+            width: 0%;
+            transition: width 0.2s ease;
+        }
+        .mula-now-playing {
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 8px 12px;
+            color: white;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            height: 20px;
+            overflow: visible;
+            cursor: pointer;
+            user-select: none;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .mula-now-playing-label {
+            color: #FF3366;
+            font-weight: 600;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            flex-shrink: 0;
+            line-height: 1;
+            opacity: 0.9;
+        }
+        .mula-now-playing-text {
+            flex: 1;
+            position: relative;
+            height: 16px;
+            overflow: hidden;
+            mask-image: linear-gradient(to right, black 85%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%);
+            opacity: 0.9;
+            min-width: 0;
+        }
+        /* Refined expand/collapse indicator */
+        .mula-now-playing::after {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-right: 1.5px solid rgba(255, 255, 255, 0.8);
+            border-bottom: 1.5px solid rgba(255, 255, 255, 0.8);
+            transform: rotate(45deg) translateY(-2px);
+            margin-left: auto;
+            transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+            flex-shrink: 0;
+        }
+        .mula-widget-1.expanded .mula-now-playing::after {
+            transform: rotate(225deg) translateY(0);
+        }
+        .mula-drawer {
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-top: none;
+            position: relative;
+        }
+        .mula-widget-1.expanded .mula-drawer {
+            max-height: 280px;
+        }
+        .mula-drawer-content {
+            padding: 16px 16px 10px 16px; /* Reduce bottom padding */
+            display: flex;
+            flex-direction: column;
+            gap: 10px; /* Reduce gap slightly */
+        }
+        .mula-main-content {
+            display: flex;
+            gap: 16px;
+        }
+        .mula-thumbnail-section {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .mula-thumbnail {
+            width: 72px;
+            height: 72px;
+            background-size: cover;
+            background-position: center;
+            border-radius: 2px;
+            flex-shrink: 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        .mula-thumbnail-metrics {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.8);
+            width: 72px; /* Match thumbnail width */
+        }
+        .mula-metrics-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            width: 100%;
+        }
+        .mula-thumbnail::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(255,51,102,0.2), transparent);
+        }
+        .mula-thumbnail.loading {
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 0.8; }
+            100% { opacity: 0.6; }
+        }
+        .mula-price {
+            position: absolute;
+            bottom: 16px;
+            right: 16px;
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+            background: rgba(0, 0, 0, 0.85);
+            padding: 4px 8px;
+            border-radius: 2px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            letter-spacing: 0.5px;
+        }
+        .mula-price-discount {
+            color: #FF3366;
+            margin-left: 6px;
+        }
+        .mula-details {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            min-width: 0;
+        }
+        .mula-item-count {
+            font-size: 10px;
+            color: #FF3366;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+            opacity: 0.9;
+        }
+        .mula-quick-nav {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 4px;
+            margin-top: auto;
+        }
+        .mula-quick-nav-item {
+            height: 28px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+            color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+        }
+        .mula-quick-nav-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+        }
+        .mula-quick-nav-item:hover {
+            border-color: rgba(255, 255, 255, 0.4);
+            color: white;
+        }
+        .mula-quick-nav-item.active {
+            background: #FF3366;
+            border-color: #FF3366;
+            color: white;
+        }
+        .mula-share-button {
+            padding: 8px 12px;
+            background: transparent;
+            border: 1px solid #FF3366;
+            color: #FF3366;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            border-radius: 2px;
+            margin-top: auto;
+        }
+        .mula-share-button:hover {
+            background: #FF3366;
+            color: white;
+        }
+        .mula-text-rotator {
+            position: absolute;
+            width: 100%;
+            transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+            line-height: 16px;
+        }
+        .mula-text-item {
+            height: 16px;
+            white-space: nowrap;
+            line-height: 16px;
+            display: flex;
+            align-items: center;
+            font-weight: 400;
+        }
+        .mula-text-item.marquee {
+            animation: marquee 15s linear infinite;
+            animation-play-state: running;
+        }
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+        }
+        .mula-price-tag {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: #FF3366;
+            color: white;
+            padding: 4px 8px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 2px;
+            letter-spacing: 0.5px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 2px;
+        }
+        .mula-price-original {
+            font-size: 10px;
+            text-decoration: line-through;
+            opacity: 0.8;
+        }
+        .mula-price-discount {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        .mula-engagement-metrics {
+            position: absolute;
+            left: 8px;
+            bottom: 8px;
+            display: flex;
+            gap: 12px;
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.8);
+            align-items: center;
+        }
+        .mula-metric {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .mula-metric-icon {
+            width: 12px;
+            height: 12px;
+            opacity: 0.8;
+        }
+        .mula-save-button {
+            width: 100%;
+            padding: 4px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+            color: white;
+            font-size: 10px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .mula-save-button:hover {
+            border-color: #FF3366;
+            color: #FF3366;
+        }
+        .mula-save-button.saved {
+            background: #FF3366;
+            border-color: #FF3366;
+            color: white;
+        }
+        .mula-save-button.saved:hover {
+            background: #E62E5C;
+            border-color: #E62E5C;
+        }
+        .mula-save-button svg {
+            width: 12px;
+            height: 12px;
+            transition: all 0.2s ease;
+        }
+        .mula-save-button.saved svg {
+            fill: white;
+        }
+        .mula-others-viewed {
+            margin-top: 8px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .mula-others-viewed-title {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+        .mula-others-viewed-items {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 4px;
+            min-height: 40px;
+            padding: 0 1px;
+            margin: 0 8px; /* Add margin to bring thumbnails in from edges */
+        }
+        .mula-others-viewed-item {
+            width: 100%;
+            padding-bottom: 100%;
+            background-size: cover;
+            background-position: center;
+            border-radius: 2px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .mula-others-viewed-item.loading {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .mula-others-viewed-item.loading::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(255,51,102,0.1), transparent);
+        }
+        .mula-others-viewed-item.loading::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 200%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent 0%,
+                rgba(255, 255, 255, 0.1) 50%,
+                transparent 100%
+            );
+            animation: shimmerMove 1.5s infinite;
+        }
+        @keyframes shimmerMove {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(50%); }
+        }
+        .mula-others-viewed-item:hover {
+            border-color: #FF3366;
+        }
+        /* Widget Style 2 */
+        .mula-widget-2 {
+            position: absolute;
+            bottom: 30px;
+            left: 45px;
+            right: 59px;
+            z-index: 9999;
+            pointer-events: none;
+            visibility: hidden;
+        }
+        .mula-widget-2.active {
+            visibility: visible;
+            pointer-events: auto; /* Enable interactions when active */
+        }
+        .mula-dock {
+            position: relative;
+            height: 64px;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            display: flex;
+            align-items: center;
+            padding: 0 12px;
+            transform: translateY(0);
+            transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+            pointer-events: auto;
+            border-radius: 32px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        .pin-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            cursor: pointer;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: none;
+            transition: all 0.2s ease;
+            margin-top: 12px;
+            margin-bottom: 16px;
+        }
+        .pin-button:hover {
+            transform: translateY(-1px);
+            background: rgba(0, 0, 0, 0.9);
+        }
+        .pin-button.pinned {
+            background: #30d158;
+        }
+        .mula-dock-items {
+            display: flex;
+            gap: 16px;
+            height: 44px;
+            align-items: center;
+            padding: 0 12px;
+        }
+        .mula-dock-item {
+            width: 44px;
+            height: 44px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+            transform-origin: center;
+            border-radius: 12px;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .mula-dock-item:hover {
+            transform: translateY(-4px);
+            border-color: rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.15);
+        }
+        .mula-dock-item-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .mula-dock-divider {
+            width: 1px;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.2);
+            margin: 0 8px;
+        }
+        .mula-dock.hidden {
+            transform: translateY(100%);
+            opacity: 0;
+        }
+        .mula-suggested-items {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        .mula-suggested-item {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        .mula-suggested-item.loading {
+            animation: pulse 1.5s infinite;
+        }
+        .mula-suggested-item.loading::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(255,255,255,0.1), transparent);
+        }
+        .mula-suggested-item.loading::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 200%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent 0%,
+                rgba(255, 255, 255, 0.1) 50%,
+                transparent 100%
+            );
+            animation: shimmerMove 1.5s infinite;
+        }
+        @keyframes shimmerMove {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(50%); }
+        }
+        @keyframes pulse {
+            0% { opacity: 0.5; }
+            50% { opacity: 0.7; }
+            100% { opacity: 0.5; }
+        }
+        /* Focus View Styles */
+        .mula-focus-view {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            z-index: 10001;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            transform: translateY(100%);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+            pointer-events: none;
+        }
+        .mula-focus-view.visible {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .mula-focus-header {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 20px;
+        }
+        .mula-focus-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .mula-focus-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+        .mula-focus-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 24px;
+        }
+        .mula-focus-image {
+            width: 100%;
+            max-width: 280px;
+            aspect-ratio: 1;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        .mula-focus-details {
+            text-align: center;
+            color: white;
+        }
+        .mula-focus-price {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        .mula-focus-description {
+            font-size: 16px;
+            line-height: 1.5;
+            color: rgba(255, 255, 255, 0.9);
+            max-width: 280px;
+            margin: 0 auto;
+        }
+        .mula-focus-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+        .mula-focus-button {
+            padding: 12px 24px;
+            border-radius: 24px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .mula-focus-button.primary {
+            background: white;
+            color: black;
+            border: none;
+        }
+        .mula-focus-button.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        .mula-focus-button.secondary {
+            background: transparent;
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .mula-focus-button.secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+        /* Widget Style 3 - Text Selection Popup */
+        .mula-widget-3 {
+            position: fixed;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            min-width: 280px;
+            max-width: 320px;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            color: white;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+            overflow: hidden;
+            transform-origin: top center;
+            transform: scale(0.98) translateY(10px);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+            visibility: hidden;
+        }
+
+        .mula-widget-3.visible {
+            transform: scale(1) translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+            visibility: visible;
+        }
+
+        .mula-selection-header {
+            padding: 12px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.7);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .mula-selection-content {
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .mula-recommended-products {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .mula-product-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .mula-product-card:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.25);
+        }
+
+        .mula-product-image {
+            width: 100%;
+            padding-bottom: 100%;
+            background-size: cover;
+            background-position: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .mula-product-info {
+            padding: 8px;
+        }
+
+        .mula-product-title {
+            font-size: 12px;
+            font-weight: 500;
+            margin: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .mula-product-price {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 2px;
+        }
+
+        .mula-actions {
+            display: flex;
+            gap: 8px;
+            padding: 12px 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .mula-action-button {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 18px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            color: white;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .mula-action-button:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .mula-action-button svg {
+            width: 16px;
+            height: 16px;
+            opacity: 0.9;
+        }
+
+        /* Widget 4 - Horizontal Carousel Styles */
+        .mula-widget-4 {
+            position: fixed;
+            bottom: 15px;
+            left: 15px;
+            right: 15px;
+            width: calc(100% - 30px);
+            z-index: 9990;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", sans-serif;
+            visibility: hidden;
+            transform-origin: bottom center;
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .mula-widget-4.active {
+            visibility: visible;
+        }
+
+        .mula-widget-4.expanded {
+            visibility: visible !important;
+            z-index: 9999 !important;
+        }
+
+        /* Initial State - Peek Card */
+        .mula-peek-card {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100%);
+            width: 180px;
+            height: 64px;
+            background: rgba(0, 0, 0, 0.65); /* Lower opacity for better blur effect */
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 9990;
+            cursor: pointer;
+            opacity: 0;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+        
+        .mula-widget-4.active .mula-peek-card {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+        
+        .mula-widget-4.expanded .mula-peek-card {
+            opacity: 0;
+            transform: translateX(-50%) translateY(100%);
+            pointer-events: none;
+        }
+        
+        .mula-peek-image {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            background-size: cover;
+            background-position: center;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+        
+        .mula-peek-content {
+            flex: 1;
+            overflow: hidden;
+        }
+        
+        .mula-peek-title {
+            font-size: 12px;
+            color: white;
+            font-weight: 500;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        /* Add text scrolling like Now Playing */
+        .mula-text-scroller {
+            position: relative;
+            height: 14px;
+            overflow: hidden;
+        }
+        
+        .mula-scrolling-text {
+            position: absolute;
+            white-space: nowrap;
+            animation: textScroll 12s linear infinite;
+        }
+        
+        @keyframes textScroll {
+            0% { transform: translateX(0); }
+            40% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+        }
+        
+        .mula-peek-price {
+            font-size: 11px;
+            color: #FF375F;
+            font-weight: 600;
+        }
+        
+        .mula-peek-indicator {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.7;
+        }
+        
+        /* Carousel container styles */
+        .mula-carousel-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.65); /* Lower opacity for better blur effect */
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 18px 18px 0 0 !important; /* Bottom corners flat to touch screen edge */
+            padding-bottom: 0 !important; /* Remove extra padding */
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: none; /* Remove bottom border */
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        .mula-widget-4.expanded .mula-carousel-container {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Enhanced carousel header styles with fixed overlap */
+        .mula-carousel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            position: relative;
+        }
+        
+        .mula-carousel-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: white;
+            letter-spacing: -0.01em;
+        }
+        
+        .mula-carousel-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-right: 40px; /* Add margin to avoid overlap with close button */
+        }
+        
+        .mula-carousel-arrow {
+            width: 30px;
+            height: 30px;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .mula-carousel-arrow svg {
+            width: 16px;
+            height: 16px;
+        }
+        
+        .mula-carousel-arrow:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .mula-carousel-indicator {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .mula-carousel-track {
+            padding: 15px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .mula-carousel-track::-webkit-scrollbar {
+            display: none;
+        }
+
+        .mula-carousel-items {
+            display: flex;
+            transition: transform 0.5s ease;
+        }
+        
+        .mula-carousel-item {
+            min-width: 180px;
+            height: 260px;
+            margin-right: 12px;
+            border-radius: 14px;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            transform-origin: center bottom;
+        }
+        
+        .mula-carousel-item:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
+        }
+        
+        /* Add microanimation for tap */
+        .mula-carousel-item:active {
+            transform: scale(0.98) translateY(-2px);
+            transition: all 0.1s ease;
+        }
+        
+        .mula-item-image {
+            height: 65%;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        
+        .mula-item-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 4px;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+        
+        .mula-item-content {
+            padding: 12px;
+        }
+        
+        .mula-item-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: white;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .mula-item-price {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.7);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .mula-price-original {
+            text-decoration: line-through;
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .mula-price-discount {
+            color: #FF375F;
+        }
+
+        /* Widget 5 - Glass Card Grid Styles */
+        .mula-widget-5 {
+            position: absolute;
+            top: 60px;
+            left: 15px;
+            right: 15px;
+            z-index: 9991;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", sans-serif;
+            visibility: hidden;
+        }
+        
+        .mula-widget-5.active {
+            visibility: visible;
+        }
+        
+        /* Initial State - Floating Indicator */
+        .mula-floating-indicator {
+            position: absolute; /* Changed back to absolute so it's positioned within the mobile mockup */
+            top: 60px;
+            right: 20px;
+            width: 36px; /* Smaller size */
+            height: 36px; /* Smaller size */
+            border-radius: 18px;
+            background: rgba(33, 33, 33, 0.85); /* Dark color instead of white */
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1); /* Darker border */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            cursor: pointer;
+            transform: translateY(-20px);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            /* Add transition for scroll reactivity */
+            transition-property: transform, opacity, background, width, height, top;
+        }
+        
+        .mula-indicator-icon {
+            width: 18px; /* Smaller icon */
+            height: 18px; /* Smaller icon */
+            opacity: 0.9;
+        }
+        
+        .mula-widget-5.active .mula-floating-indicator {
+            transform: translateY(0);
+            opacity: 0.85; /* Slightly more transparent */
+        }
+        
+        /* Scroll reactivity - make it more compact when scrolling */
+        .mula-widget-5.scrolled .mula-floating-indicator {
+            top: 20px; /* Move up when scrolled */
+            width: 32px; /* Even smaller when scrolled */
+            height: 32px; /* Even smaller when scrolled */
+            background: rgba(33, 33, 33, 0.75); /* More transparent when scrolled */
+        }
+        
+        .mula-widget-5.scrolled .mula-indicator-icon {
+            width: 16px; /* Smaller icon when scrolled */
+            height: 16px; /* Smaller icon when scrolled */
+        }
+        
+        .mula-widget-5.expanded .mula-floating-indicator {
+            opacity: 0;
+            transform: scale(0.8) translateY(-20px);
+            pointer-events: none;
+        }
+        
+        .mula-glass-container {
+            position: absolute;
+            top: 50px;
+            left: 10px;
+            right: 10px;
+            max-height: 90%; /* Increase max height from 80% to 90% */
+            overflow-y: auto; /* Add scrolling for the container if needed */
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 18px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            opacity: 0;
+            transform: scale(0.95);
+            transform-origin: top right;
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none;
+            z-index: 9992;
+        }
+        
+        .mula-widget-5.expanded .mula-glass-container {
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: auto;
+        }
+        
+        /* Change from grid to horizontal carousel layout */
+        .mula-glass-grid {
+            display: flex;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            padding: 10px 5px 15px; /* Add extra bottom padding since we're removing the button */
+            margin: 0 -5px;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            transition-delay: 0.1s;
+            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+            scrollbar-width: none; /* Hide scrollbar for Firefox */
+        }
+        
+        .mula-glass-grid::-webkit-scrollbar {
+            display: none; /* Hide scrollbar for Chrome/Safari */
+        }
+        
+        .mula-widget-5.expanded .mula-glass-grid {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .mula-glass-card {
+            flex: 0 0 auto;
+            width: 130px; /* Smaller width from 160px to 130px */
+            height: 170px; /* Smaller height from 200px to 170px */
+            margin-right: 10px; /* Smaller margin from 12px to 10px */
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 12px; /* Smaller radius from 14px to 12px */
+            overflow: hidden;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); 
+            transition: all 0.3s ease;
+        }
+        
+        .mula-glass-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.25);
+        }
+        
+        .mula-glass-label {
+            font-size: 10px; /* Smaller font from 12px to 10px */
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        
+        .mula-glass-name {
+            font-size: 13px; /* Slightly smaller from 14px to 13px */
+            color: white;
+            font-weight: 500;
+        }
+        
+        .mula-glass-price {
+            font-size: 12px; /* Slightly smaller from 13px to 12px */
+            color: #FF375F;
+            font-weight: 500;
+        }
+        
+        .mula-glass-cta {
+            margin: 20px auto 16px;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            transition-delay: 0.2s;
+        }
+        
+        .mula-widget-5.expanded .mula-glass-cta {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .mula-pulse-dot {
+            width: 8px;
+            height: 8px;
+            background: #FF375F;
+            border-radius: 50%;
+            position: relative;
+        }
+        
+        .mula-pulse-dot::after {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            width: 16px;
+            height: 16px;
+            background: rgba(255, 55, 95, 0.4);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(0.5); opacity: 0.8; }
+            70% { transform: scale(1.1); opacity: 0; }
+            100% { transform: scale(1.2); opacity: 0; }
+        }
+
+        /* Widget 6 - Floating Showcase Styles */
+        .mula-widget-6 {
+            position: absolute !important;
+            bottom: 30px !important;
+            right: 20px !important;
+            z-index: 9992;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", sans-serif;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        
+        .mula-widget-6.active {
+            visibility: visible;
+            pointer-events: auto;
+        }
+        
+        /* Initial State - Pulsing Dot */
+        .mula-trending-dot {
+            position: absolute;
+            bottom: 30px;
+            right: 20px;
+            width: 48px;
+            height: 48px;
+            border-radius: 24px;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transform: translateY(80px);
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+        
+        .mula-widget-6.active .mula-trending-dot {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        .mula-widget-6.expanded .mula-trending-dot {
+            opacity: 0;
+            transform: scale(0.8) translateY(20px);
+            pointer-events: none;
+        }
+        
+        .mula-dot-icon {
+            width: 12px;
+            height: 12px;
+            background: #FF375F;
+            border-radius: 50%;
+            position: relative;
+        }
+        
+        .mula-dot-icon::after {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            width: 20px;
+            height: 20px;
+            background: rgba(255, 55, 95, 0.4);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        .mula-dot-label {
+            position: absolute;
+            top: -6px;
+            right: -3px;
+            background: #FF375F;
+            color: white;
+            font-size: 9px;
+            font-weight: 700;
+            padding: 2px 4px;
+            border-radius: 6px;
+            line-height: 1;
+        }
+        
+        .mula-showcase-container {
+            width: 280px;
+            background: rgba(22, 22, 24, 0.85);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border-radius: 18px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
+            padding: 16px;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.45s cubic-bezier(0.23, 1, 0.32, 1);
+            pointer-events: none;
+        }
+        
+        .mula-widget-6.expanded .mula-showcase-container {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+        
+        .mula-showcase-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .mula-showcase-pill {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 6px 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: white;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .mula-live-icon {
+            width: 10px;
+            height: 10px;
+            animation: blink 1.5s infinite;
+        }
+        
+        @keyframes blink {
+            0% { opacity: 0.3; }
+            50% { opacity: 1; }
+            100% { opacity: 0.3; }
+        }
+        
+        .mula-showcase-close {
+            width: 28px;
+            height: 28px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .mula-showcase-close svg {
+            width: 14px;
+            height: 14px;
+        }
+        
+        .mula-showcase-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+        
+        .mula-showcase-preview {
+            display: flex;
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+        
+        .mula-item-preview {
+            width: 100px;
+            height: 100px;
+            border-radius: 10px;
+            background-color: #333;
+            background-size: cover;
+            background-position: center;
+            flex-shrink: 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .mula-item-preview::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255, 55, 95, 0.15), transparent 70%);
+        }
+        
+        .mula-item-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .mula-item-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 4px;
+            letter-spacing: -0.01em;
+        }
+        
+        .mula-item-price {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 12px;
+        }
+        
+        .mula-item-stats {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .mula-stat {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            padding: 6px 0;
+            text-align: center;
+        }
+        
+        .mula-stat-number {
+            font-size: 14px;
+            font-weight: 600;
+            color: white;
+        }
+        
+        .mula-stat-label {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+        
+        .mula-showcase-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .mula-action-primary {
+            flex: 1;
+            background: white;
+            color: black;
+            border: none;
+            border-radius: 12px;
+            height: 40px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .mula-action-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+        }
+        
+        .mula-action-secondary {
+            width: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .mula-action-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        /* Common styles for widget close buttons */
+        .mula-close-carousel,
+        .mula-close-glass {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 28px;
+            height: 28px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            z-index: 10;
+        }
+
+        .mula-close-carousel svg,
+        .mula-close-glass svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        .mula-close-carousel:hover,
+        .mula-close-glass:hover,
+        .mula-showcase-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        /* Enhanced Carousel Item Styles */
+        .mula-carousel-item {
+            min-width: 180px;
+            height: 260px;
+            margin-right: 12px;
+            border-radius: 14px;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .mula-carousel-item:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
+        }
+
+        .mula-item-image {
+            height: 65%;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+
+        .mula-item-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 4px;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+
+        /* Enhanced Animation for Glass Card Grid */
+        .mula-glass-title {
+            font-size: 18px;
+            color: white;
+            margin-bottom: 16px;
+            padding: 0 16px;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .mula-widget-5.expanded .mula-glass-title {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .mula-glass-cta {
+            margin: 20px auto 16px;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            transition-delay: 0.2s;
+        }
+
+        .mula-widget-5.expanded .mula-glass-cta {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Context trail animation */
+        .mula-context-trail {
+            position: absolute;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.6s ease;
+        }
+
+        .mula-widget-5.expanded .mula-context-trail {
+            opacity: 0.4;
+        }
+
+        /* Enhanced Widget 4 - Horizontal Carousel Styles */
+        .mula-widget-4 {
+            position: fixed;
+            bottom: 15px;
+            left: 15px;
+            right: 15px;
+            width: calc(100% - 30px);
+            z-index: 9990;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", sans-serif;
+            visibility: hidden;
+            transform-origin: bottom center;
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .mula-widget-4.active {
+            visibility: visible;
+        }
+
+        .mula-widget-4.expanded {
+            visibility: visible !important;
+            z-index: 9999 !important;
+        }
+
+        /* Initial State - Peek Card */
+        .mula-peek-card {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100%);
+            width: 180px;
+            height: 64px;
+            background: rgba(0, 0, 0, 0.65); /* Lower opacity for better blur effect */
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 9990;
+            cursor: pointer;
+            opacity: 0;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .mula-widget-4.active .mula-peek-card {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .mula-widget-4.expanded .mula-peek-card {
+            opacity: 0;
+            transform: translateX(-50%) translateY(100%);
+            pointer-events: none;
+        }
+
+        .mula-peek-image {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            background-size: cover;
+            background-position: center;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+
+        .mula-peek-content {
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .mula-peek-title {
+            font-size: 12px;
+            color: white;
+            font-weight: 500;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Add text scrolling like Now Playing */
+        .mula-text-scroller {
+            position: relative;
+            height: 14px;
+            overflow: hidden;
+        }
+        
+        .mula-scrolling-text {
+            position: absolute;
+            white-space: nowrap;
+            animation: textScroll 12s linear infinite;
+        }
+        
+        @keyframes textScroll {
+            0% { transform: translateX(0); }
+            40% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+        }
+        
+        .mula-peek-price {
+            font-size: 11px;
+            color: #FF375F;
+            font-weight: 600;
+        }
+        
+        .mula-peek-indicator {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.7;
+        }
+        
+        /* Carousel container styles */
+        .mula-carousel-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.65); /* Lower opacity for better blur effect */
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 18px 18px 0 0 !important; /* Bottom corners flat to touch screen edge */
+            padding-bottom: 0 !important; /* Remove extra padding */
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: none; /* Remove bottom border */
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        .mula-widget-4.expanded .mula-carousel-container {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Enhanced carousel header styles with fixed overlap */
+        .mula-carousel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            position: relative;
+        }
+        
+        .mula-carousel-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: white;
+            letter-spacing: -0.01em;
+        }
+        
+        .mula-carousel-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-right: 40px; /* Add margin to avoid overlap with close button */
+        }
+        
+        .mula-carousel-arrow {
+            width: 30px;
+            height: 30px;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .mula-carousel-arrow svg {
+            width: 16px;
+            height: 16px;
+        }
+        
+        .mula-carousel-arrow:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .mula-carousel-indicator {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .mula-carousel-track {
+            padding: 15px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .mula-carousel-track::-webkit-scrollbar {
+            display: none;
+        }
+
+        .mula-carousel-items {
+            display: flex;
+            transition: transform 0.5s ease;
+        }
+
+        /* Remove the invalid JavaScript within style tags and replace with proper CSS */
+        /* Enhanced Widget 4 - Text scrolling animation */
+        @keyframes textScroll {
+            0% { transform: translateX(0); }
+            40% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+        }
+        
+        .mula-text-scroller {
+            position: relative;
+            height: 14px;
+            overflow: hidden;
+        }
+        
+        .mula-scrolling-text {
+            position: absolute;
+            white-space: nowrap;
+            animation: textScroll 12s linear infinite;
+        }
+        
+        /* Enhanced Widget 4 - Core positioning */
+        .mula-widget-4 {
+            position: fixed;
+            bottom: 15px;
+            left: 15px;
+            right: 15px;
+            width: calc(100% - 30px);
+            z-index: 9990;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", sans-serif;
+            visibility: hidden;
+            transform-origin: bottom center;
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        .mula-widget-4.active {
+            visibility: visible;
+        }
+        
+        .mula-widget-4.expanded {
+            visibility: visible !important;
+            z-index: 9999 !important;
+        }
+        
+        /* Enhanced Widget 4 - Carousel container */
+        .mula-carousel-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.65); /* Lower opacity for better blur effect */
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 18px 18px 0 0; /* Bottom corners flat to touch screen edge */
+            padding-bottom: 0; /* Remove extra padding */
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: none; /* Remove bottom border */
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        .mula-widget-4.expanded .mula-carousel-container {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Enhanced Widget 4 - Controls overlap fix */
+        .mula-carousel-controls {
+            margin-right: 40px; /* Add margin to avoid overlap with close button */
+        }
+        
+        /* Enhanced Widget 4 - Microanimation for items */
+        .mula-carousel-item:active {
+            transform: scale(0.98) translateY(-2px);
+            transition: all 0.1s ease;
+        }
+        
+        /* Fix Widget 4 positioning to appear inside the mobile mockup */
+        .mula-widget-4 {
+            position: absolute !important; /* Override fixed positioning */
+            bottom: 15px !important;
+            left: 15px !important;
+            right: 15px !important;
+            z-index: 9999 !important;
+            width: auto !important; /* Let it size to the container */
+            transform: none !important;
+        }
+        
+        .mula-widget-4.expanded {
+            width: auto !important;
+            height: auto !important;
+            max-height: calc(100% - 60px) !important;
+        }
+        
+        .mula-widget-4.expanded .mula-carousel-container {
+            border-radius: 18px !important; /* Round both top and bottom corners */
+            padding-bottom: 0 !important;
+            max-height: 80vh !important; /* Limit max height */
+            opacity: 1 !important;
+            transform: translateY(0) !important;
+            border-bottom: none !important;
+            overflow-y: auto !important;
+        }
+        
+        /* Make sure the widget is fully visible when expanded */
+        .mobile-container {
+            overflow: hidden !important; /* Prevent overflow outside mobile mockup */
+        }
+        
+        /* Position widget container properly inside iframe */
+        #widget-container {
+            position: absolute !important;
+            z-index: 1000;
+            pointer-events: none;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+        }
+        
+        /* Make sure any widgets are visible over the iframe */
+        iframe {
+            z-index: 1;
+        }
+
+        /* Widget 7 - Sticky Inline Carousel */
+        .mula-widget-7 {
+            position: relative;
+            width: 100%;
+            margin: 25px 0;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", sans-serif;
+            visibility: hidden;
+            z-index: 9988;
+            display: none; /* Initially hidden */
+        }
+        
+        .mula-widget-7.active {
+            visibility: visible;
+            display: block; /* Show when active */
+            border: 2px solid rgba(255, 55, 95, 0.5); /* Make it more visible */
+            border-radius: 16px;
+        }
+        
+        .mula-sticky-carousel {
+            background: #000;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            margin: 0 auto;
+            max-width: 100%;
+            position: relative;
+        }
+        
+        .mula-sticky-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 15px 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        
+        .mula-sticky-title {
+            color: white;
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+        }
+        
+        .mula-sticky-subtitle {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 12px;
+            margin-top: 2px;
+        }
+        
+        .mula-view-all {
+            color: #FF375F;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 6px 10px;
+            border-radius: 12px;
+            background: rgba(255, 55, 95, 0.1);
+            transition: all 0.2s ease;
+        }
+        
+        .mula-view-all:hover {
+            background: rgba(255, 55, 95, 0.15);
+        }
+        
+        .mula-sticky-track {
+            overflow-x: auto;
+            padding: 15px;
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+            display: flex;
+            gap: 12px;
+        }
+        
+        .mula-sticky-track::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .mula-sticky-card {
+            flex: 0 0 auto;
+            width: 150px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            transition: all 0.25s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .mula-sticky-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25);
+        }
+        
+        .mula-sticky-image {
+            height: 150px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        
+        .mula-sticky-like {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 30px;
+            height: 30px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.2s ease;
+        }
+        
+        .mula-sticky-like:hover {
+            background: rgba(0, 0, 0, 0.7);
+            transform: scale(1.05);
+        }
+        
+        .mula-sticky-like svg {
+            width: 16px;
+            height: 16px;
+            fill: white;
+            opacity: 0.8;
+        }
+        
+        .mula-sticky-like.active svg {
+            fill: #FF375F;
+            opacity: 1;
+        }
+        
+        .mula-sticky-content {
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+        
+        .mula-sticky-label {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-bottom: 4px;
+        }
+        
+        .mula-sticky-name {
+            font-size: 13px;
+            color: white;
+            font-weight: 500;
+            margin-bottom: 4px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-height: 1.3;
+        }
+        
+        .mula-sticky-price {
+            font-size: 12px;
+            color: #FF375F;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        
+        .mula-sticky-content-spacer {
+            flex: 1;
+            min-height: 4px;
+        }
+        
+        .mula-sticky-buy {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 0;
+            font-size: 12px;
+            font-weight: 500;
+            width: 100%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+        
+        .mula-sticky-buy:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+    </style>
+    
+    <script>
+        // Add dynamic styles for Widget 4 when document loads - keep this part
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!document.querySelector('style#widget4-styles')) {
+                const styleEl = document.createElement('style');
+                styleEl.id = 'widget4-styles';
+                styleEl.textContent = `
+                    @keyframes textScroll {
+                        0% { transform: translateX(0); }
+                        40% { transform: translateX(0); }
+                        100% { transform: translateX(-100%); }
+                    }
+                    .mula-text-scroller {
+                        position: relative;
+                        height: 14px;
+                        overflow: hidden;
+                    }
+                    .mula-scrolling-text {
+                        position: absolute;
+                        white-space: nowrap;
+                        animation: textScroll 12s linear infinite;
+                    }
+                    .mula-carousel-controls {
+                        margin-right: 40px !important;
+                    }
+                    .mula-carousel-item:active {
+                        transform: scale(0.98) translateY(-2px) !important;
+                        transition: all 0.1s ease !important;
+                    }
+                `;
+                document.head.appendChild(styleEl);
+            }
+        });
+    </script>
+</head>
+<body>
+    <h1 class="sandbox-title">Mula Sandbox</h1>
+    <div class="widget-toggles">
+        <div class="widget-group">
+            <button class="widget-toggle" data-widget="1">Widget Style 1</button>
+            <div class="widget-info">
+                <div class="widget-info-content">
+                    <strong>Progress Tracking Widget</strong>
+                    Helps readers track their position in the article while providing quick navigation and sharing options. Features include:
+                    <ul>
+                        <li>Progress indicator</li>
+                        <li>Quick jump navigation</li>
+                        <li>Price tracking</li>
+                        <li>Social engagement metrics</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="widget-group">
+            <button class="widget-toggle" data-widget="2">Widget Style 2</button>
+            <div class="widget-info">
+                <div class="widget-info-content">
+                    <strong>Product Collection & Comparison</strong>
+                    Interactive dock-based widget for collecting and comparing products. Features include:
+                    <ul>
+                        <li>Pin products to dock for quick access</li>
+                        <li>Smart product suggestions</li>
+                        <li>Focus view with personalization</li>
+                        <li>Social sharing and engagement tracking</li>
+                        <li>Real-time price and stock updates</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="widget-group">
+            <button class="widget-toggle" data-widget="3">Widget Style 3</button>
+            <div class="widget-info">
+                <div class="widget-info-content">
+                    <strong>Smart Selection Assistant</strong>
+                    Context-aware popup that appears when text is selected, providing intelligent product recommendations and sharing options. Features include:
+                    <ul>
+                        <li>Instant product recommendations based on selected text</li>
+                        <li>Quick share and save actions</li>
+                        <li>Smart positioning around selected text</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="widget-group">
+            <button class="widget-toggle" data-widget="4">Widget Style 4</button>
+            <div class="widget-info">
+                <div class="widget-info-content">
+                    <strong>Price History Tracker</strong>
+                    Interactive price history visualization with predictive insights. Features include:
+                    <ul>
+                        <li>Historical price trends</li>
+                        <li>Price drop predictions</li>
+                        <li>Deal quality score</li>
+                        <li>Price alerts setup</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="widget-group">
+            <button class="widget-toggle" data-widget="5">Widget Style 5</button>
+            <div class="widget-info">
+                <div class="widget-info-content">
+                    <strong>Style Match Finder</strong>
+                    AI-powered outfit coordination and style recommendations. Features include:
+                    <ul>
+                        <li>Visual style matching</li>
+                        <li>Personalized outfit suggestions</li>
+                        <li>Wardrobe integration</li>
+                        <li>Seasonal trend alignment</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="widget-group">
+            <button class="widget-toggle" data-widget="6">Widget Style 6</button>
+            <div class="widget-info">
+                <div class="widget-info-content">
+                    <strong>Social Shopping Hub</strong>
+                    Community-driven shopping experience with real-time interactions. Features include:
+                    <ul>
+                        <li>Live shopping sessions</li>
+                        <li>Community reviews and photos</li>
+                        <li>Style influencer picks</li>
+                        <li>Group buying discounts</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="widget-group active">
+            <button class="widget-toggle active" data-widget="7">Widget Style 7</button>
+            <div class="widget-info">
+                <div class="widget-info-content">
+                    <strong>Sticky Carousel</strong>
+                    In-content product carousel that allows users to browse related products without leaving the article. Features include:
+                    <ul>
+                        <li>Horizontally scrollable product cards</li>
+                        <li>"Like" feature for favorite products</li>
+                        <li>Quick buy buttons</li>
+                        <li>Seamless integration with article content</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="navigation-tabs">
+        <button class="nav-tab active" data-page="sandbox">Sandbox</button>
+        <button class="nav-tab" data-page="metrics">Behavior Metrics</button>
+        <button class="nav-tab" data-page="strategies">Content Engagement Strategies</button>
+        <button class="nav-tab" data-page="playground">Playground</button>
+    </div>
+    <div class="mobile-container">
+        <iframe id="content-frame" src="/src/cloned-site/www.harpersbazaar.com/fashion/trends/g63384941/nordstrom-winter-sale-2025/index.html"></iframe>
+        <div class="mula-widget-1" style="display: none;">
+            <div class="mula-progress-bar"></div>
+            <div class="mula-now-playing">
+                <span class="mula-now-playing-label">Now Viewing</span>
+                <div class="mula-now-playing-text">
+                    <div class="mula-text-rotator">
+                        <!-- Text items will be injected here -->
+                    </div>
+                </div>
+            </div>
+            <div class="mula-drawer">
+                <div class="mula-drawer-content">
+                    <div class="mula-main-content">
+                        <div class="mula-thumbnail-section">
+                            <div class="mula-thumbnail"></div>
+                            <div class="mula-thumbnail-metrics">
+                                <div class="mula-metrics-row">
+                                    <div class="mula-metric mula-views">
+                                        <svg class="mula-metric-icon" viewBox="0 0 24 24">
+                                            <path fill="currentColor" d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                                        </svg>
+                                        <span class="mula-metric-count">2.1k</span>
+                                    </div>
+                                    <div class="mula-metric mula-saves">
+                                        <svg class="mula-metric-icon" viewBox="0 0 24 24">
+                                            <path fill="currentColor" d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/>
+                                        </svg>
+                                        <span class="mula-metric-count">847</span>
+                                    </div>
+                                </div>
+                                <button class="mula-save-button">
+                                    <svg viewBox="0 0 24 24">
+                                        <path fill="currentColor" d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2zm0 15l-5-2.18L7 18V5h10v13z"/>
+                                    </svg>
+                                    Save
+                                </button>
+                            </div>
+                        </div>
+                        <div class="mula-details">
+                            <div class="mula-item-count"></div>
+                            <div class="mula-quick-nav"></div>
+                            <button class="mula-share-button">Share this item</button>
+                        </div>
+                    </div>
+                    <div class="mula-others-viewed">
+                        <div class="mula-others-viewed-title">Others also viewed</div>
+                        <div class="mula-others-viewed-items">
+                            <!-- Will be populated dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mula-widget-2">
+            <div class="mula-dock hidden">
+                <div class="mula-dock-items">
+                    <!-- Pinned items will be added here dynamically -->
+                </div>
+            </div>
+            <div class="mula-focus-view">
+                <div class="mula-focus-header">
+                    <button class="mula-focus-close">✕</button>
+                </div>
+                <div class="mula-focus-content">
+                    <img class="mula-focus-image" src="" alt="Product focus">
+                    <div class="mula-focus-details">
+                        <div class="mula-focus-price"></div>
+                        <p class="mula-focus-description"></p>
+                        <div class="mula-focus-actions">
+                            <button class="mula-focus-button primary">Buy Now</button>
+                            <button class="mula-focus-button secondary">Personalize</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mula-widget-3">
+            <div class="mula-selection-header">
+                <svg width="14" height="14" viewBox="0 0 24 24" style="fill: currentColor;">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                </svg>
+                <span>Related Products</span>
+            </div>
+            <div class="mula-selection-content">
+                <div class="mula-recommended-products">
+                    <!-- Products will be populated dynamically -->
+                </div>
+            </div>
+            <div class="mula-actions">
+                <button class="mula-action-button">
+                    <svg viewBox="0 0 24 24" style="fill: currentColor;">
+                        <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/>
+                    </svg>
+                    Share
+                </button>
+                <button class="mula-action-button">
+                    <svg viewBox="0 0 24 24" style="fill: currentColor;">
+                        <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2zm0 15l-5-2.18L7 18V5h10v13z"/>
+                    </svg>
+                    Save
+                </button>
+            </div>
+        </div>
+        
+        <!-- Widget Style 4 - Horizontal Carousel with Initial & Expanded States -->
+        <div class="mula-widget-4">
+            <!-- Initial State - Peek Card -->
+            <div class="mula-peek-card">
+                <div class="mula-peek-image"></div>
+                <div class="mula-peek-content">
+                    <div class="mula-peek-title">Trending Fashion</div>
+                    <div class="mula-peek-price">From $75</div>
+    </div>
+                <div class="mula-peek-indicator">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5">
+                        <path d="M12 5v14M5 12h14" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Expanded State - Full Carousel -->
+            <div class="mula-carousel-container">
+                <div class="mula-carousel-header">
+                    <div class="mula-carousel-title">Trending Now</div>
+                    <div class="mula-carousel-controls">
+                        <button class="mula-carousel-arrow mula-left" aria-label="Previous">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                        <div class="mula-carousel-indicator">
+                            <span class="mula-current-page">1</span>
+                            <span class="mula-page-divider">/</span>
+                            <span class="mula-total-pages">4</span>
+                        </div>
+                        <button class="mula-carousel-arrow mula-right" aria-label="Next">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <button class="mula-close-carousel" aria-label="Close">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="mula-carousel-track">
+                    <div class="mula-carousel-items">
+                        <!-- Items will be dynamically added -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Widget Style 5 - Glass Card Grid with Initial & Expanded States -->
+        <div class="mula-widget-5">
+            <!-- Initial State - Floating Indicator -->
+            <div class="mula-floating-indicator">
+                <svg class="mula-indicator-icon" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5">
+                    <path d="M4 6h16M4 12h16M4 18h7" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+
+            <!-- Expanded State - Glass Card Grid -->
+            <div class="mula-glass-container">
+                <div class="mula-glass-title">Curated For You</div>
+                <div class="mula-glass-grid">
+                    <!-- Glass cards will be dynamically added -->
+                </div>
+                <div class="mula-glass-cta">
+                    <div class="mula-pulse-dot"></div>
+                    <span>Explore More</span>
+                </div>
+                <button class="mula-close-glass" aria-label="Close">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Widget Style 6 - Floating Showcase with Initial & Expanded States -->
+        <div class="mula-widget-6">
+            <!-- Initial State - Trending Dot -->
+            <div class="mula-trending-dot">
+                <div class="mula-dot-icon"></div>
+                <div class="mula-dot-label">LIVE</div>
+            </div>
+
+            <!-- Expanded State - Full Showcase -->
+            <div class="mula-showcase-container">
+                <div class="mula-showcase-header">
+                    <div class="mula-showcase-pill">
+                        <svg class="mula-live-icon" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="5" fill="#FF375F"/>
+                        </svg>
+                        <span>Live Trending</span>
+                    </div>
+                    <button class="mula-showcase-close" aria-label="Close">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="mula-showcase-preview">
+                    <div class="mula-item-preview"></div>
+                    <div class="mula-item-info">
+                        <div class="mula-item-title">Limited Edition Drop</div>
+                        <div class="mula-item-price">$249</div>
+                        <div class="mula-item-stats">
+                            <div class="mula-stat">
+                                <div class="mula-stat-number">125</div>
+                                <div class="mula-stat-label">Viewing</div>
+                            </div>
+                            <div class="mula-stat">
+                                <div class="mula-stat-number">78%</div>
+                                <div class="mula-stat-label">Claimed</div>
+                            </div>
+                            <div class="mula-stat">
+                                <div class="mula-stat-number">04:32</div>
+                                <div class="mula-stat-label">Left</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mula-showcase-actions">
+                    <button class="mula-action-primary">View Drop</button>
+                    <button class="mula-action-secondary">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Track active widgets - remove Widget 3 from default active set
+        const activeWidgets = new Set();
+        let currentTextIndex = 0;
+        let titles = [];
+        let lastKnownScrollY = 0;
+        let currentSection = 0;
+        let thumbnailUrls = [];
+        const pinnedItems = new Set();
+        let productData = new Map(); // Store product data for focus view
+
+        // Add navigation tab functionality
+        const navTabs = document.querySelectorAll('.nav-tab');
+        navTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const page = tab.dataset.page;
+                navTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+
+                if (page === 'sandbox') {
+                    window.location.href = '/';
+                } else if (page === 'metrics') {
+                    window.location.href = './src/behavior-metrics.html';
+                } else if (page === 'strategies') {
+                    window.location.href = './src/content-engagement.html';
+                } else if (page === 'playground') {
+                    window.location.href = './playground.html';
+                }
+            });
+        });
+
+        // Add widget toggle functionality
+        const toggles = document.querySelectorAll('.widget-toggle');
+        const widget1 = document.querySelector('.mula-widget-1');
+        const widget2 = document.querySelector('.mula-widget-2');
+        const dock = widget2.querySelector('.mula-dock');
+        const progressBar = widget1.querySelector('.mula-progress-bar');
+        const textRotator = widget1.querySelector('.mula-text-rotator');
+
+        // Function to check if we can access iframe content
+        function checkIframeAccess() {
+            const iframe = document.getElementById('content-frame');
+            try {
+                const doc = iframe.contentDocument;
+                if (doc && doc.body) {
+                    // We have access, add the buttons
+                    addPinButtons();
+                    return true;
+                }
+            } catch (e) {
+                console.log('Waiting for iframe access...');
+            }
+            return false;
+        }
+
+        // Poll for iframe access
+        function pollForIframeAccess() {
+            if (!checkIframeAccess()) {
+                setTimeout(pollForIframeAccess, 500); // Try again in 500ms
+            }
+        }
+
+        function addPinButtons() {
+            const iframe = document.getElementById('content-frame');
+            const doc = iframe.contentDocument;
+            
+            // Add styles to iframe document
+            const style = doc.createElement('style');
+            style.textContent = `
+                .pin-button {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 6px;
+                    background: rgba(0, 0, 0, 0.85);
+                    color: white;
+                    border: none;
+                    padding: 8px 16px;
+                    border-radius: 20px;
+                    font-size: 13px;
+                    cursor: pointer;
+                    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+                    backdrop-filter: blur(10px);
+                    -webkit-backdrop-filter: blur(10px);
+                    border: none;
+                    transition: all 0.2s ease;
+                    margin-top: 12px;
+                    margin-bottom: 16px;
+                }
+                .pin-button:hover {
+                    transform: translateY(-1px);
+                    background: rgba(0, 0, 0, 0.9);
+                }
+                .pin-button.pinned {
+                    background: #30d158;
+                }
+            `;
+            doc.head.appendChild(style);
+            
+            // Find all product titles (h2) and add buttons after them
+            const titles = Array.from(doc.querySelectorAll('h2'));
+            titles.forEach((title, index) => {
+                // Skip if button already exists
+                if (title.nextElementSibling?.classList.contains('pin-button')) return;
+
+                const button = doc.createElement('button');
+                button.className = 'pin-button';
+                button.innerHTML = `
+                    <svg width="16" height="16" viewBox="0 0 24 24" style="fill: currentColor;">
+                        <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2zm0 15l-5-2.18L7 18V5h10v13z"/>
+                    </svg>
+                    Pin Item
+                `;
+
+                button.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const isPinned = pinnedItems.has(index);
+                    if (isPinned) {
+                        pinnedItems.delete(index);
+                        button.classList.remove('pinned');
+                        button.innerHTML = `
+                            <svg width="16" height="16" viewBox="0 0 24 24" style="fill: currentColor;">
+                                <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/>
+                            </svg>
+                            Pin Item
+                        `;
+                    } else {
+                        pinnedItems.add(index);
+                        button.classList.add('pinned');
+                        button.innerHTML = `
+                            <svg width="16" height="16" viewBox="0 0 24 24" style="fill: currentColor;">
+                                <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/>
+                            </svg>
+                            Pinned
+                        `;
+                        
+                        // Find the closest container that has the product image
+                        const productContainer = title.parentElement;
+                        const img = productContainer ? productContainer.querySelector('img') : null;
+                        
+                        if (img) {
+                            thumbnailUrls[index] = img.src;
+                            // Store product data for focus view with hardcoded values matching the screenshot
+                            productData.set(index, {
+                                title: title.textContent.trim(),
+                                image: img.src,
+                                price: 'Nordstrom $3,115',
+                                description: "If you're going to make one investment this season, let it be this cozy coat."
+                            });
+                            // Show dock immediately when pinning first item
+                            dock.classList.remove('hidden');
+                        }
+                    }
+                    updateDock();
+                });
+
+                title.insertAdjacentElement('afterend', button);
+            });
+        }
+
+        function updateDock() {
+            const dockItems = widget2.querySelector('.mula-dock-items');
+            dockItems.innerHTML = '';
+            
+            // Add pinned items to dock
+            Array.from(pinnedItems).forEach(index => {
+                const item = document.createElement('div');
+                item.className = 'mula-dock-item';
+                
+                const img = thumbnailUrls[index];
+                if (img) {
+                    item.innerHTML = `<img src="${img}" class="mula-dock-item-img" alt="Pinned item">`;
+                } else {
+                    item.innerHTML = `
+                        <svg viewBox="0 0 24 24" style="width: 24px; height: 24px; fill: rgba(255, 255, 255, 0.8);">
+                            <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
+                        </svg>
+                    `;
+                }
+                
+                // Add click handler to show focus view
+                item.addEventListener('click', () => {
+                    const focusView = widget2.querySelector('.mula-focus-view');
+                    const data = productData.get(index);
+                    
+                    if (data) {
+                        focusView.querySelector('.mula-focus-image').src = data.image;
+                        focusView.querySelector('.mula-focus-price').textContent = data.price;
+                        focusView.querySelector('.mula-focus-description').textContent = data.description;
+                        
+                        // Make sure focus view is visible and interactive
+                        focusView.style.display = 'flex';
+                        focusView.style.pointerEvents = 'auto';
+                        focusView.classList.add('visible');
+                    }
+                });
+                
+                dockItems.appendChild(item);
+            });
+
+            if (pinnedItems.size > 0) {
+                // Add divider
+                const divider = document.createElement('div');
+                divider.className = 'mula-dock-divider';
+                dockItems.appendChild(divider);
+                
+                // Add suggested items container
+                const suggestedContainer = document.createElement('div');
+                suggestedContainer.className = 'mula-suggested-items';
+                
+                // Add 3 loading suggestion items
+                for (let i = 0; i < 3; i++) {
+                    const suggestedItem = document.createElement('div');
+                    suggestedItem.className = 'mula-suggested-item loading';
+                    suggestedContainer.appendChild(suggestedItem);
+                }
+                
+                dockItems.appendChild(suggestedContainer);
+            }
+            
+            // Show/hide dock based on whether there are items
+            dock.classList.toggle('hidden', pinnedItems.size === 0);
+        }
+
+        // Initialize focus view close button
+        document.addEventListener('DOMContentLoaded', () => {
+            const focusView = widget2.querySelector('.mula-focus-view');
+            const closeButton = focusView.querySelector('.mula-focus-close');
+            
+            closeButton.addEventListener('click', () => {
+                focusView.classList.remove('visible');
+            });
+
+            // Add button click handlers
+            const buyButton = focusView.querySelector('.mula-focus-button.primary');
+            const personalizeButton = focusView.querySelector('.mula-focus-button.secondary');
+            
+            buyButton.addEventListener('click', () => {
+                // Implement buy functionality
+                console.log('Buy clicked');
+            });
+            
+            personalizeButton.addEventListener('click', () => {
+                // Implement personalize functionality
+                console.log('Personalize clicked');
+            });
+        });
+
+        // Initialize when iframe loads
+        document.getElementById('content-frame').addEventListener('load', function() {
+            const doc = this.contentDocument;
+            const iframe = this;
+            const widget3 = document.querySelector('.mula-widget-3');
+            
+            // Remove the initial active state setup for Widget 3
+            
+            // Add mouseup event to handle text selection with debug logging
+            doc.addEventListener('mouseup', () => {
+                console.log('mouseup fired');
+                if (!activeWidgets.has('3')) {
+                    console.log('Widget 3 inactive');
+                    return;
+                }
+                
+                const selection = doc.getSelection();
+                const selectedText = selection.toString().trim();
+                console.log('Selected text:', selectedText);
+                
+                if (selectedText) {
+                    const range = selection.getRangeAt(0);
+                    const rect = range.getBoundingClientRect();
+                    const iframeRect = iframe.getBoundingClientRect();
+                    
+                    // First, position the widget off-screen to measure it
+                    widget3.style.visibility = 'hidden';
+                    widget3.style.display = 'flex';
+                    widget3.classList.add('visible');
+                    
+                    // Force reflow and get dimensions
+                    const widgetWidth = widget3.offsetWidth;
+                    const widgetHeight = widget3.offsetHeight;
+                    
+                    // Calculate position relative to the viewport
+                    const popupX = iframeRect.left + rect.left + (rect.width / 2);
+                    const popupY = iframeRect.top + rect.top;
+                    
+                    // Position the popup
+                    const finalLeft = Math.max(20, Math.min(popupX - (widgetWidth / 2), window.innerWidth - widgetWidth - 20));
+                    const finalTop = Math.max(20, popupY - widgetHeight - 12);
+                    
+                    widget3.style.left = `${finalLeft}px`;
+                    widget3.style.top = `${finalTop}px`;
+                    
+                    // Make it visible
+                    widget3.style.visibility = 'visible';
+                    
+                    // Update recommended products
+                    const recommendedProducts = getRecommendedProducts(selectedText);
+                    updateRecommendedProducts(recommendedProducts);
+                }
+            });
+
+            // Hide popup when clicking outside or making a new selection
+            doc.addEventListener('mousedown', (e) => {
+                console.log('mousedown fired');
+                const clickedInsidePopup = widget3.contains(e.target);
+                console.log('Clicked inside popup:', clickedInsidePopup);
+                if (!clickedInsidePopup) {
+                    widget3.classList.remove('visible');
+                }
+            });
+
+            // Handle share button click
+            widget3.querySelector('.mula-action-button:first-child').addEventListener('click', () => {
+                const selection = doc.getSelection();
+                const selectedText = selection.toString().trim();
+                // You can implement custom sharing functionality here
+                console.log('Share:', selectedText);
+            });
+
+            // Handle save button click
+            widget3.querySelector('.mula-action-button:last-child').addEventListener('click', () => {
+                const selection = doc.getSelection();
+                const selectedText = selection.toString().trim();
+                // You can implement custom save functionality here
+                console.log('Save:', selectedText);
+            });
+
+            // Extract titles for Widget 1 (limit to first 6)
+            const productTitles = Array.from(doc.querySelectorAll('h2'))
+                .slice(0, 6)
+                .map(h2 => h2.textContent.trim());
+
+            if (productTitles.length > 0) {
+                titles = productTitles;
+                textRotator.innerHTML = titles
+                    .map(title => `<div class="mula-text-item">${title}</div>`)
+                    .join('');
+
+                // Set up quick navigation
+                const quickNav = widget1.querySelector('.mula-quick-nav');
+                quickNav.innerHTML = titles.map((_, i) => 
+                    `<div class="mula-quick-nav-item" data-index="${i}">${i + 1}</div>`
+                ).join('');
+
+                // Add quick navigation click handler
+                quickNav.addEventListener('click', (e) => {
+                    const item = e.target.closest('.mula-quick-nav-item');
+                    if (item) {
+                        const index = parseInt(item.dataset.index);
+                        const items = Array.from(doc.querySelectorAll('h2')).slice(0, 6);
+                        if (items[index]) {
+                            items[index].scrollIntoView({ behavior: 'smooth' });
+                            currentSection = index;
+                            rotateText(index);
+                        }
+                    }
+                });
+
+                // Add expand/collapse functionality
+                const nowPlaying = widget1.querySelector('.mula-now-playing');
+                nowPlaying.addEventListener('click', () => {
+                    widget1.classList.toggle('expanded');
+                    if (widget1.classList.contains('expanded')) {
+                        updateOthersViewed(currentSection);
+                    }
+                });
+
+                // Add scroll event listener
+                this.contentWindow.addEventListener('scroll', () => {
+                    const doc = this.contentDocument;
+                    const winHeight = doc.documentElement.clientHeight;
+                    const height = doc.documentElement.scrollHeight - winHeight;
+                    const scrollY = doc.documentElement.scrollTop;
+                    const progress = (scrollY / height) * 100;
+                    
+                    updateProgress(progress);
+                });
+
+                // Initial update
+                updateProgress(0);
+                rotateText(0);
+            }
+            
+            // Wait for proxy to be ready before sending initial state
+            window.addEventListener('message', function onProxyReady(event) {
+                if (event.data.type === 'proxyReady') {
+                    // Remove the listener since we only need it once
+                    window.removeEventListener('message', onProxyReady);
+
+                    const iframe = document.getElementById('content-frame');
+                    
+                    // Send initial widget state for Widget 2
+                    if (activeWidgets.has('2')) {
+                        iframe.contentWindow.postMessage({
+                            type: 'widgetStateChanged',
+                            widget: '2',
+                            active: true
+                        }, '*');
+                    }
+                    
+                    // Send initial widget state for Widget 7
+                    iframe.contentWindow.postMessage({
+                        type: 'widgetStateChanged',
+                        widget: '7',
+                        active: activeWidgets.has('7')
+                    }, '*');
+                }
+            });
+        });
+
+        function getRecommendedProducts(selectedText) {
+            // This is a mock function to generate recommended products
+            // In a real implementation, this would use AI/ML to find relevant products
+            const mockProducts = [
+                {
+                    title: 'Wool-Cashmere Wrap Coat',
+                    price: '$895',
+                    image: 'https://placehold.co/400x400/333/white?text=Wrap+Coat'
+                },
+                {
+                    title: 'Alex Mill Pointelle Cardigan',
+                    price: '$195',
+                    image: 'https://placehold.co/400x400/333/white?text=Cardigan'
+                }
+            ];
+            return mockProducts;
+        }
+
+        function updateRecommendedProducts(products) {
+            const container = document.querySelector('.mula-recommended-products');
+            container.innerHTML = products.map(product => `
+                <div class="mula-product-card">
+                    <div class="mula-product-image" style="background-image: url('${product.image}')"></div>
+                    <div class="mula-product-info">
+                        <h3 class="mula-product-title">${product.title}</h3>
+                        <div class="mula-product-price">${product.price}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Update Widget 1's text rotation
+        function rotateText(index) {
+            if (titles.length === 0) return;
+            currentTextIndex = index;
+            textRotator.style.transform = `translateY(-${currentTextIndex * 16}px)`;
+            
+            // Check if current text needs marquee
+            const textItems = textRotator.querySelectorAll('.mula-text-item');
+            textItems.forEach((item, i) => {
+                item.classList.remove('marquee');
+                if (i === currentTextIndex && item.scrollWidth > item.clientWidth) {
+                    item.classList.add('marquee');
+                }
+            });
+        }
+
+        // Update Widget 1's progress
+        function updateProgress(percent) {
+            progressBar.style.width = `${percent}%`;
+            
+            const iframe = document.getElementById('content-frame');
+            const doc = iframe.contentDocument;
+            const items = Array.from(doc.querySelectorAll('h2')).slice(0, 6);  // Only first 6
+            
+            let nextItem = null;
+            const viewportHeight = iframe.clientHeight;
+            
+            for (let i = 0; i < items.length; i++) {
+                const rect = items[i].getBoundingClientRect();
+                if (rect.top >= -150 && rect.top <= viewportHeight) {
+                    nextItem = i;
+                    break;
+                }
+            }
+            
+            if (nextItem !== null && nextItem !== currentSection) {
+                currentSection = nextItem;
+                rotateText(nextItem);
+            }
+        }
+
+        // Update others viewed section
+        function updateOthersViewed(currentIndex) {
+            const container = widget1.querySelector('.mula-others-viewed-items');
+            if (!container) return;
+            
+            // Clear existing content
+            container.innerHTML = '';
+            
+            // Add 4 loading placeholders
+            for (let i = 0; i < 4; i++) {
+                const placeholder = document.createElement('div');
+                placeholder.className = 'mula-others-viewed-item loading';
+                container.appendChild(placeholder);
+            }
+            
+            // Simulate loading real items with delay
+            setTimeout(() => {
+                const availableIndices = Array.from({length: Math.min(6, titles.length)}, (_, i) => i)
+                    .filter(i => i !== currentIndex);
+                
+                const loadedItems = container.querySelectorAll('.mula-others-viewed-item');
+                
+                for (let i = 0; i < 4 && i < availableIndices.length; i++) {
+                    const randomIndex = Math.floor(Math.random() * availableIndices.length);
+                    const itemIndex = availableIndices.splice(randomIndex, 1)[0];
+                    
+                    setTimeout(() => {
+                        if (loadedItems[i]) {
+                            const img = document.getElementById('content-frame')
+                                .contentDocument
+                                .querySelectorAll('h2')[itemIndex]
+                                ?.previousElementSibling
+                                ?.querySelector('img');
+
+                            if (img) {
+                                loadedItems[i].style.backgroundImage = `url('${img.src}')`;
+                                loadedItems[i].classList.remove('loading');
+                                loadedItems[i].dataset.index = itemIndex;
+                                
+                                loadedItems[i].addEventListener('click', () => {
+                                    const items = document.getElementById('content-frame')
+                                        .contentDocument
+                                        .querySelectorAll('h2')
+                                        .slice(0, 6);  // Only first 6
+                                    if (items[itemIndex]) {
+                                        items[itemIndex].scrollIntoView({ behavior: 'smooth' });
+                                        currentSection = itemIndex;
+                                        rotateText(itemIndex);
+                                    }
+                                });
+                            }
+                        }
+                    }, i * 200); // Stagger the loading
+                }
+            }, 800);
+        }
+
+        // Original updateWidgetVisibility function will be replaced by the one in DOMContentLoaded
+        // We're keeping this function definition but making it call the new one
+        function updateWidgetVisibility() {
+            if (window.updateWidgetVisibility) {
+                window.updateWidgetVisibility();
+            }
+        }
+
+        // Start polling immediately in case widget 2 is already active
+        if (activeWidgets.has('2')) {
+            pollForIframeAccess();
+        }
+    </script>
+
+    <script>
+        // Initialize new widgets 4-6 after the document is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Define a global activeWidgets Set if it doesn't exist already
+            window.activeWidgets = window.activeWidgets || new Set();
+            
+            // Set Widget 7 as active by default
+            window.activeWidgets.add('7');
+            
+            // Widget 4 - Horizontal Carousel
+            const createCarouselItems = () => {
+                const carousel = document.querySelector('.mula-carousel-items');
+                const widget4 = document.querySelector('.mula-widget-4');
+                const peekCard = widget4.querySelector('.mula-peek-card');
+                const closeBtn = widget4.querySelector('.mula-close-carousel');
+                const peekTitle = widget4.querySelector('.mula-peek-title');
+                const peekImage = widget4.querySelector('.mula-peek-image');
+                const carouselTrack = widget4.querySelector('.mula-carousel-track');
+                
+                // Add text scrolling by wrapping the title text in a scroller
+                if (peekTitle) {
+                    const titleText = peekTitle.textContent || 'Trending Fashion';
+                    peekTitle.innerHTML = `<div class="mula-text-scroller"><div class="mula-scrolling-text">${titleText}</div></div>`;
+                }
+                
+                // Set preview image for peek card
+                if (peekImage) {
+                    peekImage.style.backgroundImage = "url('https://placehold.co/400x400/333/white?text=Trending')";
+                }
+                
+                // Toggle expanded state when peek card is clicked
+                if (peekCard) {
+                    peekCard.addEventListener('click', () => {
+                        widget4.classList.add('expanded');
+                    });
+                }
+                
+                // Close carousel when close button is clicked
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', () => {
+                        widget4.classList.remove('expanded');
+                    });
+                }
+                
+                if (!carousel) return;
+                
+                // Define carousel items
+                const carouselItems = [
+                    { title: 'Premium Overcoat', price: '$249', discount: '$349', badge: 'TRENDING', image: 'https://placehold.co/400x400/333/white?text=Overcoat' },
+                    { title: 'Cashmere Sweater', price: '$179', discount: '$229', badge: 'NEW', image: 'https://placehold.co/400x400/333/white?text=Sweater' },
+                    { title: 'Winter Boots', price: '$195', discount: null, badge: 'POPULAR', image: 'https://placehold.co/400x400/333/white?text=Boots' },
+                    { title: 'Wool Scarf', price: '$75', discount: '$95', badge: 'SALE', image: 'https://placehold.co/400x400/333/white?text=Scarf' },
+                    { title: 'Designer Coat', price: '$389', discount: '$489', badge: 'LIMITED', image: 'https://placehold.co/400x400/333/white?text=Coat' },
+                    { title: 'Leather Gloves', price: '$69', discount: null, badge: null, image: 'https://placehold.co/400x400/333/white?text=Gloves' }
+                ];
+                
+                // Clear existing carousel items to avoid duplication
+                carousel.innerHTML = '';
+                
+                // Create and append carousel items with enhanced animations
+                carouselItems.forEach((item, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'mula-carousel-item';
+                    div.style.animationDelay = `${index * 0.05}s`;
+                    div.innerHTML = `
+                        <div class="mula-item-image" style="background-image: url('${item.image}')">
+                            ${item.badge ? `<div class="mula-item-badge">${item.badge}</div>` : ''}
+                        </div>
+                        <div class="mula-item-content">
+                            <div class="mula-item-title">${item.title}</div>
+                            <div class="mula-item-price">
+                                <span>${item.price}</span>
+                                ${item.discount ? `<span class="mula-price-original">${item.discount}</span>` : ''}
+                                ${item.discount ? `<span class="mula-price-discount">${Math.round((1 - parseInt(item.price.replace('$', '')) / parseInt(item.discount.replace('$', ''))) * 100)}% off</span>` : ''}
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Add tap interaction for items
+                    div.addEventListener('click', (e) => {
+                        console.log(`Selected: ${item.title}`);
+                        // Could expand to show details or add to cart
+                    });
+                    
+                    carousel.appendChild(div);
+                });
+                
+                // Update total pages in the indicator
+                const totalPages = document.querySelector('.mula-total-pages');
+                if (totalPages) {
+                    totalPages.textContent = Math.ceil(carouselItems.length / 2);
+                }
+                
+                // Add carousel navigation with looping behavior
+                const leftArrow = document.querySelector('.mula-carousel-arrow.mula-left');
+                const rightArrow = document.querySelector('.mula-carousel-arrow.mula-right');
+                const currentPage = document.querySelector('.mula-current-page');
+                let page = 1;
+                const maxPage = Math.ceil(carouselItems.length / 2);
+                
+                if (leftArrow && rightArrow && currentPage) {
+                    // Function to update carousel position
+                    const updateCarouselPosition = () => {
+                        carousel.style.transform = `translateX(-${(page - 1) * 384}px)`;
+                        currentPage.textContent = page;
+                    };
+                    
+                    leftArrow.addEventListener('click', () => {
+                        if (page > 1) {
+                            page--;
+                        } else {
+                            // Loop to the end when at first page
+                            page = maxPage;
+                        }
+                        updateCarouselPosition();
+                    });
+                    
+                    rightArrow.addEventListener('click', () => {
+                        if (page < maxPage) {
+                            page++;
+                        } else {
+                            // Loop to the beginning when at last page
+                            page = 1;
+                        }
+                        updateCarouselPosition();
+                    });
+                }
+                
+                // Add drag to scroll functionality
+                if (carouselTrack) {
+                    let isDragging = false;
+                    let startX, scrollLeft;
+                    
+                    const startDrag = (e) => {
+                        isDragging = true;
+                        startX = e.pageX || (e.touches ? e.touches[0].pageX : 0);
+                        scrollLeft = carouselTrack.scrollLeft;
+                        // Change cursor style
+                        carouselTrack.style.cursor = 'grabbing';
+                    };
+                    
+                    const endDrag = () => {
+                        isDragging = false;
+                        carouselTrack.style.cursor = 'grab';
+                        
+                        // Update page indicator based on scroll position
+                        if (currentPage && carousel.scrollWidth > 0) {
+                            const scrollPercentage = carouselTrack.scrollLeft / (carousel.scrollWidth - carouselTrack.clientWidth);
+                            page = Math.min(maxPage, Math.max(1, Math.ceil(scrollPercentage * maxPage)));
+                            currentPage.textContent = page;
+                        }
+                    };
+                    
+                    const drag = (e) => {
+                        if (!isDragging) return;
+                        
+                        e.preventDefault();
+                        const x = e.pageX || (e.touches ? e.touches[0].pageX : 0);
+                        const walk = (x - startX) * 1.5;
+                        carouselTrack.scrollLeft = scrollLeft - walk;
+                    };
+                    
+                    // Remove existing event listeners if any
+                    carouselTrack.removeEventListener('mousedown', startDrag);
+                    carouselTrack.removeEventListener('mousemove', drag);
+                    window.removeEventListener('mouseup', endDrag);
+                    carouselTrack.removeEventListener('touchstart', startDrag);
+                    carouselTrack.removeEventListener('touchmove', drag);
+                    carouselTrack.removeEventListener('touchend', endDrag);
+                    
+                    // Add event listeners for desktop
+                    carouselTrack.addEventListener('mousedown', startDrag);
+                    carouselTrack.addEventListener('mousemove', drag);
+                    window.addEventListener('mouseup', endDrag);
+                    
+                    // Add event listeners for mobile
+                    carouselTrack.addEventListener('touchstart', startDrag);
+                    carouselTrack.addEventListener('touchmove', drag);
+                    carouselTrack.addEventListener('touchend', endDrag);
+                    
+                    // Set initial cursor style
+                    carouselTrack.style.cursor = 'grab';
+                }
+            };
+            
+            // Widget 5 - Glass Card Grid
+            const createGlassCards = () => {
+                const glassCardGrid = document.querySelector('.mula-glass-grid');
+                const widget5 = document.querySelector('.mula-widget-5');
+                
+                // Setup floating indicator and close button
+                const floatingIndicator = document.querySelector('.mula-floating-indicator');
+                const closeGlass = document.querySelector('.mula-close-glass');
+                
+                floatingIndicator.addEventListener('click', () => {
+                    widget5.classList.add('expanded');
+                    createContextTrail(floatingIndicator, glassCardGrid);
+                });
+                
+                closeGlass.addEventListener('click', () => {
+                    widget5.classList.remove('expanded');
+                });
+                
+                // Create a visual connection between indicator and content
+                function createContextTrail(indicator, target) {
+                    const trail = document.createElement('div');
+                    trail.className = 'mula-context-trail';
+                    
+                    const indicatorRect = indicator.getBoundingClientRect();
+                    const targetRect = target.getBoundingClientRect();
+                    
+                    const startX = indicatorRect.left + indicatorRect.width / 2;
+                    const startY = indicatorRect.top + indicatorRect.height / 2;
+                    const endX = targetRect.left + targetRect.width / 2;
+                    const endY = targetRect.top + 40;
+                    
+                    const length = Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2));
+                    const angle = Math.atan2(endY - startY, endX - startX) * (180 / Math.PI);
+                    
+                    trail.style.width = `${length}px`;
+                    trail.style.height = '2px';
+                    trail.style.backgroundColor = 'rgba(255, 255, 255, 0.15)';
+                    trail.style.position = 'absolute';
+                    trail.style.top = `${startY}px`;
+                    trail.style.left = `${startX}px`;
+                    trail.style.transformOrigin = '0 0';
+                    trail.style.transform = `rotate(${angle}deg)`;
+                    trail.style.zIndex = '9991';
+                    
+                    document.body.appendChild(trail);
+                    widget5.querySelector('.mula-context-trail')?.remove();
+                    widget5.appendChild(trail);
+                }
+                
+                // Glass cards data
+                const glassCards = [
+                    {
+                        label: 'Electronics',
+                        name: 'Wireless Earbuds Pro',
+                        price: '$129.99',
+                        image: 'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80'
+                    },
+                    {
+                        label: 'Fashion',
+                        name: 'Minimal Watch',
+                        price: '$89.99',
+                        image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80'
+                    },
+                    {
+                        label: 'Home',
+                        name: 'Smart Diffuser',
+                        price: '$59.99',
+                        image: 'https://images.unsplash.com/photo-1531829039722-d3fb3e705a4b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80'
+                    },
+                    {
+                        label: 'Accessories',
+                        name: 'Leather Wallet',
+                        price: '$49.99',
+                        image: 'https://images.unsplash.com/photo-1627123424574-724758594e93?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80'
+                    },
+                    {
+                        label: 'Tech',
+                        name: 'Ultra HD Monitor',
+                        price: '$349.99',
+                        image: 'https://images.unsplash.com/photo-1586210579191-33b45e38fa2c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80'
+                    },
+                    {
+                        label: 'Lifestyle',
+                        name: 'Fitness Tracker',
+                        price: '$79.99',
+                        image: 'https://images.unsplash.com/photo-1575311373937-040b8e1fd6b0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80'
+                    }
+                ];
+                
+                // Add scroll indicator to prompt swiping
+                const scrollIndicator = document.createElement('div');
+                scrollIndicator.className = 'mula-scroll-indicator';
+                scrollIndicator.innerHTML = `
+                    <div style="font-size: 10px; color: rgba(255,255,255,0.6); text-align: center; margin: 0 0 15px; opacity: 0.8;">
+                        <svg width="14" height="8" viewBox="0 0 14 8" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 4px; vertical-align: middle;">
+                            <path d="M13.3536 4.35355C13.5488 4.15829 13.5488 3.84171 13.3536 3.64645L10.1716 0.464466C9.97631 0.269204 9.65973 0.269204 9.46447 0.464466C9.2692 0.659728 9.2692 0.976311 9.46447 1.17157L12.2929 4L9.46447 6.82843C9.2692 7.02369 9.2692 7.34027 9.46447 7.53553C9.65973 7.7308 9.97631 7.7308 10.1716 7.53553L13.3536 4.35355ZM0 4.5H13V3.5H0V4.5Z" fill="white"/>
+                        </svg>
+                        Swipe for more
+                        <svg width="14" height="8" viewBox="0 0 14 8" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-left: 4px; vertical-align: middle;">
+                            <path d="M13.3536 4.35355C13.5488 4.15829 13.5488 3.84171 13.3536 3.64645L10.1716 0.464466C9.97631 0.269204 9.65973 0.269204 9.46447 0.464466C9.2692 0.659728 9.2692 0.976311 9.46447 1.17157L12.2929 4L9.46447 6.82843C9.2692 7.02369 9.2692 7.34027 9.46447 7.53553C9.65973 7.7308 9.97631 7.7308 10.1716 7.53553L13.3536 4.35355ZM0 4.5H13V3.5H0V4.5Z" fill="white"/>
+                        </svg>
+                    </div>
+                `;
+                
+                // Add cards to grid with staggered animations
+                glassCards.forEach((card, index) => {
+                    const glassCard = document.createElement('div');
+                    glassCard.className = 'mula-glass-card';
+                    glassCard.style.transitionDelay = `${0.05 * index}s`;
+                    glassCard.style.transform = 'translateY(20px)';
+                    glassCard.style.opacity = '0';
+                    
+                    // Add card image
+                    glassCard.style.backgroundImage = `linear-gradient(180deg, rgba(0,0,0,0) 60%, rgba(0,0,0,0.8) 100%), url(${card.image})`;
+                    glassCard.style.backgroundSize = 'cover';
+                    glassCard.style.backgroundPosition = 'center';
+                    
+                    // Add content at the bottom
+                    const content = document.createElement('div');
+                    content.style.position = 'absolute';
+                    content.style.bottom = '0';
+                    content.style.left = '0';
+                    content.style.width = '100%';
+                    content.style.padding = '12px';
+                    
+                    content.innerHTML = `
+                        <div class="mula-glass-label">${card.label}</div>
+                        <div class="mula-glass-name">${card.name}</div>
+                        <div class="mula-glass-price">${card.price}</div>
+                    `;
+                    
+                    glassCard.appendChild(content);
+                    glassCardGrid.appendChild(glassCard);
+                    
+                    // Show cards with animation when expanded
+                    setTimeout(() => {
+                        if (widget5.classList.contains('expanded')) {
+                            glassCard.style.transform = 'translateY(0)';
+                            glassCard.style.opacity = '1';
+                        }
+                    }, 50);
+                });
+                
+                // Add event listener to animate cards when widget is expanded
+                widget5.addEventListener('transitionend', (e) => {
+                    if (e.propertyName === 'transform' && widget5.classList.contains('expanded')) {
+                        const cards = glassCardGrid.querySelectorAll('.mula-glass-card');
+                        cards.forEach((card, index) => {
+                            setTimeout(() => {
+                                card.style.transform = 'translateY(0)';
+                                card.style.opacity = '1';
+                            }, 50 + index * 50);
+                        });
+                    }
+                });
+                
+                // Append scroll indicator
+                glassCardGrid.parentNode.insertBefore(scrollIndicator, glassCardGrid.nextSibling);
+                
+                // Handle scroll position for the floating indicator
+                handleScrollPosition();
+            }
+            
+            // Widget 6 - Floating Showcase
+            const initFloatingShowcase = () => {
+                const widget6 = document.querySelector('.mula-widget-6');
+                const trendingDot = widget6.querySelector('.mula-trending-dot');
+                const closeBtn = widget6.querySelector('.mula-showcase-close');
+                
+                // Toggle expanded state when trending dot is clicked
+                trendingDot.addEventListener('click', () => {
+                    widget6.classList.add('expanded');
+                });
+                
+                // Close showcase when close button is clicked
+                closeBtn.addEventListener('click', () => {
+                    widget6.classList.remove('expanded');
+                });
+                
+                // Set preview image for showcase
+                const preview = widget6.querySelector('.mula-item-preview');
+                if (preview) {
+                    preview.style.backgroundImage = "url('https://placehold.co/400x400/333/white?text=Limited+Edition')";
+                }
+                
+                // Add action button handlers
+                const primaryButton = widget6.querySelector('.mula-action-primary');
+                const secondaryButton = widget6.querySelector('.mula-action-secondary');
+                
+                if (primaryButton) {
+                    primaryButton.addEventListener('click', () => {
+                        console.log('View Drop clicked');
+                        // You could navigate to product page or expand details here
+                    });
+                }
+                
+                if (secondaryButton) {
+                    secondaryButton.addEventListener('click', () => {
+                        console.log('Save clicked');
+                        // You could save to user wishlist here
+                        secondaryButton.textContent = 'Saved';
+                        secondaryButton.style.background = 'rgba(255, 55, 95, 0.2)';
+                    });
+                }
+            };
+            
+            // Find all widget toggles and set up their event listeners
+            const setupWidgetToggles = () => {
+                const toggles = document.querySelectorAll('.widget-toggle');
+
+        toggles.forEach(toggle => {
+                    // Remove any existing event listeners
+                    const newToggle = toggle.cloneNode(true);
+                    toggle.parentNode.replaceChild(newToggle, toggle);
+                    
+                    newToggle.addEventListener('click', () => {
+                        const widgetId = newToggle.dataset.widget;
+                        const isActive = newToggle.classList.contains('active');
+                        const widgetGroup = newToggle.closest('.widget-group');
+                
+                if (isActive) {
+                            newToggle.classList.remove('active');
+                    widgetGroup.classList.remove('active');
+                            window.activeWidgets.delete(widgetId);
+                } else {
+                            newToggle.classList.add('active');
+                    widgetGroup.classList.add('active');
+                            window.activeWidgets.add(widgetId);
+                }
+                
+                updateWidgetVisibility();
+            });
+        });
+            };
+            
+            // Global function to update widget visibility
+            window.updateWidgetVisibility = function() {
+                // Widget 1
+                const widget1 = document.querySelector('.mula-widget-1');
+                if (widget1) {
+                    widget1.style.display = window.activeWidgets.has('1') ? 'block' : 'none';
+                }
+                
+                // Widget 2
+                const widget2 = document.querySelector('.mula-widget-2');
+                if (widget2) {
+                    widget2.classList.toggle('active', window.activeWidgets.has('2'));
+                    if (window.activeWidgets.has('2')) {
+                pollForIframeAccess(); // Try to add buttons when widget becomes active
+                // Make sure dock is visible if there are pinned items
+                if (pinnedItems.size > 0) {
+                    dock.classList.remove('hidden');
+                }
+            } else {
+                dock.classList.add('hidden');
+                // Hide all pin buttons
+                try {
+                    const iframe = document.getElementById('content-frame');
+                    const buttons = iframe.contentDocument.querySelectorAll('.pin-button');
+                    buttons.forEach(button => button.remove());
+                } catch (e) {
+                    console.log('Could not access iframe to remove buttons');
+                        }
+                }
+            }
+
+                // Widget 3
+            const widget3 = document.querySelector('.mula-widget-3');
+                if (widget3) {
+                    widget3.classList.toggle('visible', window.activeWidgets.has('3'));
+                }
+                
+                // Widget 4
+                const widget4 = document.querySelector('.mula-widget-4');
+                if (widget4) {
+                    widget4.classList.toggle('active', window.activeWidgets.has('4'));
+                }
+                
+                // Widget 5
+                const widget5 = document.querySelector('.mula-widget-5');
+                if (widget5) {
+                    widget5.classList.toggle('active', window.activeWidgets.has('5'));
+                }
+                
+                // Widget 6
+                const widget6 = document.querySelector('.mula-widget-6');
+                if (widget6) {
+                    widget6.classList.toggle('active', window.activeWidgets.has('6'));
+                }
+                
+                // Widget 7
+                const widget7 = document.querySelector('.mula-widget-7');
+                if (widget7) {
+                    widget7.classList.toggle('active', window.activeWidgets.has('7'));
+                    
+                    // Communicate with iframe for Widget 7
+                    try {
+                        const iframe = document.getElementById('content-frame');
+                        if (iframe && iframe.contentWindow) {
+                            iframe.contentWindow.postMessage({
+                                type: 'widgetStateChanged',
+                                widget: '7',
+                                active: window.activeWidgets.has('7')
+                            }, '*');
+                        }
+                    } catch (e) {
+                        console.log('Could not access iframe to update Widget 7');
+                    }
+                }
+            };
+            
+            // Initialize widgets 4-6
+            createCarouselItems();
+            createGlassCards();
+            initFloatingShowcase();
+            createStickyCarousel();  // Initialize Widget 7 - Sticky Carousel
+            
+            // Setup toggle buttons
+            setupWidgetToggles();
+            
+            // If there are any existing active widgets, update their visibility
+            updateWidgetVisibility();
+        });
+
+        // Handle scroll position for the floating indicator
+        function handleScrollPosition() {
+            const widget5 = document.querySelector('.mula-widget-5');
+            
+            // Add scroll reactivity for Widget 5
+            const handleScroll = () => {
+                const iframe = document.getElementById('content-frame');
+                if (!iframe || !iframe.contentWindow) return;
+                
+                try {
+                    // Get scroll position from inside the iframe
+                    const scrollY = iframe.contentWindow.scrollY || iframe.contentDocument.documentElement.scrollTop || 0;
+                    const threshold = 100; // Start changing at 100px scroll
+                    
+                    if (scrollY > threshold) {
+                        widget5.classList.add('scrolled');
+                        // Since we're using absolute positioning, we need to update indicator positioning manually
+                        const indicator = widget5.querySelector('.mula-floating-indicator');
+                        if (indicator) {
+                            // This adjusts the position as if it were fixed
+                            indicator.style.top = `${20 + scrollY}px`;
+                        }
+                    } else {
+                        widget5.classList.remove('scrolled');
+                        // Reset the indicator position
+                        const indicator = widget5.querySelector('.mula-floating-indicator');
+                        if (indicator) {
+                            indicator.style.top = '60px';
+                        }
+                    }
+                } catch (e) {
+                    console.log('Could not access iframe scroll position');
+                }
+            };
+            
+            // Listen for scroll events in the iframe
+            const addScrollListener = () => {
+                const iframe = document.getElementById('content-frame');
+                if (!iframe || !iframe.contentWindow) {
+                    // If iframe is not ready, try again in a moment
+                    setTimeout(addScrollListener, 300);
+                    return;
+                }
+                
+                try {
+                    iframe.contentWindow.addEventListener('scroll', handleScroll, { passive: true });
+                    // Initial check
+                    handleScroll();
+                } catch (e) {
+                    console.log('Could not add scroll listener to iframe', e);
+                }
+            };
+            
+            // Initialize scroll listener
+            addScrollListener();
+        }
+
+        // Widget 7 - Sticky Inline Carousel
+        function createStickyCarousel() {
+            console.log('createStickyCarousel function called'); // Debug log
+            const stickyTrack = document.querySelector('.mula-sticky-track');
+            const widget7 = document.querySelector('.mula-widget-7');
+            
+            if (!stickyTrack || !widget7) {
+                console.log('Track or widget element not found:', { stickyTrack, widget7 }); // Debug log
+                return;
+            }
+            
+            console.log('Building sticky carousel elements'); // Debug log
+            // Product data for the carousel
+            const stickyProducts = [
+                {
+                    label: 'Premium',
+                    name: 'Cashmere Wrap Scarf',
+                    price: '$89.99',
+                    image: 'https://images.unsplash.com/photo-1520367691844-3df6788d16fd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80'
+                },
+                {
+                    label: 'Best Seller',
+                    name: 'Wool Knit Cap',
+                    price: '$29.99',
+                    image: 'https://images.unsplash.com/photo-1590736969955-71a9313dc5fc?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80'
+                },
+                {
+                    label: 'Limited',
+                    name: 'Leather Gloves',
+                    price: '$49.99',
+                    image: 'https://images.unsplash.com/photo-1533055640609-24b498dfd74c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80'
+                },
+                {
+                    label: 'New',
+                    name: 'Tweed Jacket',
+                    price: '$149.99',
+                    image: 'https://images.unsplash.com/photo-1614676459401-34413f54cc73?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80'
+                },
+                {
+                    label: 'Sale',
+                    name: 'Wool Beanie',
+                    price: '$18.99',
+                    image: 'https://images.unsplash.com/photo-1576871337622-98d48d1cf531?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80'
+                },
+                {
+                    label: 'Top Rated',
+                    name: 'Boot Socks',
+                    price: '$14.99',
+                    image: 'https://images.unsplash.com/photo-1586350977771-b3b0abd50c82?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80'
+                }
+            ];
+            
+            // Create product cards
+            stickyProducts.forEach((product, index) => {
+                const card = document.createElement('div');
+                card.className = 'mula-sticky-card';
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(10px)';
+                card.style.transition = 'all 0.3s ease';
+                card.style.transitionDelay = `${0.05 * index}s`;
+                
+                const cardHtml = `
+                    <div class="mula-sticky-image" style="background-image: url('${product.image}')">
+                        <button class="mula-sticky-like" aria-label="Like product">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="mula-sticky-content">
+                        <div class="mula-sticky-label">${product.label}</div>
+                        <div class="mula-sticky-name">${product.name}</div>
+                        <div class="mula-sticky-price">${product.price}</div>
+                        <div class="mula-sticky-content-spacer"></div>
+                        <button class="mula-sticky-buy">Buy Now</button>
+                    </div>
+                `;
+                
+                card.innerHTML = cardHtml;
+                stickyTrack.appendChild(card);
+                
+                // Animate in cards
+                setTimeout(() => {
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, 100 + index * 50);
+                
+                // Add like functionality
+                const likeButton = card.querySelector('.mula-sticky-like');
+                likeButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    likeButton.classList.toggle('active');
+                    
+                    if (likeButton.classList.contains('active')) {
+                        // Like animation
+                        const heart = document.createElement('div');
+                        heart.style.position = 'absolute';
+                        heart.style.top = '50%';
+                        heart.style.left = '50%';
+                        heart.style.transform = 'translate(-50%, -50%)';
+                        heart.style.color = '#FF375F';
+                        heart.style.fontSize = '24px';
+                        heart.style.opacity = '0';
+                        heart.style.transition = 'all 0.6s ease';
+                        heart.innerHTML = '❤️';
+                        
+                        likeButton.appendChild(heart);
+                        
+                        setTimeout(() => {
+                            heart.style.opacity = '1';
+                            heart.style.transform = 'translate(-50%, -50%) scale(1.5)';
+                        }, 10);
+                        
+                        setTimeout(() => {
+                            heart.style.opacity = '0';
+                            heart.style.transform = 'translate(-50%, -80%) scale(0.5)';
+                        }, 600);
+                        
+                        setTimeout(() => {
+                            heart.remove();
+                        }, 1200);
+                    }
+                });
+                
+                // Add buy button functionality
+                const buyButton = card.querySelector('.mula-sticky-buy');
+                buyButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('Buy button clicked for:', product.name);
+                    
+                    // Visual feedback
+                    const originalText = buyButton.textContent;
+                    buyButton.textContent = 'Added to Cart';
+                    buyButton.style.background = '#FF375F';
+                    
+                    setTimeout(() => {
+                        buyButton.textContent = originalText;
+                        buyButton.style.background = 'rgba(255, 255, 255, 0.15)';
+                    }, 1500);
+                });
+                
+                // Make the entire card clickable
+                card.addEventListener('click', (e) => {
+                    // Ignore clicks on the like and buy buttons
+                    if (e.target.closest('.mula-sticky-like') || e.target.closest('.mula-sticky-buy')) {
+                        return;
+                    }
+                    console.log('Card clicked:', product.name);
+                });
+            });
+            
+            // Add button functionality
+            const viewAllButton = document.querySelector('.mula-view-all');
+            viewAllButton.addEventListener('click', () => {
+                console.log('View All clicked');
+            });
+        }
+    </script>
+</body>
+</html>

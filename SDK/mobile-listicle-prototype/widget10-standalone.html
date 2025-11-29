@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Single Article Preview Widget</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", sans-serif;
+            background-color: #f5f5f7;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        h1 {
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 24px;
+        }
+        
+        .container {
+            max-width: 375px; /* iPhone-sized container */
+            width: 100%;
+            padding: 10px;
+        }
+        
+        .return-button {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background-color: rgba(0, 0, 0, 0.05);
+            color: #333;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: background-color 0.2s ease;
+            z-index: 10;
+        }
+        
+        .return-button:hover {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Widget 10 - Single Article Preview */
+        .mula-widget-10 {
+            position: relative;
+            width: 100%;
+            margin: 25px 0;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", sans-serif;
+        }
+        
+        .mula-article-preview {
+            background-color: white;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .mula-article-cover {
+            position: relative;
+            width: 100%;
+            height: 180px;
+            overflow: hidden;
+        }
+        
+        .mula-article-cover-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+        
+        .mula-article-preview:hover .mula-article-cover-image {
+            transform: scale(1.05);
+        }
+        
+        .mula-article-category {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255, 255, 255, 0.85);
+            color: #333;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 15px;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .mula-listicle-rank {
+            position: absolute;
+            bottom: -20px;
+            left: 20px;
+            width: 40px;
+            height: 40px;
+            background: #ff375f;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 700;
+            box-shadow: 0 4px 10px rgba(255, 55, 95, 0.3);
+            border: 3px solid white;
+        }
+        
+        .mula-article-body {
+            padding: 25px 20px 20px;
+        }
+        
+        .mula-article-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .mula-article-author {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .mula-author-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .mula-author-name {
+            font-size: 13px;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .mula-publish-date {
+            font-size: 12px;
+            color: #777;
+        }
+        
+        .mula-article-title {
+            font-size: 18px;
+            font-weight: 700;
+            line-height: 1.3;
+            color: #111;
+            margin-bottom: 12px;
+        }
+        
+        .mula-article-content {
+            font-size: 15px;
+            line-height: 1.5;
+            color: #444;
+            max-height: 4.5em; /* Show 3 lines */
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 15px;
+            transition: max-height 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+        
+        .mula-article-content.expanded {
+            max-height: 1000px; /* Large value to ensure all content is shown */
+        }
+        
+        .mula-content-fade {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 30px;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1));
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        
+        .expanded .mula-content-fade {
+            opacity: 0;
+        }
+        
+        .mula-article-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+        }
+        
+        .mula-article-metrics {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .mula-metric {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 13px;
+            color: #666;
+        }
+        
+        .mula-metric svg {
+            width: 14px;
+            height: 14px;
+            color: #555;
+        }
+        
+        .mula-read-toggle {
+            background: transparent;
+            border: none;
+            color: #007aff;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            padding: 0;
+        }
+        
+        .mula-read-toggle-icon {
+            transition: transform 0.3s ease;
+        }
+        
+        .expanded .mula-read-toggle-icon {
+            transform: rotate(180deg);
+        }
+        
+        .mula-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 15px;
+        }
+        
+        .mula-tag {
+            font-size: 12px;
+            color: #666;
+            background: #f0f0f0;
+            padding: 4px 10px;
+            border-radius: 12px;
+        }
+        
+        .debug-info {
+            margin-top: 40px;
+            padding: 15px;
+            background: #f1f1f1;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 12px;
+            color: #555;
+            width: 100%;
+            max-width: 375px;
+        }
+    </style>
+</head>
+<body>
+    <a href="playground.html" class="return-button" id="returnButton">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+        Return to Playground
+    </a>
+    
+    <h1>Single Article Preview</h1>
+    
+    <div class="container">
+        <div class="mula-widget-10">
+            <div class="mula-article-preview">
+                <div class="mula-article-cover">
+                    <img src="https://images.unsplash.com/photo-1581235720704-06d3acfcb36f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Top 10 Budget Smartphones" class="mula-article-cover-image">
+                    <div class="mula-article-category">Smartphones</div>
+                    <div class="mula-listicle-rank">4</div>
+                </div>
+                
+                <div class="mula-article-body">
+                    <div class="mula-article-meta">
+                        <div class="mula-article-author">
+                            <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Author" class="mula-author-avatar">
+                            <div>
+                                <div class="mula-author-name">Michael Chen</div>
+                                <div class="mula-publish-date">May 8, 2023</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h2 class="mula-article-title">The $299 Smartphone With Premium Features</h2>
+                    
+                    <div class="mula-article-content" id="articleContent">
+                        <p>Coming in at number 4 on our "Top 10 Budget Smartphones That Feel Premium" list is this incredible device that manages to pack high-end features into a surprisingly affordable package.</p>
+                        
+                        <p>For just $299, you get a gorgeous 6.5-inch AMOLED display with a 90Hz refresh rate that rivals phones costing twice as much. Colors are vibrant and text is crisp, making everything from social media browsing to video streaming a pleasure.</p>
+                        
+                        <p>The camera system is another standout feature. The 48MP main sensor captures detailed photos even in challenging lighting conditions, while the 12MP ultrawide lens lets you fit more into the frame. Night mode performance is particularly impressive for a phone in this price range.</p>
+                        
+                        <p>Battery life doesn't disappoint either – the 4,500mAh battery easily lasts a full day of heavy use, and the included 33W fast charger takes you from 0 to 60% in just 30 minutes.</p>
+                        
+                        <p>Where compromises have been made is in the processor – while not the absolute fastest chip available, it handles everyday tasks smoothly and only shows slight lag in the most demanding games at highest settings. The plastic back doesn't feel as premium as glass, but the matte finish looks sleek and resists fingerprints well.</p>
+                        
+                        <p>For anyone looking to get maximum value without breaking the bank, this phone represents one of the best balances of performance, features, and affordability on the market today.</p>
+                        
+                        <div class="mula-content-fade"></div>
+                    </div>
+                    
+                    <div class="mula-article-footer">
+                        <div class="mula-article-metrics">
+                            <div class="mula-metric">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                                5.7K
+                            </div>
+                            <div class="mula-metric">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+                                </svg>
+                                124
+                            </div>
+                        </div>
+                        
+                        <button class="mula-read-toggle" id="readToggleBtn">
+                            Read More
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mula-read-toggle-icon">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <div class="mula-tags">
+                        <div class="mula-tag">Budget</div>
+                        <div class="mula-tag">Smartphone</div>
+                        <div class="mula-tag">Tech Review</div>
+                        <div class="mula-tag">Best Value</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="debug-info">
+            <div id="debug-output">Debug information will appear here</div>
+        </div>
+    </div>
+    
+    <script>
+        // Toggle article content expansion
+        const articleContent = document.getElementById('articleContent');
+        const readToggleBtn = document.getElementById('readToggleBtn');
+        
+        if (readToggleBtn && articleContent) {
+            readToggleBtn.addEventListener('click', function() {
+                articleContent.classList.toggle('expanded');
+                
+                if (articleContent.classList.contains('expanded')) {
+                    readToggleBtn.innerHTML = `
+                        Read Less
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mula-read-toggle-icon">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    `;
+                    
+                    // Log expansion in debug
+                    logDebug('Article content expanded');
+                    
+                    // Track engagement (would be an API call in a real app)
+                    trackEngagement('content_expanded');
+                } else {
+                    readToggleBtn.innerHTML = `
+                        Read More
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mula-read-toggle-icon">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    `;
+                    
+                    // Log collapse in debug
+                    logDebug('Article content collapsed');
+                    
+                    // Track engagement (would be an API call in a real app)
+                    trackEngagement('content_collapsed');
+                }
+            });
+        }
+        
+        // Check if running in iframe and hide return button if needed
+        function hideReturnButtonInIframe() {
+            const returnButton = document.getElementById('returnButton');
+            
+            // Check if we're in an iframe
+            const isInIframe = window.self !== window.top;
+            
+            if (returnButton) {
+                if (isInIframe) {
+                    returnButton.style.display = 'none';
+                    logDebug('Return button hidden (running in iframe)');
+                } else {
+                    returnButton.style.display = 'flex';
+                    logDebug('Return button visible (running standalone)');
+                }
+            }
+        }
+        
+        // Debug logging function
+        function logDebug(message) {
+            const debugOutput = document.getElementById('debug-output');
+            if (debugOutput) {
+                const timestamp = new Date().toLocaleTimeString();
+                debugOutput.innerHTML += `<div>[${timestamp}] ${message}</div>`;
+            }
+            
+            // Also log to console
+            console.log(`[Debug] ${message}`);
+        }
+        
+        // Simulate engagement tracking
+        function trackEngagement(action) {
+            // In a real app, this would send data to an analytics service
+            logDebug(`Engagement tracked: ${action}`);
+            
+            // Update view count periodically (for demo purposes)
+            if (action === 'content_expanded') {
+                const viewCountElement = document.querySelector('.mula-metric:first-child');
+                if (viewCountElement) {
+                    const currentCount = viewCountElement.textContent.trim();
+                    const numericPart = currentCount.match(/\d+(\.\d+)?/)[0];
+                    // Convert to number, add small increment, and format back
+                    let newCount = parseFloat(numericPart) + 0.1;
+                    viewCountElement.textContent = newCount.toFixed(1) + 'K';
+                }
+            }
+        }
+        
+        // Run on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            hideReturnButtonInIframe();
+            logDebug('Widget 10 initialized - Single Article Preview');
+            
+            // Track page view
+            trackEngagement('page_view');
+        });
+    </script>
+</body>
+</html> 

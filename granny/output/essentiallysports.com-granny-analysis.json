@@ -1,0 +1,117 @@
+{
+  "domain": "essentiallysports.com",
+  "analyzed_at": "2025-11-28T23:42:25.291Z",
+  "health_check": {
+    "sdk_present": false,
+    "sdk_version": null,
+    "cdn_url": null,
+    "load_time_ms": null,
+    "checked_pages": [
+      {
+        "url": "https://essentiallysports.com",
+        "type": "homepage"
+      },
+      {
+        "url": "https://www.essentiallysports.com/ncaa-college-football-news-mike-elko-and-co-get-chilly-reception-as-steve-sarkisians-texas-turns-up-mind-games/",
+        "type": "article"
+      },
+      {
+        "url": "https://www.essentiallysports.com/ncaa-college-football-news-indiana-injury-report-curt-cignetti-faces-two-massive-setbacks-ej-williams-jr-brendan-franke/",
+        "type": "article"
+      },
+      {
+        "url": "https://www.essentiallysports.com/nfl-active-news-steelers-steelers-rookie-qb-will-howard-makes-his-strong-feelings-clear-on-sitting-behind-aaron-rodgers-and-mason-rudolph/",
+        "type": "article"
+      }
+    ],
+    "detection_method": "not_found",
+    "deployment_date": null,
+    "errors": [
+      "Mula SDK script tag not found on homepage or article pages"
+    ],
+    "warnings": [
+      "SDK might be deployed via GTM (dynamic loading) - not detectable with static HTML parsing"
+    ]
+  },
+  "traffic_estimate": {
+    "total_urls": 36,
+    "distribution": {
+      "soccer": {
+        "count": 3,
+        "percentage": 8,
+        "rank": 1
+      },
+      "nba": {
+        "count": 3,
+        "percentage": 8,
+        "rank": 2
+      },
+      "nascar": {
+        "count": 3,
+        "percentage": 8,
+        "rank": 3
+      },
+      "golf": {
+        "count": 3,
+        "percentage": 8,
+        "rank": 4
+      },
+      "nfl": {
+        "count": 3,
+        "percentage": 8,
+        "rank": 5
+      },
+      "wrestling": {
+        "count": 3,
+        "percentage": 8,
+        "rank": 6
+      },
+      "ufc": {
+        "count": 3,
+        "percentage": 8,
+        "rank": 7
+      },
+      "tennis": {
+        "count": 3,
+        "percentage": 8,
+        "rank": 8
+      },
+      "mlb": {
+        "count": 3,
+        "percentage": 8,
+        "rank": 9
+      },
+      "boxing": {
+        "count": 3,
+        "percentage": 8,
+        "rank": 10
+      },
+      "nhl": {
+        "count": 3,
+        "percentage": 8,
+        "rank": 11
+      }
+    },
+    "sources": [
+      "sitemap",
+      "rss"
+    ],
+    "confidence": 60
+  },
+  "url_patterns": [],
+  "deployment_ready": false,
+  "recommendations": [
+    {
+      "priority": "🔴 CRITICAL",
+      "category": "SDK Deployment",
+      "message": "Mula SDK is not deployed. Cannot proceed with targeting configuration.",
+      "action": "Deploy SDK via GTM or direct script tag"
+    },
+    {
+      "priority": "✅ READY",
+      "category": "Traffic Intelligence",
+      "message": "Top sports identified: SOCCER (8%), NBA (8%), NASCAR (8%)",
+      "action": "Deploy targeting for top 3 sports first"
+    }
+  ]
+}

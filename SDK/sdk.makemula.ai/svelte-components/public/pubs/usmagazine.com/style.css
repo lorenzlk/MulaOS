@@ -1,0 +1,29 @@
+/* usmagazine.com specific overrides for SmartScroll */
+/* Using CSS variables that can penetrate shadow DOM */
+
+:root {
+    /* Remove padding on main */
+    --mula-main-padding: 0;
+    
+    /* Remove max-width on desktop for container */
+    --mula-container-max-width: 600px;
+    
+    /* Card border - none by default */
+    --mula-card-border: none;
+    
+    /* Card image background color - usmagazine.com pink */
+    --mula-card-image-bg-r: 236;
+    --mula-card-image-bg-g: 43;
+    --mula-card-image-bg-b: 140;
+    --mula-card-image-bg-opacity: 0.1;
+}
+
+@media (min-width: 768px) {
+    :root {
+        /* Remove max-width constraint on desktop */
+        --mula-container-max-width: none;
+        
+        /* Add pink border to mula-card on desktop */
+        --mula-card-border: 2px solid #ec2b8c;
+    }
+}

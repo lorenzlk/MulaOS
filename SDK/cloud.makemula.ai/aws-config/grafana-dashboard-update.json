@@ -1,0 +1,97 @@
+{
+  "dashboard": {
+    "id": 2,
+    "uid": "cez8nq0xic64gf",
+    "title": "Mula Search Phrase Analytics",
+    "tags": ["mula", "search-phrases"],
+    "timezone": "browser",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Search Phrase Counts by Host",
+        "type": "stat",
+        "targets": [
+          {
+            "datasource": {
+              "type": "cloudwatch",
+              "uid": "cloudwatch"
+            },
+            "namespace": "Mula/SearchPhrases",
+            "metricName": "SearchPhraseCount",
+            "dimensions": {
+              "Host": "www.on3.com"
+            },
+            "statistic": "Sum",
+            "period": "300",
+            "refId": "A"
+          },
+          {
+            "datasource": {
+              "type": "cloudwatch",
+              "uid": "cloudwatch"
+            },
+            "namespace": "Mula/SearchPhrases",
+            "metricName": "SearchPhraseCount",
+            "dimensions": {
+              "Host": "www.brit.co"
+            },
+            "statistic": "Sum",
+            "period": "300",
+            "refId": "B"
+          },
+          {
+            "datasource": {
+              "type": "cloudwatch",
+              "uid": "cloudwatch"
+            },
+            "namespace": "Mula/SearchPhrases",
+            "metricName": "SearchPhraseCount",
+            "dimensions": {
+              "Host": "www.swimmingworldmagazine.com"
+            },
+            "statistic": "Sum",
+            "period": "300",
+            "refId": "C"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 0
+        }
+      },
+      {
+        "id": 2,
+        "title": "Total Search Phrase Counts Over Time",
+        "type": "timeseries",
+        "targets": [
+          {
+            "datasource": {
+              "type": "cloudwatch",
+              "uid": "cloudwatch"
+            },
+            "namespace": "Mula/SearchPhrases",
+            "metricName": "SearchPhraseCount",
+            "statistic": "Sum",
+            "period": "300",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 0
+        }
+      }
+    ],
+    "time": {
+      "from": "now-2h",
+      "to": "now"
+    },
+    "refresh": "30s",
+    "schemaVersion": 30,
+    "version": 1
+  }
+}

@@ -1,0 +1,197 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "Mula Real-Time Analytics (CloudWatch)",
+    "tags": ["mula", "analytics", "real-time", "cloudwatch"],
+    "style": "dark",
+    "timezone": "browser",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Incoming Records",
+        "type": "graph",
+        "targets": [
+          {
+            "datasource": "CloudWatch",
+            "namespace": "AWS/Kinesis",
+            "metricName": "IncomingRecords",
+            "dimensions": {
+              "StreamName": "mula-realtime-events"
+            },
+            "statistics": ["Sum"],
+            "period": 60,
+            "refId": "A",
+            "legendFormat": "Records"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "Records",
+            "min": 0
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0}
+      },
+      {
+        "id": 2,
+        "title": "Incoming Bytes",
+        "type": "graph",
+        "targets": [
+          {
+            "datasource": "CloudWatch",
+            "namespace": "AWS/Kinesis",
+            "metricName": "IncomingBytes",
+            "dimensions": {
+              "StreamName": "mula-realtime-events"
+            },
+            "statistics": ["Sum"],
+            "period": 60,
+            "refId": "A",
+            "legendFormat": "Bytes"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "Bytes",
+            "min": 0
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0}
+      },
+      {
+        "id": 3,
+        "title": "PutRecord Success Rate",
+        "type": "stat",
+        "targets": [
+          {
+            "datasource": "CloudWatch",
+            "namespace": "AWS/Kinesis",
+            "metricName": "PutRecord.Success",
+            "dimensions": {
+              "StreamName": "mula-realtime-events"
+            },
+            "statistics": ["Sum"],
+            "period": 60,
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                {"color": "green", "value": null},
+                {"color": "yellow", "value": 100},
+                {"color": "red", "value": 50}
+              ]
+            }
+          }
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8}
+      },
+      {
+        "id": 4,
+        "title": "PutRecord Latency",
+        "type": "graph",
+        "targets": [
+          {
+            "datasource": "CloudWatch",
+            "namespace": "AWS/Kinesis",
+            "metricName": "PutRecord.Latency",
+            "dimensions": {
+              "StreamName": "mula-realtime-events"
+            },
+            "statistics": ["Average"],
+            "period": 60,
+            "refId": "A",
+            "legendFormat": "Latency (ms)"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "Latency (ms)",
+            "min": 0
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8}
+      },
+      {
+        "id": 5,
+        "title": "Records per Second",
+        "type": "stat",
+        "targets": [
+          {
+            "datasource": "CloudWatch",
+            "namespace": "AWS/Kinesis",
+            "metricName": "IncomingRecords",
+            "dimensions": {
+              "StreamName": "mula-realtime-events"
+            },
+            "statistics": ["Sum"],
+            "period": 60,
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short",
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": null},
+                {"color": "yellow", "value": 10},
+                {"color": "green", "value": 50}
+              ]
+            }
+          }
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16}
+      },
+      {
+        "id": 6,
+        "title": "Data Throughput (Bytes/sec)",
+        "type": "stat",
+        "targets": [
+          {
+            "datasource": "CloudWatch",
+            "namespace": "AWS/Kinesis",
+            "metricName": "IncomingBytes",
+            "dimensions": {
+              "StreamName": "mula-realtime-events"
+            },
+            "statistics": ["Sum"],
+            "period": 60,
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "bytes",
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": null},
+                {"color": "yellow", "value": 1000},
+                {"color": "green", "value": 10000}
+              ]
+            }
+          }
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16}
+      }
+    ],
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    },
+    "refresh": "5s",
+    "schemaVersion": 27,
+    "version": 1
+  }
+}

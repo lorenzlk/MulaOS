@@ -1,0 +1,127 @@
+{
+  "widgets": [
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 0,
+      "width": 12,
+      "height": 6,
+      "properties": {
+        "metrics": [
+          [ "AWS/Kinesis", "IncomingRecords", "StreamName", "mula-realtime-events" ],
+          [ ".", "IncomingBytes", ".", "." ],
+          [ ".", "PutRecord.Success", ".", "." ],
+          [ ".", "PutRecord.Latency", ".", "." ]
+        ],
+        "view": "timeSeries",
+        "stacked": false,
+        "region": "us-east-1",
+        "title": "Mula Real-Time Analytics - Kinesis Metrics",
+        "period": 60,
+        "stat": "Sum"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 12,
+      "y": 0,
+      "width": 12,
+      "height": 6,
+      "properties": {
+        "metrics": [
+          [ "AWS/Kinesis", "IncomingRecords", "StreamName", "mula-realtime-events" ]
+        ],
+        "view": "singleValue",
+        "stacked": false,
+        "region": "us-east-1",
+        "title": "Records per Minute",
+        "period": 60,
+        "stat": "Sum"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 6,
+      "width": 12,
+      "height": 6,
+      "properties": {
+        "metrics": [
+          [ "AWS/Kinesis", "IncomingBytes", "StreamName", "mula-realtime-events" ]
+        ],
+        "view": "singleValue",
+        "stacked": false,
+        "region": "us-east-1",
+        "title": "Bytes per Minute",
+        "period": 60,
+        "stat": "Sum",
+        "unit": "Bytes"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 12,
+      "y": 6,
+      "width": 12,
+      "height": 6,
+      "properties": {
+        "metrics": [
+          [ "AWS/Kinesis", "PutRecord.Success", "StreamName", "mula-realtime-events" ]
+        ],
+        "view": "singleValue",
+        "stacked": false,
+        "region": "us-east-1",
+        "title": "Success Rate",
+        "period": 60,
+        "stat": "Sum"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 12,
+      "width": 24,
+      "height": 6,
+      "properties": {
+        "metrics": [
+          [ "AWS/Kinesis", "IncomingRecords", "StreamName", "mula-realtime-events" ]
+        ],
+        "view": "timeSeries",
+        "stacked": false,
+        "region": "us-east-1",
+        "title": "Incoming Records Over Time",
+        "period": 60,
+        "stat": "Sum",
+        "yAxis": {
+          "left": {
+            "min": 0
+          }
+        }
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 18,
+      "width": 24,
+      "height": 6,
+      "properties": {
+        "metrics": [
+          [ "AWS/Kinesis", "IncomingBytes", "StreamName", "mula-realtime-events" ]
+        ],
+        "view": "timeSeries",
+        "stacked": false,
+        "region": "us-east-1",
+        "title": "Data Throughput Over Time",
+        "period": 60,
+        "stat": "Sum",
+        "unit": "Bytes",
+        "yAxis": {
+          "left": {
+            "min": 0
+          }
+        }
+      }
+    }
+  ]
+}

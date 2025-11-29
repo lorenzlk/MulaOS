@@ -1,0 +1,7 @@
+{
+  "ApplicationCodeUpdate": {
+    "CodeContent": {
+      "TextContent": "CREATE OR REPLACE STREAM \"SEARCH_PHRASE_STREAM\" (\n    \"search_phrase\" VARCHAR(64),\n    \"host\" VARCHAR(32),\n    \"count\" INTEGER\n);\n\nCREATE OR REPLACE PUMP \"SEARCH_PHRASE_PUMP\" AS INSERT INTO \"SEARCH_PHRASE_STREAM\"\nSELECT STREAM \n    \"search_phrase\",\n    \"host\",\n    COUNT(*) as \"count\"\nFROM \"mula-realtime-events_001\"\nWHERE \"search_phrase\" IS NOT NULL\n    AND \"search_phrase\" != ''\n    AND \"eventName\" = 'mula_widget_view'\nGROUP BY \"search_phrase\", \"host\", STEP(\"COL_timestamp\" BY INTERVAL '1' MINUTE);"
+    }
+  }
+}

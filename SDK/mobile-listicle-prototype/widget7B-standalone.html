@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Widget 7B Standalone - Flip Card Carousel</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f7;
+            color: #333;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* Widget 7B - Flip Card Carousel */
+        .mula-widget-7B {
+            position: relative;
+            background: #000;
+            border-radius: 16px;
+            padding: 16px;
+            color: white;
+            margin-bottom: 30px;
+            overflow: hidden;
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+        }
+        
+        .mula-flip-carousel {
+            padding: 0px 0px 16px 0px;
+        }
+        
+        .mula-flip-carousel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 10px;
+            margin-bottom: 16px;
+            position: relative;
+        }
+        
+        .mula-flip-title {
+            font-size: 18px;
+            font-weight: 500;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        .mula-flip-subtitle {
+            font-size: 13px;
+            opacity: 0.7;
+            margin-top: 2px;
+            font-weight: 300;
+            margin-bottom: 6px;
+        }
+        
+        .scroll-indicator {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            opacity: 0.6;
+        }
+        
+        .scroll-indicator:hover {
+            background: rgba(255, 255, 255, 0.2);
+            opacity: 1;
+        }
+        
+        .scroll-indicator svg {
+            width: 20px;
+            height: 20px;
+            fill: white;
+        }
+        
+        .mula-flip-track-container {
+            position: relative;
+            padding: 0 10px; /* Add padding for the buttons */
+            overflow: hidden;
+        }
+        
+        .mula-flip-track {
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+            padding: 10px 5px;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            /* Hide scrollbar */
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+        }
+        
+        .mula-flip-track::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, and Opera */
+        }
+        
+        .mula-flip-card {
+            flex: 0 0 auto;
+            width: 150px;
+            background: transparent;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            transform-style: preserve-3d;
+            will-change: transform;
+            transform: translateZ(0);
+            height: 255px; /* Fixed height for cards to ensure flip works properly */
+        }
+        
+        /* 3D Flip Card Effect */
+        .mula-flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.8s;
+            transform-style: preserve-3d;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        .mula-flip-card.flipped .mula-flip-card-inner {
+            transform: rotateY(180deg);
+        }
+        
+        .mula-flip-card-front, .mula-flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            border-radius: 12px;
+            overflow: hidden;
+            background-color: #1a1a1a;
+        }
+        
+        .mula-flip-card-front {
+            z-index: 1;
+        }
+        
+        .mula-flip-card-back {
+            transform: rotateY(180deg);
+            background-color: #141414;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 12px 10px;
+            text-align: center;
+        }
+        
+        .discount-text {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: #FF375F;
+        }
+        
+        .discount-amount {
+            font-size: 44px;
+            font-weight: 800;
+            color: #FF375F;
+            margin: 0;
+            line-height: 0.9;
+            text-shadow: 0 0 10px rgba(255, 55, 95, 0.5);
+            letter-spacing: -0.5px;
+        }
+        
+        .discount-message {
+            font-size: 11px;
+            line-height: 1.3;
+            margin: 8px 0 10px;
+            max-width: 90%;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 400;
+        }
+        
+        .discount-code-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            gap: 6px;
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .discount-code {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 13px;
+            letter-spacing: 1px;
+            user-select: all;
+            flex-grow: 0;
+            display: inline-block;
+        }
+        
+        .copy-button {
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: white;
+            transition: all 0.2s ease;
+        }
+        
+        .copy-button:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+        
+        .copy-button:active {
+            transform: scale(0.95);
+        }
+        
+        .copy-button svg {
+            width: 16px;
+            height: 16px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+        
+        .copy-tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+            pointer-events: none;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            z-index: 100;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        .copy-tooltip.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .discount-instructions {
+            font-size: 10px;
+            opacity: 0.6;
+            margin: 2px 0 6px;
+            max-width: 90%;
+        }
+        
+        .mula-flip-card:hover .mula-flip-card-inner {
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .mula-flip-card:hover {
+            transform: scale(1.02);
+        }
+        
+        .mula-flip-card:active {
+            transform: scale(0.98);
+            transition: all 0.1s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+        
+        .mula-flip-card:active .mula-flip-card-inner {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .mula-flip-card.tapped {
+            animation: cardRelease 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+        
+        @keyframes cardRelease {
+            0% { transform: scale(0.98); }
+            40% { transform: scale(1.03); }
+            100% { transform: scale(1.02); }
+        }
+        
+        .mula-flip-image {
+            height: 150px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        /* Image overlay gradient */
+        .mula-flip-image::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 70%;
+            background: linear-gradient(to top, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0) 100%);
+            z-index: 1;
+        }
+        
+        /* Configure 3D tilt effect */
+        .mula-flip-track {
+            perspective: 1000px;
+        }
+        
+        .mula-flip-label {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 500;
+        }
+        
+        .mula-flip-info {
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+        
+        .mula-flip-name {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 4px;
+            color: white;
+        }
+        
+        .mula-flip-price {
+            font-weight: 700;
+            font-size: 16px;
+            color: #FF375F;
+            margin-bottom: 2px;
+        }
+        
+        .mula-like-button {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.7);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            transition: all 0.2s;
+        }
+        
+        .mula-like-button svg {
+            width: 16px;
+            height: 16px;
+            stroke: white;
+            fill: none;
+            stroke-width: 2;
+            transition: all 0.2s;
+        }
+        
+        .mula-like-button.active svg {
+            fill: #FF375F;
+            stroke: #FF375F;
+        }
+        
+        .mula-buy-button {
+            width: 100%;
+            padding: 8px 0;
+            background: #111111;
+            color: white;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        
+        .mula-buy-button:hover {
+            background: #222222;
+        }
+        
+        .mula-buy-button:active {
+            transform: scale(0.98);
+        }
+        
+        /* Confetti Canvas */
+        .confetti-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 1;
+            transition: opacity 0.5s ease;
+        }
+        
+        .confetti-container.fade-out {
+            opacity: 0;
+        }
+        
+        #confetti-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+        }
+        
+        .debug-info {
+            margin: 30px auto;
+            padding: 15px;
+            background-color: #e8e8e8;
+            border-radius: 8px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Fallback content for troubleshooting */
+        .fallback-content {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #ffe0e0;
+            border-radius: 8px;
+            display: none;
+        }
+        
+        /* Return button */
+        .return-button {
+            display: inline-block;
+            margin-top: 20px;
+            background: #000;
+            color: white;
+            padding: 10px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .return-button:hover {
+            background: #333;
+            transform: translateY(-2px);
+        }
+
+        /* Clipboard notification in header */
+        .header-notification {
+            position: absolute;
+            top: 0;
+            right: 120px; /* Position to the left of the navigation arrows */
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            opacity: 0;
+            transition: all 0.3s ease;
+            pointer-events: none;
+            z-index: 100;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        .header-notification.visible {
+            opacity: 1;
+        }
+        
+        .header-notification svg {
+            width: 16px;
+            height: 16px;
+            fill: none;
+            stroke: #4CD964;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .discount-off {
+            font-size: 20px;
+            font-weight: 700;
+            color: #FF375F;
+            margin-top: -5px;
+            letter-spacing: 0.5px;
+        }
+
+        .mula-product-img {
+            height: 150px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .mula-product-label {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 500;
+        }
+
+        .mula-like-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.7);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            transition: all 0.2s;
+        }
+
+        .mula-like-btn svg {
+            width: 16px;
+            height: 16px;
+            stroke: white;
+            fill: none;
+            stroke-width: 2;
+            transition: all 0.2s;
+        }
+
+        .mula-like-btn.active svg {
+            fill: #FF375F;
+            stroke: #FF375F;
+        }
+
+        .mula-product-info {
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .mula-product-name {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 4px;
+            color: white;
+        }
+
+        .mula-product-price {
+            font-weight: 700;
+            font-size: 16px;
+            color: #FF375F;
+            margin-bottom: 2px;
+        }
+
+        .mula-product-caption {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 8px;
+        }
+
+        .mula-buy-btn {
+            width: 100%;
+            padding: 8px 0;
+            background: #111111;
+            color: white;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+            font-size: 14px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .mula-buy-btn:hover {
+            background: #222222;
+        }
+
+        .mula-buy-btn:active {
+            transform: scale(0.98);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="playground.html" id="returnButton" class="return-button">← Return to Playground</a>
+        
+        <h1>Widget 7B - Flip Card Carousel</h1>
+        <p>A carousel with flippable cards that reveal discount offers with confetti animation.</p>
+        
+        <div class="mula-widget-7B">
+            <div class="mula-flip-carousel">
+                <div class="mula-flip-carousel-header">
+                    <div>
+                        <div class="mula-flip-title">Special Offers</div>
+                        <div class="mula-flip-subtitle">Tap to reveal your discount</div>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <div class="scroll-indicator left">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/>
+                            </svg>
+                        </div>
+                        <div class="scroll-indicator right">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <!-- Add header notification for copy to clipboard -->
+                    <div class="header-notification" id="headerNotification">
+                        <svg viewBox="0 0 24 24">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        Copied to clipboard!
+                    </div>
+                </div>
+                <div class="mula-flip-track-container">
+                    <div class="mula-flip-track">
+                        <!-- Cards will be inserted here via JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Confetti container -->
+        <div class="confetti-container">
+            <canvas id="confetti-canvas"></canvas>
+        </div>
+
+        <!-- Fallback content in case JavaScript fails -->
+        <div class="fallback-content" id="fallback">
+            <h3>Fallback Content</h3>
+            <p>If you're seeing this, the JavaScript may not be executing properly.</p>
+        </div>
+    </div>
+    
+    <div class="debug-info">
+        <div id="debug-output">Debug information will appear here</div>
+    </div>
+    
+    <script>
+        // Show fallback content after timeout if JavaScript doesn't execute
+        setTimeout(function() {
+            const track = document.querySelector('.mula-flip-track');
+            if (!track || !track.children || track.children.length <= 0) {
+                document.getElementById('fallback').style.display = 'block';
+                document.getElementById('debug-output').innerHTML = '⚠️ Carousel not loaded within timeout period, showing fallback content\n' + document.getElementById('debug-output').innerHTML;
+            }
+        }, 2000);
+
+        // Hide Return to Playground button if inside an iframe (on the playground page)
+        function hideReturnButtonInIframe() {
+            if (window.self !== window.top) {
+                // We're in an iframe, hide the return button
+                const returnButton = document.getElementById('returnButton');
+                if (returnButton) {
+                    returnButton.style.display = 'none';
+                }
+                debugLog('In iframe mode, hiding return button');
+            } else {
+                debugLog('In standalone mode, showing return button');
+            }
+        }
+        
+        // Call on page load
+        hideReturnButtonInIframe();
+
+        // Debug log function - modified to prepend logs at the top
+        function debugLog(message) {
+            console.log(message); // Also log to console
+            const debugOutput = document.getElementById('debug-output');
+            const timestamp = new Date().toLocaleTimeString();
+            debugOutput.innerHTML = `[${timestamp}] ${message}\n` + debugOutput.innerHTML;
+        }
+        
+        debugLog('Script loaded');
+        
+        // Confetti animation function
+        class Confetti {
+            constructor() {
+                this.canvas = document.getElementById('confetti-canvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.particles = [];
+                this.animationId = null;
+                this.container = document.querySelector('.confetti-container');
+                
+                // Set canvas dimensions to match window
+                this.resizeCanvas();
+                window.addEventListener('resize', () => this.resizeCanvas());
+            }
+            
+            resizeCanvas() {
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+            }
+            
+            createParticles(x, y) {
+                const colors = ['#FF375F', '#FFD700', '#00BFFF', '#FF7F50', '#9932CC', '#32CD32'];
+                const numParticles = 80;
+                
+                for (let i = 0; i < numParticles; i++) {
+                    this.particles.push({
+                        x: x,
+                        y: y,
+                        size: Math.random() * 6 + 3,
+                        color: colors[Math.floor(Math.random() * colors.length)],
+                        speedX: Math.random() * 12 - 6,
+                        speedY: Math.random() * -10 - 5,
+                        gravity: 0.4,
+                        rotation: Math.random() * 360,
+                        rotationSpeed: Math.random() * 5 - 2.5,
+                        opacity: 1,
+                        fadeSpeed: Math.random() * 0.02 + 0.015  // Faster fade
+                    });
+                }
+            }
+            
+            animateParticles() {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                for (let i = 0; i < this.particles.length; i++) {
+                    const p = this.particles[i];
+                    
+                    // Apply physics
+                    p.speedY += p.gravity;
+                    p.x += p.speedX;
+                    p.y += p.speedY;
+                    p.rotation += p.rotationSpeed;
+                    p.opacity -= p.fadeSpeed;  // Use particle-specific fade speed
+                    
+                    // Draw the particle
+                    this.ctx.save();
+                    this.ctx.translate(p.x, p.y);
+                    this.ctx.rotate(p.rotation * Math.PI / 180);
+                    this.ctx.globalAlpha = p.opacity;
+                    this.ctx.fillStyle = p.color;
+                    this.ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+                    this.ctx.restore();
+                }
+                
+                // Remove particles that are offscreen or faded out
+                this.particles = this.particles.filter(p => p.opacity > 0 && p.y < this.canvas.height);
+                
+                if (this.particles.length > 0) {
+                    this.animationId = requestAnimationFrame(() => this.animateParticles());
+                } else {
+                    cancelAnimationFrame(this.animationId);
+                    this.animationId = null;
+                    
+                    // Fade out the confetti container when particles are done
+                    this.container.classList.add('fade-out');
+                    
+                    // Reset after fade transition completes
+                    setTimeout(() => {
+                        this.container.classList.remove('fade-out');
+                        // Clear the canvas completely
+                        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                    }, 500);
+                }
+            }
+            
+            triggerConfetti(x, y) {
+                // Cancel previous animation if running
+                if (this.animationId) {
+                    cancelAnimationFrame(this.animationId);
+                    this.particles = [];
+                }
+                
+                this.createParticles(x, y);
+                this.animateParticles();
+            }
+        }
+        
+        // Initialize confetti
+        const confetti = new Confetti();
+        
+        // Widget 7B - Flip Card Carousel
+        function createFlipCardCarousel() {
+            debugLog('createFlipCardCarousel function called');
+            const flipTrack = document.querySelector('.mula-flip-track');
+            
+            if (!flipTrack) {
+                debugLog('⚠️ ERROR: Flip track element not found');
+                return;
+            }
+            
+            debugLog('Building flip carousel elements');
+            
+            // Product data for the carousel with discount amounts
+            const flipProducts = [
+                {
+                    label: 'Premium',
+                    name: 'Cashmere Wrap Scarf',
+                    price: '$89.99',
+                    caption: 'Luxurious & versatile',
+                    image: 'https://images.unsplash.com/photo-1520367691844-3df6788d16fd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80',
+                    discount: '15',
+                    code: 'SCARF15'
+                },
+                {
+                    label: 'Best Seller',
+                    name: 'Wool Knit Cap',
+                    price: '$29.99',
+                    caption: 'Cozy winter essential',
+                    image: 'https://images.unsplash.com/photo-1576871337622-98d48d1cf531?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2680&q=80',
+                    discount: '20',
+                    code: 'CAP20'
+                },
+                {
+                    label: 'New',
+                    name: 'Leather Gloves',
+                    price: '$49.99',
+                    caption: 'Touchscreen compatible',
+                    image: 'https://images.unsplash.com/photo-1603251579771-271947028401?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2670&q=80',
+                    discount: '10',
+                    code: 'GLOVE10'
+                },
+                {
+                    label: 'Limited',
+                    name: 'Faux Fur Hat',
+                    price: '$39.99',
+                    caption: 'Stylish & warm',
+                    image: 'https://images.unsplash.com/photo-1608667508764-33cf0726b13a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8ZnVyJTIwaGF0fGVufDB8fDB8fHww&auto=format&fit=crop&w=900&q=60',
+                    discount: '25',
+                    code: 'HAT25'
+                },
+                {
+                    label: 'Sale',
+                    name: 'Wool Mittens',
+                    price: '$24.99',
+                    caption: 'Nordic pattern',
+                    image: 'https://images.unsplash.com/photo-1584735855263-6bfdc352a75b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8bWl0dGVuc3xlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=900&q=60',
+                    discount: '30',
+                    code: 'MITTEN30'
+                },
+                {
+                    label: 'Trending',
+                    name: 'Fleece Neck Gaiter',
+                    price: '$19.99',
+                    caption: 'Multi-functional',
+                    image: 'https://images.unsplash.com/photo-1599447291320-f1997e7c3bf6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8bmVjayUyMHdhcm1lcnxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=900&q=60',
+                    discount: '15',
+                    code: 'GAITER15'
+                }
+            ];
+            
+            try {
+                // Function to create a product card
+                function createCard(product, index) {
+                    const card = document.createElement('div');
+                    card.className = 'mula-flip-card';
+                    card.setAttribute('data-index', index);
+                    
+                    // Generate a unique discount code for the product
+                    const discountCode = product.code;
+                    
+                    const inner = document.createElement('div');
+                    inner.className = 'mula-flip-card-inner';
+                    
+                    // Create the front of the card
+                    const front = document.createElement('div');
+                    front.className = 'mula-flip-card-front';
+                    front.innerHTML = `
+                        <div class="mula-flip-image" style="background-image: url('${product.image}')">
+                            <div class="mula-flip-label">${product.label}</div>
+                            <button class="mula-like-button">
+                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="mula-flip-info">
+                            <div class="mula-flip-name">${product.name}</div>
+                            <div class="mula-flip-price">${product.price}</div>
+                        </div>
+                        <button class="mula-buy-button">Buy</button>
+                    `;
+                    
+                    // Create the back of the card with the discount
+                    const back = document.createElement('div');
+                    back.className = 'mula-flip-card-back';
+                    back.innerHTML = `
+                        <div class="discount-text">Congratulations!</div>
+                        <div class="discount-amount">${product.discount}%</div>
+                        <div class="discount-off">OFF</div>
+                        <div class="discount-message">This is a discount code, exclusively for you.</div>
+                        <div class="discount-code-container">
+                            <div class="discount-code" data-code="${product.code}">${product.code}</div>
+                            <button class="copy-button" title="Copy to clipboard" aria-label="Copy discount code">
+                                <svg viewBox="0 0 24 24">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="discount-instructions">Use at checkout</div>
+                        <button class="mula-buy-button">Buy Now</button>
+                    `;
+                    
+                    // Append the front and back to the inner container
+                    inner.appendChild(front);
+                    inner.appendChild(back);
+                    
+                    // Append the inner container to the card
+                    card.appendChild(inner);
+                    
+                    return card;
+                }
+                
+                // Create and append all product cards
+                flipProducts.forEach((product, index) => {
+                    const card = createCard(product, index);
+                    flipTrack.appendChild(card);
+                    
+                    // Add click event for card flip
+                    card.addEventListener('click', (e) => {
+                        // Don't flip when clicking buttons
+                        if (!e.target.closest('.mula-like-button') && 
+                            !e.target.closest('.mula-buy-button') && 
+                            !e.target.closest('.copy-button') && 
+                            !e.target.closest('.discount-code')) {
+                            
+                            // Toggle flip class
+                            card.classList.toggle('flipped');
+                            
+                            // Generate confetti if card is being flipped to show back
+                            if (card.classList.contains('flipped')) {
+                                // Get the position of the card for confetti origin
+                                const rect = card.getBoundingClientRect();
+                                const centerX = rect.left + rect.width / 2;
+                                const centerY = rect.top + rect.height / 2;
+                                
+                                // Trigger confetti
+                                confetti.triggerConfetti(centerX, centerY);
+                                
+                                debugLog(`Card flipped: ${product.name} - Discount: ${product.discount}%`);
+                            }
+                        }
+                    });
+                    
+                    // Add event for like button
+                    const likeButton = card.querySelector('.mula-like-button');
+                    if (likeButton) {
+                        likeButton.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            likeButton.classList.toggle('active');
+                            
+                            if (likeButton.classList.contains('active')) {
+                                likeButton.querySelector('svg').setAttribute('fill', '#FF375F');
+                                debugLog(`Liked: ${product.name}`);
+                            } else {
+                                likeButton.querySelector('svg').setAttribute('fill', 'none');
+                                debugLog(`Unliked: ${product.name}`);
+                            }
+                        });
+                    }
+                    
+                    // Add event for buy button
+                    const buyButtons = card.querySelectorAll('.mula-buy-button');
+                    buyButtons.forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            
+                            // Visual feedback
+                            btn.classList.add('animate');
+                            setTimeout(() => {
+                                btn.classList.remove('animate');
+                            }, 600);
+                            
+                            debugLog(`Buy clicked: ${product.name}`);
+                        });
+                    });
+                    
+                    // Add copy-to-clipboard functionality
+                    const copyBtn = card.querySelector('.copy-button');
+                    const codeElement = card.querySelector('.discount-code');
+                    
+                    if (copyBtn && codeElement) {
+                        copyBtn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            const code = codeElement.dataset.code;
+                            
+                            // Copy to clipboard
+                            navigator.clipboard.writeText(code).then(() => {
+                                // Show notification in header
+                                const headerNotification = document.getElementById('headerNotification');
+                                if (headerNotification) {
+                                    headerNotification.classList.add('visible');
+                                    
+                                    // Hide after delay
+                                    setTimeout(() => {
+                                        headerNotification.classList.remove('visible');
+                                    }, 2000);
+                                }
+                                
+                                debugLog(`Copied discount code: ${code}`);
+                            }).catch(err => {
+                                debugLog(`Error copying code: ${err}`);
+                            });
+                        });
+                        
+                        // Make the code element clickable too
+                        codeElement.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            copyBtn.click();
+                        });
+                    }
+                });
+                
+                // Implement horizontal scroll with buttons
+                const scrollLeftButton = document.querySelector('.scroll-indicator.left');
+                const scrollRightButton = document.querySelector('.scroll-indicator.right');
+                
+                scrollLeftButton.addEventListener('click', () => {
+                    flipTrack.scrollBy({
+                        left: -210,
+                        behavior: 'smooth'
+                    });
+                });
+                
+                scrollRightButton.addEventListener('click', () => {
+                    flipTrack.scrollBy({
+                        left: 210,
+                        behavior: 'smooth'
+                    });
+                });
+                
+                // Add touch scrolling behavior
+                let isDown = false;
+                let startX;
+                let scrollLeft;
+                
+                flipTrack.addEventListener('mousedown', (e) => {
+                    isDown = true;
+                    flipTrack.style.cursor = 'grabbing';
+                    startX = e.pageX - flipTrack.offsetLeft;
+                    scrollLeft = flipTrack.scrollLeft;
+                });
+                
+                flipTrack.addEventListener('mouseleave', () => {
+                    isDown = false;
+                    flipTrack.style.cursor = 'grab';
+                });
+                
+                flipTrack.addEventListener('mouseup', () => {
+                    isDown = false;
+                    flipTrack.style.cursor = 'grab';
+                });
+                
+                flipTrack.addEventListener('mousemove', (e) => {
+                    if (!isDown) return;
+                    e.preventDefault();
+                    const x = e.pageX - flipTrack.offsetLeft;
+                    const walk = (x - startX) * 2; // Speed multiplier
+                    flipTrack.scrollLeft = scrollLeft - walk;
+                });
+                
+                debugLog('Flip card carousel created successfully with ' + flipProducts.length + ' cards');
+                
+            } catch (error) {
+                debugLog('⚠️ ERROR creating flip card carousel: ' + error.message);
+                console.error(error);
+                document.getElementById('fallback').style.display = 'block';
+            }
+        }
+        
+        // Initialize the carousel when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            debugLog('DOMContentLoaded event fired');
+            createFlipCardCarousel();
+        });
+    </script>
+</body>
+</html>

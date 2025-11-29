@@ -1,0 +1,408 @@
+diff --git a/www.makemula.ai/helpers/EnvironmentHelpers.js b/www.makemula.ai/helpers/EnvironmentHelpers.js
+index 82c7166..115a52a 100644
+--- a/www.makemula.ai/helpers/EnvironmentHelpers.js
++++ b/www.makemula.ai/helpers/EnvironmentHelpers.js
+@@ -8,7 +8,7 @@ const getStorageHandler = () => {
+     return {
+       write: async (filePath, data) => {
+         if (!filePath.startsWith('.')) {
+-          filePath = `.${filePath}`;
++          filePath = `./data${filePath}`;
+         }
+         const dirPath = path.dirname(filePath);
+         fs.mkdirSync(dirPath, { recursive: true });
+@@ -17,7 +17,7 @@ const getStorageHandler = () => {
+       },
+       read: async (filePath) => {
+         if (!filePath.startsWith('.')) {
+-          filePath = `.${filePath}`;
++          filePath = `./data${filePath}`;
+         }
+         if (fs.existsSync(filePath)) {
+           return fs.readFileSync(filePath).toString();
+@@ -26,7 +26,7 @@ const getStorageHandler = () => {
+       },
+       delete: async (filePath) => {
+         if (!filePath.startsWith('.')) {
+-          filePath = `.${filePath}`;
++          filePath = `./data${filePath}`;
+         }
+         if (fs.existsSync(filePath)) {
+           fs.unlinkSync(filePath);
+diff --git a/www.makemula.ai/helpers/SlackHelpers.js b/www.makemula.ai/helpers/SlackHelpers.js
+index 264faa9..7294d8b 100644
+--- a/www.makemula.ai/helpers/SlackHelpers.js
++++ b/www.makemula.ai/helpers/SlackHelpers.js
+@@ -1,10 +1,13 @@
+ const { WebClient } = require('@slack/web-api');
+ const { createLogger } = require('./LoggingHelpers');
+-const config = require('../config');
+ 
+ const logger = createLogger('SlackHelpers');
+ 
+-const slackClient = new WebClient(config.slack.token);
++// Initialize Slack client with token from environment
++const slackClient = new WebClient(process.env.SLACK_TOKEN);
++
++// Use test channel in development
++const getChannel = (channel) => process.env.NODE_ENV === 'development' ? 'proj-mula-slackbot-test' : channel;
+ 
+ /**
+  * Send a message to a Slack channel
+@@ -13,11 +16,12 @@ const slackClient = new WebClient(config.slack.token);
+  * @param {Object} [blocks] - Optional Slack blocks for rich formatting
+  */
+ async function sendSlackMessage(channel, text, blocks = null) {
+-  logger.info('Sending Slack message', { channel, textLength: text.length });
++  const targetChannel = getChannel(channel);
++  logger.info('Sending Slack message', { channel: targetChannel, textLength: text.length });
+ 
+   try {
+     const message = {
+-      channel,
++      channel: targetChannel,
+       text,
+       ...(blocks && { blocks })
+     };
+@@ -25,14 +29,14 @@ async function sendSlackMessage(channel, text, blocks = null) {
+     const result = await slackClient.chat.postMessage(message);
+     
+     logger.info('Slack message sent', { 
+-      channel,
++      channel: targetChannel,
+       ts: result.ts,
+       textLength: text.length
+     });
+ 
+     return result;
+   } catch (error) {
+-    logger.error('Error sending Slack message', error, { channel });
++    logger.error('Error sending Slack message', error, { channel: targetChannel });
+     throw error;
+   }
+ }
+@@ -88,13 +92,13 @@ async function sendErrorNotification(error, context = {}) {
+     }
+ 
+     const result = await sendSlackMessage(
+-      config.slack.errorChannel,
++      process.env.SLACK_ERROR_CHANNEL,
+       `Error Alert: ${error.message}`,
+       blocks
+     );
+ 
+     logger.info('Error notification sent', { 
+-      channel: config.slack.errorChannel,
++      channel: process.env.SLACK_ERROR_CHANNEL,
+       ts: result.ts
+     });
+ 
+diff --git a/www.makemula.ai/worker.js b/www.makemula.ai/worker.js
+index 66babc2..d91f9a9 100644
+--- a/www.makemula.ai/worker.js
++++ b/www.makemula.ai/worker.js
+@@ -3,8 +3,8 @@ const Bull = require('bull');
+ const { createEncore, createQA } = require('./services/encore');
+ const { checkSite } = require('./scripts/onboarding/index.js');
+ const { generateSlackMessage } = require('./openai/health-checks/index.js');
+-const { postToSlack } = require('./helpers/SlackHelpers');
+-const { Page } = require('./models');
++const { sendSlackMessage } = require('./helpers/SlackHelpers');
++const { Page, Search } = require('./models');
+ 
+ // Get Redis URL from environment variable or default to localhost
+ const redisUrl = process.env.REDISCLOUD_URL || 'redis://127.0.0.1:6379';
+@@ -55,7 +55,6 @@ encoreQueue.process('qa', async (job) => {
+ // Process health check jobs
+ healthCheckQueue.process('checkSite', async (job) => {
+   const { url } = job.data;
+-  
+   try {
+     // Run the health check
+     const result = await checkSite(url);
+@@ -64,49 +63,58 @@ healthCheckQueue.process('checkSite', async (job) => {
+     const message = await generateSlackMessage(result);
+     
+     // Post the result to the channel
+-    await postToSlack(job.data.channelId, [
+-      {
++    await sendSlackMessage(
++      job.data.channelId,
++      `Health check results for ${url}`,
++      [{
+         type: 'section',
+         text: {
+           type: 'mrkdwn',
+           text: message
+         }
+-      }
+-    ], `Health check results for ${url}`);
++      }]
++    );
+ 
+   } catch (error) {
+     console.error('Error processing health check:', error);
+     // Send error to the channel
+-    await postToSlack(job.data.channelId, [
+-      {
++    await sendSlackMessage(
++      job.data.channelId,
++      `Error checking ${url}`,
++      [{
+         type: 'section',
+         text: {
+           type: 'mrkdwn',
+           text: `❌ Error checking health status for ${url}: ${error.message}`
+         }
+-      }
+-    ], `Error checking ${url}`);
++      }]
++    );
+   }
+ });
+ 
+ // Process search jobs
+ searchQueue.process('search', async (job) => {
+-  const { query, channelId } = job.data;
++  const { searchId } = job.data;
+   try {
+     // Import search worker functionality
+     const { processSearchQuery } = require('./workers/searchWorker');
+-    await processSearchQuery(query, channelId);
++    await processSearchQuery(searchId);
+   } catch (error) {
+     console.error('Error processing search:', error);
+-    await postToSlack(channelId, [
+-      {
+-        type: 'section',
+-        text: {
+-          type: 'mrkdwn',
+-          text: `❌ Error processing search for "${query}": ${error.message}`
+-        }
+-      }
+-    ], `Error searching for ${query}`);
++    const search = await Search.findByPk(searchId);
++    if (search) {
++      await sendSlackMessage(
++        process.env.SLACK_ERROR_CHANNEL,
++        `Error processing search for "${search.phrase}"`,
++        [{
++          type: 'section',
++          text: {
++            type: 'mrkdwn',
++            text: `❌ Error processing search: ${error.message}`
++          }
++        }]
++      );
++    }
+   }
+ });
+ 
+@@ -121,4 +129,5 @@ searchQueue.process('search', async (job) => {
+   });
+ });
+ 
++// Start listening for jobs
+ console.log('Worker is listening for jobs on all queues...');
+diff --git a/www.makemula.ai/workers/searchWorker.js b/www.makemula.ai/workers/searchWorker.js
+index 9f5c86f..be73cc8 100644
+--- a/www.makemula.ai/workers/searchWorker.js
++++ b/www.makemula.ai/workers/searchWorker.js
+@@ -1,118 +1,96 @@
+ require('dotenv').config();
+-const Bull = require('bull');
+-const { getJson } = require('serpapi');
+-const { OpenAI } = require('openai');
+-const AWS = require('aws-sdk');
+ const { Search } = require('../models');
++const { createLogger } = require('../helpers/LoggingHelpers');
++const { sendSlackMessage } = require('../helpers/SlackHelpers');
++const { searchAmazonProducts, searchGoogleShoppingProducts, generateProductDescriptions } = require('../helpers/ProductHelpers');
++const { uploadJsonToS3 } = require('../helpers/S3Helpers');
+ 
+-const openai = new OpenAI({
+-  apiKey: process.env.OPENAI_API_KEY,
+-});
++const logger = createLogger('SearchWorker');
+ 
+-// Configure AWS SDK
+-AWS.config.update({
+-  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+-  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+-  region: process.env.AWS_REGION,
+-});
+-
+-const s3 = new AWS.S3();
+-
+-const redisUrl = process.env.REDISCLOUD_URL || 'redis://127.0.0.1:6379';
+-const searchQueue = new Bull('searchQueue', redisUrl);
+-
+-// Process jobs in the queue
+-searchQueue.process(async (job) => {
+-  const { searchId } = job.data;
+-  const search = await Search.findByPk(searchId);
+-  
+-  if (!search) {
+-    throw new Error(`Could not find search with ID: ${searchId}`);
+-  }
+-
+-  console.log(`Processing search job for phrase: ${search.phrase}`);
++/**
++ * Process a search query and generate product recommendations
++ * @param {number} searchId - The ID of the search record to process
++ */
++async function processSearchQuery(searchId) {
++  logger.info('Processing search query', { searchId });
+ 
+   try {
+-    // Get Google Shopping results
+-    const googleShoppingResults = await getJson({
+-      engine: "google_shopping",
+-      q: search.phrase,
+-      location: "United States",
+-      hl: "en",
+-      gl: "us",
+-      direct_link: true,
+-      num: 20,
+-      api_key: process.env.SERP_API_KEY
++    // Get search record
++    const search = await Search.findByPk(searchId);
++    if (!search) {
++      throw new Error(`Could not find search with ID: ${searchId}`);
++    }
++
++    // Search for products
++    const amazonResults = await searchAmazonProducts(search.phrase, {
++      accessKeyId: process.env.MULA_AMAZON_ASSOC_ACCESS_KEY_ID,
++      secretKey: process.env.MULA_AMAZON_ASSOC_SECRET_KEY,
++      accountId: process.env.MULA_AMAZON_ASSOC_ACCOUNT_ID
+     });
+ 
+-    // Fetch immersive product details for each result
+-    for(let i = 0; i < googleShoppingResults['shopping_results'].length; i++) {
+-      const { product_id, immersive_product_page_token } = googleShoppingResults['shopping_results'][i];
+-      if (immersive_product_page_token) {
+-        console.log("Fetching immersive product details for product:", {product_id, immersive_product_page_token});
+-        const imProductResult = await getJson({
+-          engine: "google_immersive_product",
+-          page_token: immersive_product_page_token,
+-          api_key: process.env.SERP_API_KEY
+-        });
+-        // console.log("Immersive product details:", JSON.stringify(imProductResult));
+-        // Add immersive product details to the shopping result
+-        googleShoppingResults['shopping_results'][i].brand = imProductResult.product_results?.brand;
+-        googleShoppingResults['shopping_results'][i].about_the_product = imProductResult.product_results?.about_the_product;
+-        googleShoppingResults['shopping_results'][i].stores = imProductResult.product_results?.stores;
+-      }
+-    }
++    const googleShoppingResults = await searchGoogleShoppingProducts(search.phrase);
+ 
+-    // Generate descriptions using OpenAI
+-    const googleShoppingResultsLite = googleShoppingResults['shopping_results'].map((p) => ({
+-      position: p.position,
+-      title: p.title
+-    }));
++    // Generate descriptions for the best results
++    const resultsToDescribe = amazonResults.products.length > 0 ? 
++      amazonResults.products : 
++      googleShoppingResults.products;
++    
++    const descriptions = await generateProductDescriptions(resultsToDescribe, search.phrase);
+ 
+-    const googleShoppingDescriptionsResponse = await openai.chat.completions.create({
+-      model: 'gpt-4o-mini',
+-      response_format: {
+-        type: "json_object"
+-      },
+-      messages: [
+-        {
+-          role: 'system',
+-          content: 'You are an assistant specialized in writing product descriptions. You only return JSON responses.',
+-        },
+-        {
+-          role: 'user',
+-          content: `Generate and append a description property to every product in the given JSON product array. Only generate one sentence per product. Return only a JSON object with a single property "products" that contains the augmented array.\n\nJSON product array:\n${JSON.stringify(googleShoppingResultsLite)}`,
+-        },
+-      ],
+-    });
++    // Upload results to S3
++    const s3Key = `https://fakehost.com/searches/${search.phraseID}/results.json`;
++    const finalResults = {
++      timestamp: new Date().toISOString(),
++      query: search.phrase,
++      amazonResults: amazonResults.products.length > 0 ? amazonResults : null,
++      googleShoppingResults: googleShoppingResults.products.length > 0 ? googleShoppingResults : null,
++      descriptions
++    };
+ 
+-    const googleShoppingDescriptions = JSON.parse(googleShoppingDescriptionsResponse.choices[0].message.content).products;
++    await uploadJsonToS3(s3Key, finalResults);
+ 
+-    // Combine results with descriptions
+-    for(let i in googleShoppingResults['shopping_results']) {
+-      const product = googleShoppingResults['shopping_results'][i];
+-      for(let j in googleShoppingDescriptions) {
+-        const description = googleShoppingDescriptions[j];
+-        if(description.position === product.position) {
+-          product.description = description.description;
++    // Send results to Slack
++    const blocks = [
++      {
++        type: 'section',
++        text: {
++          type: 'mrkdwn',
++          text: `*Product Recommendations for "${search.phrase}"*`
+         }
+       }
+-    }
++    ];
+ 
+-    // Upload results to S3
+-    const s3Key = `searches/${search.phraseID}/results.json`;
+-    await s3.putObject({
+-      Bucket: process.env.AWS_S3_BUCKET,
+-      Key: s3Key,
+-      Body: JSON.stringify(googleShoppingResults),
+-      ContentType: 'application/json',
+-      ACL: 'public-read',
+-      CacheControl: 'public, s-maxage=3600, no-cache, must-revalidate, max-age=0'
+-    }).promise();
++    // Add top 5 results from either Amazon or Google Shopping
++    const topResults = resultsToDescribe.slice(0, 5);
++    topResults.forEach((product, index) => {
++      const description = descriptions.find(d => d.productId === product.productId)?.description || '';
++      blocks.push({
++        type: 'section',
++        text: {
++          type: 'mrkdwn',
++          text: `*${index + 1}. ${product.title}*\n${description}\nPrice: ${product.price}\nRating: ${product.rating || 'N/A'}`
++        }
++      });
++    });
++
++    await sendSlackMessage(
++      process.env.SLACK_SEARCH_CHANNEL,
++      `Product recommendations for "${search.phrase}"`,
++      blocks
++    );
++
++    logger.info('Search processing complete', { 
++      searchId,
++      amazonProductCount: amazonResults.products.length,
++      googleProductCount: googleShoppingResults.products.length
++    });
+ 
+-    console.log(`Successfully processed search job for searchId: ${searchId}`);
+   } catch (error) {
+-    console.error(`Failed to process search job for searchId: ${searchId}`, error);
++    logger.error('Error processing search', error, { searchId });
+     throw error;
+   }
+-}); 
+\ No newline at end of file
++}
++
++module.exports = {
++  processSearchQuery
++}; 
+\ No newline at end of file

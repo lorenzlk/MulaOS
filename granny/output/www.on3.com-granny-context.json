@@ -1,0 +1,35 @@
+{
+  "domain": "www.on3.com",
+  "analyzed_at": "2025-11-29T00:27:25.178Z",
+  "business_intelligence": {
+    "publisher_type": [
+      "sports_focused"
+    ],
+    "revenue_model": [
+      "subscription"
+    ],
+    "content_focus": [
+      "sports"
+    ],
+    "audience_type": "mass_market",
+    "tech_stack": [
+      "unknown"
+    ]
+  },
+  "contextual_intelligence": {
+    "status": "placeholder",
+    "message": "ESPN API integration, social signals, seasonal trends - to be built"
+  },
+  "temporal_intelligence": {
+    "status": "placeholder",
+    "message": "Opportunity calendar, seasonal peaks, event detection - to be built"
+  },
+  "recommendations": [
+    {
+      "priority": "✅ ALIGNED",
+      "category": "Content Focus",
+      "message": "Sports-focused publisher - perfect fit for Granny contextual intelligence",
+      "action": "Leverage sports calendar and rivalry detection"
+    }
+  ]
+}

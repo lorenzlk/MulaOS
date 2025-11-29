@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <style>
+    body {
+      font-family: 'Google Sans', Arial, sans-serif;
+      padding: 20px;
+      background-color: #f8f9fa;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+      color: #202124;
+      font-size: 14px;
+    }
+    .required {
+      color: #ea4335;
+    }
+    input[type="text"],
+    textarea,
+    select {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #dadce0;
+      border-radius: 4px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+    input[type="text"]:focus,
+    textarea:focus,
+    select:focus {
+      outline: none;
+      border-color: #1a73e8;
+      box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.1);
+    }
+    textarea {
+      resize: vertical;
+      min-height: 60px;
+    }
+    .button-group {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid #dadce0;
+    }
+    button {
+      padding: 10px 24px;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    .btn-primary {
+      background-color: #1a73e8;
+      color: white;
+    }
+    .btn-primary:hover {
+      background-color: #1557b0;
+    }
+    .btn-secondary {
+      background-color: #f1f3f4;
+      color: #202124;
+    }
+    .btn-secondary:hover {
+      background-color: #e8eaed;
+    }
+    .error {
+      color: #ea4335;
+      font-size: 12px;
+      margin-top: 5px;
+      display: none;
+    }
+    .help-text {
+      font-size: 12px;
+      color: #5f6368;
+      margin-top: 4px;
+    }
+    .account-select {
+      max-height: 120px;
+      overflow-y: auto;
+      border: 1px solid #dadce0;
+      border-radius: 4px;
+      padding: 8px;
+      background-color: white;
+    }
+    .account-checkbox {
+      margin: 6px 0;
+    }
+    .account-checkbox input {
+      width: auto;
+      margin-right: 8px;
+    }
+    .account-checkbox label {
+      display: inline;
+      font-weight: normal;
+      margin: 0;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h2 style="margin-top: 0; color: #202124;">Add New Project</h2>
+  
+  <form id="projectForm">
+    <div class="form-group">
+      <label for="projectName">Project Name <span class="required">*</span></label>
+      <input type="text" id="projectName" name="projectName" required>
+      <div class="error" id="projectNameError">Project name is required</div>
+    </div>
+    
+    <div class="form-group">
+      <label for="summary">Summary</label>
+      <textarea id="summary" name="summary" placeholder="Brief project description"></textarea>
+    </div>
+    
+    <div class="form-group">
+      <label for="status">Status <span class="required">*</span></label>
+      <select id="status" name="status" required>
+        <option value="">Select status...</option>
+        <option value="Planning">Planning</option>
+        <option value="In Progress">In Progress</option>
+        <option value="Done">Done</option>
+        <option value="Backlog">Backlog</option>
+      </select>
+      <div class="error" id="statusError">Status is required</div>
+    </div>
+    
+    <div class="form-group">
+      <label for="owner">Owner</label>
+      <input type="text" id="owner" name="owner" placeholder="e.g., Logan Lorenz">
+      <div class="help-text">Project owner or lead</div>
+    </div>
+    
+    <div class="form-group">
+      <label for="priority">Priority <span class="required">*</span></label>
+      <select id="priority" name="priority" required>
+        <option value="">Select priority...</option>
+        <option value="High">High</option>
+        <option value="Medium" selected>Medium</option>
+        <option value="Low">Low</option>
+      </select>
+      <div class="error" id="priorityError">Priority is required</div>
+    </div>
+    
+    <div class="form-group">
+      <label for="dates">Dates</label>
+      <input type="text" id="dates" name="dates" placeholder="e.g., Q1 2026 or 2025-12-31">
+      <div class="help-text">Project timeline or target date</div>
+    </div>
+    
+    <div class="form-group">
+      <label>Related Accounts</label>
+      <div class="account-select" id="accountSelect">
+        <div style="text-align: center; padding: 20px; color: #5f6368;">
+          Loading accounts...
+        </div>
+      </div>
+      <div class="help-text">Select accounts related to this project (optional)</div>
+    </div>
+    
+    <div class="form-group">
+      <label for="notes">Notes</label>
+      <textarea id="notes" name="notes" placeholder="Additional project notes"></textarea>
+    </div>
+    
+    <div class="button-group">
+      <button type="button" class="btn-secondary" onclick="google.script.host.close()">Cancel</button>
+      <button type="submit" class="btn-primary">Add Project</button>
+    </div>
+  </form>
+  
+  <script>
+    // Load accounts when dialog opens
+    google.script.run
+      .withSuccessHandler(loadAccounts)
+      .withFailureHandler(showError)
+      .getAccountsForDialog();
+    
+    function loadAccounts(accounts) {
+      const accountSelect = document.getElementById('accountSelect');
+      if (!accounts || accounts.length === 0) {
+        accountSelect.innerHTML = '<div style="text-align: center; padding: 20px; color: #5f6368;">No accounts found</div>';
+        return;
+      }
+      
+      let html = '';
+      accounts.forEach(account => {
+        html += `
+          <div class="account-checkbox">
+            <input type="checkbox" id="account_${account.id}" name="accountIds" value="${account.id}">
+            <label for="account_${account.id}">${account.name}</label>
+          </div>
+        `;
+      });
+      accountSelect.innerHTML = html;
+    }
+    
+    function showError(error) {
+      document.getElementById('accountSelect').innerHTML = 
+        '<div style="text-align: center; padding: 20px; color: #ea4335;">Error loading accounts</div>';
+      console.error('Error:', error);
+    }
+    
+    // Handle form submission
+    document.getElementById('projectForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      // Validate required fields
+      const projectName = document.getElementById('projectName').value.trim();
+      const status = document.getElementById('status').value;
+      const priority = document.getElementById('priority').value;
+      
+      let isValid = true;
+      
+      if (!projectName) {
+        document.getElementById('projectNameError').style.display = 'block';
+        isValid = false;
+      } else {
+        document.getElementById('projectNameError').style.display = 'none';
+      }
+      
+      if (!status) {
+        document.getElementById('statusError').style.display = 'block';
+        isValid = false;
+      } else {
+        document.getElementById('statusError').style.display = 'none';
+      }
+      
+      if (!priority) {
+        document.getElementById('priorityError').style.display = 'block';
+        isValid = false;
+      } else {
+        document.getElementById('priorityError').style.display = 'none';
+      }
+      
+      if (!isValid) {
+        return;
+      }
+      
+      // Collect form data
+      const formData = {
+        projectName: projectName,
+        summary: document.getElementById('summary').value.trim(),
+        status: status,
+        owner: document.getElementById('owner').value.trim(),
+        priority: priority,
+        dates: document.getElementById('dates').value.trim(),
+        notes: document.getElementById('notes').value.trim(),
+        accountIds: []
+      };
+      
+      // Collect selected account IDs
+      const checkboxes = document.querySelectorAll('input[name="accountIds"]:checked');
+      checkboxes.forEach(checkbox => {
+        formData.accountIds.push(checkbox.value);
+      });
+      
+      // Submit to Apps Script
+      google.script.run
+        .withSuccessHandler(onSuccess)
+        .withFailureHandler(onError)
+        .addProject(formData);
+    });
+    
+    function onSuccess(result) {
+      if (result.success) {
+        google.script.host.close();
+      } else {
+        alert('Error: ' + (result.error || 'Failed to add project'));
+      }
+    }
+    
+    function onError(error) {
+      alert('Error adding project: ' + error.message);
+      console.error('Error:', error);
+    }
+  </script>
+</body>
+</html>
+

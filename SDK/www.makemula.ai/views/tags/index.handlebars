@@ -1,0 +1,32 @@
+<h1>Tags</h1>
+{{#if tags.length}}
+  <ul>
+  
+    {{#each tags}}
+      <li>
+        <a href="/tags/{{this.id}}">{{this.domain}}</a>
+        {{!-- <form action="/tags/{{this.id}}/delete" method="POST" style="display:inline;">
+          <button type="submit">Delete</button>
+        </form> --}}
+      </li>
+    {{/each}}
+  </ul>
+  <div class="card text-center mt-4">
+    <div class="card-body">
+      <form action="/tags" method="POST">
+        <button type="submit" class="btn btn-primary">Create Another Tag</button>
+      </form>
+    </div>
+  </div>
+{{else}}
+  <div class="card text-center mt-4">
+    <div class="card-body">
+      <p class="card-text fs-5">No tags found.</p>
+      <form action="/tags" method="POST">
+        <button type="submit" class="btn btn-primary">Create Your First Tag</button>
+      </form>
+    </div>
+  </div>
+{{/if}}
+
+

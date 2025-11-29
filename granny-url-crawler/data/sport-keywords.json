@@ -1,0 +1,15 @@
+{
+  "nfl": ["nfl", "/nfl/", "football"],
+  "nba": ["nba", "/nba/", "basketball"],
+  "cfb": ["college-football", "cfb", "/college-football/", "ncaa-football"],
+  "mlb": ["mlb", "/mlb/", "baseball"],
+  "nhl": ["nhl", "/nhl/", "hockey"],
+  "tennis": ["tennis", "/tennis/"],
+  "golf": ["golf", "/golf/", "pga"],
+  "boxing": ["boxing", "/boxing/"],
+  "ufc": ["ufc", "mma", "/ufc/", "/mma/"],
+  "nascar": ["nascar", "/nascar/", "racing"],
+  "soccer": ["soccer", "/soccer/", "premier-league", "la-liga"],
+  "wrestling": ["wwe", "/wwe/", "wrestling", "aew"]
+}
+

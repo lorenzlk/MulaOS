@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Page</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 16px;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+            background: white;
+        }
+
+        article {
+            margin-bottom: 40px;
+        }
+
+        h2 {
+            font-family: Georgia, serif;
+            font-size: 24px;
+            line-height: 1.3;
+            margin: 0 0 16px 0;
+            font-weight: normal;
+        }
+
+        img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .mula-pin-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            height: 38px;
+            padding: 0 20px;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: white;
+            border: none;
+            border-radius: 19px;
+            cursor: pointer;
+            font-family: "SF Pro Text", -apple-system, BlinkMacSystemFont, sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            letter-spacing: 0.3px;
+            margin: 16px 0;
+            position: relative;
+            overflow: hidden;
+            white-space: nowrap;
+            width: fit-content;
+            align-self: center;
+        }
+
+        .mula-pin-badge::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            width: 6px;
+            height: 6px;
+            background: #ff3b30;
+            border-radius: 50%;
+            transform: translateY(-50%);
+            transition: background-color 0.2s ease;
+        }
+
+        .mula-pin-badge:hover {
+            background: rgba(0, 0, 0, 0.85);
+            transform: translateY(-1px);
+        }
+
+        .mula-pin-badge.pinned {
+            background: rgba(0, 0, 0, 0.9);
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+            transform: none;
+        }
+
+        .mula-pin-badge.pinned::before {
+            background: #30d158;
+        }
+
+        .mula-pin-badge svg {
+            width: 16px;
+            height: 16px;
+            opacity: 0.9;
+            transition: all 0.2s ease;
+            fill: currentColor;
+        }
+
+        .mula-pin-badge:hover svg {
+            opacity: 1;
+        }
+
+        .product-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .price-tag {
+            margin: 12px 0;
+            font-size: 16px;
+            font-weight: 500;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <article>
+        <div class="product-container">
+            <h2>Alex Mill Faye Pointelle Cardigan</h2>
+            <div class="mula-pin-badge">
+                <svg viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                </svg>
+                <span>This is my style!</span>
+            </div>
+            <img src="https://hips.hearstapps.com/vader-prod.s3.amazonaws.com/1674589502-screen-shot-2023-01-24-at-3-11-25-pm-1674589491.png" alt="Alex Mill Faye Pointelle Cardigan">
+            <div class="price-tag">NOW 25% OFF</div>
+        </div>
+    </article>
+
+    <script>
+        // Add click handlers to pin badges
+        document.querySelectorAll('.mula-pin-badge').forEach(badge => {
+            badge.addEventListener('click', () => {
+                badge.classList.toggle('pinned');
+                const span = badge.querySelector('span');
+                if (badge.classList.contains('pinned')) {
+                    span.textContent = 'Added to My Style';
+                    if (navigator.vibrate) {
+                        navigator.vibrate(50);
+                    }
+                } else {
+                    span.textContent = 'This is my style!';
+                }
+                
+                // Notify parent window
+                window.parent.postMessage({
+                    type: 'pinStatusChanged',
+                    pinned: badge.classList.contains('pinned'),
+                    productTitle: document.querySelector('h2').textContent,
+                    productImage: document.querySelector('img').src
+                }, '*');
+            });
+        });
+    </script>
+</body>
+</html> 

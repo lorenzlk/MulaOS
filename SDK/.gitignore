@@ -1,0 +1,7 @@
+node_modules/
+*.zip
+.env
+.DS_Store
+.vscode/
+production_backup.dump
+data-providers/

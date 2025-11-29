@@ -1,0 +1,56 @@
+version: 2.1
+
+workflows:
+  version: 2
+  monorepo:
+    jobs:
+      - sdk-trigger:
+          filters:
+            paths:
+              - sdk.makemula.ai/**
+      - cdn-trigger:
+          filters:
+            paths:
+              - cdn.makemula.ai/**
+      - www-trigger:
+          filters:
+            paths:
+              - www.makemula.ai/**
+
+jobs:
+  sdk-trigger:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - run:
+          name: Trigger SDK Pipeline
+          command: |
+            circleci trigger \
+              --project mula/sdk.makemula.ai \
+              --config sdk.makemula.ai/.circleci/config.yml
+
+  cdn-trigger:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - run:
+          name: Trigger CDN Pipeline
+          command: |
+            echo "nothing setup here yet..."
+            # circleci trigger \
+            #   --project mula/cdn.makemula.ai \
+            #   --config cdn.makemula.ai/.circleci/config.yml
+
+  www-trigger:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - run:
+          name: Trigger WWW Pipeline
+          command: |
+            circleci trigger \
+              --project mula/www.makemula.ai \
+              --config www.makemula.ai/.circleci/config.yml

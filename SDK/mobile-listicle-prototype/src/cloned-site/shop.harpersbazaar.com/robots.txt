@@ -1,0 +1,4 @@
+Allow: /
+Disallow: /checkout/*
+Sitemap: https://shop.harpersbazaar.com/sitemap.xml
+Host: https://shop.harpersbazaar.com

@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartScroll Density & Position Experiment Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f7;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .test-controls {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .test-controls h3 {
+            margin-top: 0;
+            color: #1d1d1f;
+        }
+        .variant-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .variant-button {
+            padding: 8px 16px;
+            border: 2px solid #007aff;
+            background: white;
+            color: #007aff;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .variant-button.active {
+            background: #007aff;
+            color: white;
+        }
+        .variant-button:hover {
+            background: #f0f8ff;
+        }
+        .variant-button.active:hover {
+            background: #0056b3;
+        }
+        .info-panel {
+            background: #e8f4fd;
+            border: 1px solid #b3d9ff;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 15px;
+        }
+        .info-panel h4 {
+            margin: 0 0 8px 0;
+            color: #0066cc;
+        }
+        .info-item {
+            margin: 4px 0;
+            font-size: 14px;
+        }
+        .test-instructions {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 20px;
+        }
+        .test-instructions h4 {
+            margin: 0 0 8px 0;
+            color: #856404;
+        }
+        .test-instructions ol {
+            margin: 8px 0;
+            padding-left: 20px;
+        }
+        .test-instructions li {
+            margin: 4px 0;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 SmartScroll Density & Position Experiment Test</h1>
+        
+        <div class="test-instructions">
+            <h4>📋 Testing Instructions</h4>
+            <ol>
+                <li>Use the variant buttons below to force different experiment variants</li>
+                <li>Scroll down to see the SmartScroll widget with next page articles</li>
+                <li>Observe the density and position of articles in each variant</li>
+                <li>Check the browser console for experiment assignment logs</li>
+                <li>Verify that articles appear at the correct positions for each variant</li>
+            </ol>
+        </div>
+
+        <div class="test-controls">
+            <h3>🎛️ Test Controls</h3>
+            <div class="variant-buttons">
+                <button class="variant-button" onclick="testVariant('control')">Control</button>
+                <button class="variant-button" onclick="testVariant('density_inverted')">Density Inverted</button>
+                <button class="variant-button" onclick="testVariant('position_early')">Position Early</button>
+                <button class="variant-button" onclick="testVariant('random')">Random</button>
+            </div>
+            
+            <div class="info-panel">
+                <h4>📊 Current Status</h4>
+                <div class="info-item"><strong>Variant:</strong> <span id="current-variant">Not assigned</span></div>
+                <div class="info-item"><strong>Session ID:</strong> <span id="session-id">Not set</span></div>
+                <div class="info-item"><strong>Next Page Data:</strong> <span id="next-page-status">Not loaded</span></div>
+                <div class="info-item"><strong>Experiment Active:</strong> <span id="experiment-status">Unknown</span></div>
+            </div>
+        </div>
+
+        <div id="smartscroll-container">
+            <mula-smartscroll></mula-smartscroll>
+        </div>
+    </div>
+
+    <script>
+        // Mock data for testing
+        window.Mula = {
+            sessionId: 'test-session-' + Math.random().toString(36).substr(2, 9),
+            feed: [
+                {
+                    id: 'product-1',
+                    title: 'Test Product 1',
+                    price: '$29.99',
+                    image: 'https://via.placeholder.com/300x200?text=Product+1',
+                    url: 'https://example.com/product1'
+                },
+                {
+                    id: 'product-2', 
+                    title: 'Test Product 2',
+                    price: '$39.99',
+                    image: 'https://via.placeholder.com/300x200?text=Product+2',
+                    url: 'https://example.com/product2'
+                },
+                {
+                    id: 'product-3',
+                    title: 'Test Product 3', 
+                    price: '$49.99',
+                    image: 'https://via.placeholder.com/300x200?text=Product+3',
+                    url: 'https://example.com/product3'
+                },
+                {
+                    id: 'product-4',
+                    title: 'Test Product 4',
+                    price: '$59.99', 
+                    image: 'https://via.placeholder.com/300x200?text=Product+4',
+                    url: 'https://example.com/product4'
+                },
+                {
+                    id: 'product-5',
+                    title: 'Test Product 5',
+                    price: '$69.99',
+                    image: 'https://via.placeholder.com/300x200?text=Product+5', 
+                    url: 'https://example.com/product5'
+                },
+                {
+                    id: 'product-6',
+                    title: 'Test Product 6',
+                    price: '$79.99',
+                    image: 'https://via.placeholder.com/300x200?text=Product+6',
+                    url: 'https://example.com/product6'
+                }
+            ],
+            nextPage: [
+                {
+                    title: 'Test Article 1',
+                    url: 'https://example.com/article1',
+                    imageUrl: 'https://via.placeholder.com/300x200?text=Article+1'
+                },
+                {
+                    title: 'Test Article 2', 
+                    url: 'https://example.com/article2',
+                    imageUrl: 'https://via.placeholder.com/300x200?text=Article+2'
+                },
+                {
+                    title: 'Test Article 3',
+                    url: 'https://example.com/article3', 
+                    imageUrl: 'https://via.placeholder.com/300x200?text=Article+3'
+                }
+            ]
+        };
+
+        // Update status display
+        function updateStatus() {
+            document.getElementById('session-id').textContent = window.Mula.sessionId;
+            document.getElementById('next-page-status').textContent = 
+                window.Mula.nextPage && window.Mula.nextPage.length > 0 ? 
+                `${window.Mula.nextPage.length} articles loaded` : 'No articles';
+        }
+
+        // Test variant function
+        function testVariant(variant) {
+            // Update active button
+            document.querySelectorAll('.variant-button').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            if (variant === 'random') {
+                // Remove query parameter for random assignment
+                const url = new URL(window.location);
+                url.searchParams.delete('mulaABTest');
+                window.history.replaceState({}, '', url);
+                document.getElementById('current-variant').textContent = 'Random assignment';
+            } else {
+                // Set query parameter to force variant
+                const url = new URL(window.location);
+                url.searchParams.set('mulaABTest', variant);
+                window.history.replaceState({}, '', url);
+                document.getElementById('current-variant').textContent = variant;
+            }
+            
+            // Reload the page to apply the variant
+            window.location.reload();
+        }
+
+        // Initialize status
+        updateStatus();
+        
+        // Check for forced variant on load
+        const urlParams = new URLSearchParams(window.location.search);
+        const forcedVariant = urlParams.get('mulaABTest');
+        if (forcedVariant) {
+            document.getElementById('current-variant').textContent = forcedVariant;
+            document.querySelector(`[onclick="testVariant('${forcedVariant}')"]`).classList.add('active');
+        }
+
+        // Load the SmartScroll component
+        const script = document.createElement('script');
+        script.src = '/src/lib/SmartScroll.svelte';
+        script.type = 'module';
+        document.head.appendChild(script);
+    </script>
+</body>
+</html>

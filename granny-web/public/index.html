@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Granny - Publisher Intelligence</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen" x-data="grannyApp()" x-init="init()">
+  
+  <!-- Header -->
+  <div class="bg-white shadow-sm border-b border-gray-200">
+    <div class="max-w-6xl mx-auto px-6 py-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <div class="text-4xl">🏄‍♂️</div>
+          <div>
+            <h1 class="text-2xl font-bold text-gray-900">Granny</h1>
+            <p class="text-sm text-gray-500">Publisher Intelligence Agent</p>
+          </div>
+        </div>
+        <div class="text-sm text-gray-500">
+          Analyze any publisher in ~2 minutes
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="max-w-6xl mx-auto px-6 py-12">
+    
+    <!-- Search Input -->
+    <div class="bg-white rounded-2xl shadow-lg p-8 mb-8">
+      <h2 class="text-xl font-semibold text-gray-900 mb-4">Analyze a Publisher</h2>
+      
+      <div class="flex space-x-4">
+        <input 
+          type="text" 
+          x-model="domain"
+          @keyup.enter="analyze()"
+          placeholder="Enter domain (e.g., essentiallysports.com)"
+          class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          :disabled="loading"
+        />
+        <button 
+          @click="analyze()"
+          :disabled="loading || !domain"
+          class="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <span x-show="!loading">Analyze</span>
+          <span x-show="loading">Analyzing...</span>
+        </button>
+      </div>
+      
+      <!-- Quick Examples -->
+      <div class="mt-4 flex items-center space-x-2 text-sm">
+        <span class="text-gray-500">Quick examples:</span>
+        <button @click="domain = 'essentiallysports.com'" class="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700 transition">
+          EssentiallySports
+        </button>
+        <button @click="domain = 'on3.com'" class="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700 transition">
+          ON3
+        </button>
+        <button @click="domain = 'bleacherreport.com'" class="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700 transition">
+          Bleacher Report
+        </button>
+      </div>
+      
+      <!-- Manual Patterns Toggle -->
+      <div class="mt-6 border-t pt-6">
+        <button 
+          @click="showManualPatterns = !showManualPatterns"
+          class="flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium"
+        >
+          <span x-show="!showManualPatterns">➕ Add Manual URL Patterns</span>
+          <span x-show="showManualPatterns">➖ Hide Manual Patterns</span>
+        </button>
+        
+        <!-- Manual Pattern Input Section -->
+        <div x-show="showManualPatterns" x-transition class="mt-4 bg-gray-50 rounded-lg p-4">
+          <p class="text-sm text-gray-600 mb-4">
+            Add custom URL patterns for specific sections or categories. Use wildcards (*) for dynamic parts.
+          </p>
+          
+          <!-- Manual Pattern List -->
+          <div class="space-y-3 mb-4">
+            <template x-for="(pattern, index) in manualPatterns" :key="index">
+              <div class="flex gap-2 items-start bg-white rounded-lg p-3 border border-gray-200">
+                <div class="flex-1 grid grid-cols-3 gap-2">
+                  <input 
+                    type="text" 
+                    x-model="pattern.pattern"
+                    placeholder="/category/sport/*"
+                    class="px-3 py-2 border border-gray-300 rounded text-sm"
+                  />
+                  <input 
+                    type="text" 
+                    x-model="pattern.sport"
+                    placeholder="Sport (e.g., nfl, nba)"
+                    class="px-3 py-2 border border-gray-300 rounded text-sm"
+                  />
+                  <input 
+                    type="text" 
+                    x-model="pattern.search_phrase"
+                    placeholder="Search phrase (optional)"
+                    class="px-3 py-2 border border-gray-300 rounded text-sm"
+                  />
+                </div>
+                <button 
+                  @click="removeManualPattern(index)"
+                  class="px-3 py-2 bg-red-100 hover:bg-red-200 text-red-700 rounded text-sm"
+                >
+                  ✕
+                </button>
+              </div>
+            </template>
+          </div>
+          
+          <!-- Add Pattern Button -->
+          <button 
+            @click="addManualPattern()"
+            class="w-full px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg text-sm font-medium transition"
+          >
+            ➕ Add Another Pattern
+          </button>
+          
+          <!-- Examples -->
+          <div class="mt-4 text-xs text-gray-500">
+            <p class="font-semibold mb-1">Examples:</p>
+            <ul class="list-disc list-inside space-y-1 pl-2">
+              <li><code class="bg-gray-200 px-1 rounded">/nfl/*</code> - All NFL pages</li>
+              <li><code class="bg-gray-200 px-1 rounded">/category/basketball/*</code> - Basketball category</li>
+              <li><code class="bg-gray-200 px-1 rounded">/2024/*/nba/*</code> - 2024 NBA articles</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Loading State -->
+    <div x-show="loading" class="text-center py-12">
+      <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <p class="mt-4 text-gray-600">Analyzing <span x-text="domain"></span>...</p>
+      <p class="text-sm text-gray-500 mt-2">This takes about 30-60 seconds</p>
+    </div>
+    
+    <!-- Error State -->
+    <div x-show="error" class="bg-red-50 border border-red-200 rounded-lg p-6 mb-8">
+      <div class="flex items-start">
+        <div class="text-2xl mr-3">❌</div>
+        <div>
+          <h3 class="font-semibold text-red-900">Analysis Failed</h3>
+          <p class="text-red-700 mt-1" x-text="error"></p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Results Section -->
+    <div x-show="results && !loading" x-cloak>
+      
+      <!-- Header with Domain -->
+      <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-2xl font-bold text-gray-900" x-text="results.domain"></h2>
+            <p class="text-sm text-gray-500 mt-1">
+              Analyzed at <span x-text="new Date(results.analyzed_at).toLocaleString()"></span>
+            </p>
+          </div>
+          <div class="flex space-x-2">
+            <button 
+              @click="downloadJSON()"
+              class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition text-sm"
+            >
+              📥 Download JSON
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Deployment Readiness (NEW!) -->
+      <div class="bg-gradient-to-r from-green-50 to-blue-50 rounded-2xl shadow-lg p-6 mb-6" x-show="results.deployment_readiness">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-xl font-semibold text-gray-900">🚀 Deployment Readiness</h3>
+          <div class="text-right">
+            <div class="text-3xl font-bold" :class="results.deployment_readiness.percentage >= 80 ? 'text-green-600' : results.deployment_readiness.percentage >= 60 ? 'text-blue-600' : 'text-orange-600'" x-text="results.deployment_readiness.percentage + '%'"></div>
+            <div class="text-sm text-gray-600" x-text="results.deployment_readiness.level"></div>
+          </div>
+        </div>
+        
+        <!-- Progress Bar -->
+        <div class="w-full bg-gray-200 rounded-full h-4 mb-4">
+          <div 
+            class="h-4 rounded-full transition-all duration-500"
+            :class="results.deployment_readiness.percentage >= 80 ? 'bg-green-500' : results.deployment_readiness.percentage >= 60 ? 'bg-blue-500' : 'bg-orange-500'"
+            :style="`width: ${results.deployment_readiness.percentage}%`"
+          ></div>
+        </div>
+        
+        <div class="text-sm text-gray-700 mb-4">
+          <strong>Timeline:</strong> <span x-text="results.deployment_readiness.timeline"></span>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+          <div x-show="results.deployment_readiness.quick_wins && results.deployment_readiness.quick_wins.length > 0">
+            <div class="font-semibold text-gray-900 mb-2">✅ Ready:</div>
+            <ul class="space-y-1">
+              <template x-for="win in results.deployment_readiness.quick_wins" :key="win">
+                <li class="text-gray-700" x-text="win"></li>
+              </template>
+            </ul>
+          </div>
+          
+          <div x-show="results.deployment_readiness.blockers && results.deployment_readiness.blockers.length > 0">
+            <div class="font-semibold text-gray-900 mb-2">⚠️ Needs Attention:</div>
+            <ul class="space-y-1">
+              <template x-for="blocker in results.deployment_readiness.blockers" :key="blocker">
+                <li class="text-gray-700" x-text="blocker"></li>
+              </template>
+            </ul>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Monetization Maturity (NEW!) -->
+      <div class="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl shadow-lg p-6 mb-6" x-show="results.monetization_maturity">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-xl font-semibold text-gray-900">💎 Monetization Maturity</h3>
+          <div class="text-right">
+            <div class="text-3xl font-bold text-purple-600">
+              <span x-text="results.monetization_maturity.score"></span><span class="text-xl text-gray-400">/10</span>
+            </div>
+            <div class="text-sm text-gray-600" x-text="results.monetization_maturity.level"></div>
+          </div>
+        </div>
+        
+        <div class="space-y-2 text-sm mb-4">
+          <template x-for="factor in results.monetization_maturity.factors" :key="factor">
+            <div class="text-gray-700" x-text="factor"></div>
+          </template>
+        </div>
+        
+        <div class="border-t pt-4">
+          <div class="font-semibold text-gray-900 mb-2">💡 Insights:</div>
+          <ul class="space-y-1 text-sm">
+            <template x-for="insight in results.monetization_maturity.insights" :key="insight">
+              <li class="text-gray-700" x-text="'• ' + insight"></li>
+            </template>
+          </ul>
+        </div>
+      </div>
+      
+      <!-- Competitive Intelligence (NEW!) -->
+      <div class="bg-gradient-to-r from-orange-50 to-red-50 rounded-2xl shadow-lg p-6 mb-6" x-show="results.competitive_intelligence && results.competitive_intelligence.total_competitors > 0">
+        <h3 class="text-xl font-semibold text-gray-900 mb-4">⚔️ Competitive Landscape</h3>
+        
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <div class="text-sm text-gray-600">Total Competitors</div>
+            <div class="text-2xl font-bold text-orange-600" x-text="results.competitive_intelligence.total_competitors"></div>
+          </div>
+          <div class="px-4 py-2 rounded-lg" :class="results.competitive_intelligence.density === 'crowded' ? 'bg-red-100 text-red-700' : results.competitive_intelligence.density === 'moderate' ? 'bg-yellow-100 text-yellow-700' : 'bg-green-100 text-green-700'">
+            <span class="font-medium capitalize" x-text="results.competitive_intelligence.density"></span> Market
+          </div>
+        </div>
+        
+        <div class="bg-white rounded-lg p-4 mb-4">
+          <div class="text-sm font-semibold text-gray-900 mb-2">🎯 Mula Positioning:</div>
+          <div class="text-gray-700" x-text="results.competitive_intelligence.mula_positioning"></div>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+          <div x-show="results.competitive_intelligence.content_recommendation && results.competitive_intelligence.content_recommendation.length > 0">
+            <div class="font-semibold text-gray-900 mb-2">Content Widgets:</div>
+            <ul class="space-y-1">
+              <template x-for="comp in results.competitive_intelligence.content_recommendation" :key="comp">
+                <li class="text-gray-700" x-text="'• ' + comp"></li>
+              </template>
+            </ul>
+          </div>
+          
+          <div x-show="results.competitive_intelligence.ad_networks && results.competitive_intelligence.ad_networks.length > 0">
+            <div class="font-semibold text-gray-900 mb-2">Ad Networks:</div>
+            <ul class="space-y-1">
+              <template x-for="comp in results.competitive_intelligence.ad_networks" :key="comp">
+                <li class="text-gray-700" x-text="'• ' + comp"></li>
+              </template>
+            </ul>
+          </div>
+          
+          <div x-show="results.competitive_intelligence.affiliate_platforms && results.competitive_intelligence.affiliate_platforms.length > 0">
+            <div class="font-semibold text-gray-900 mb-2">Affiliate Platforms:</div>
+            <ul class="space-y-1">
+              <template x-for="comp in results.competitive_intelligence.affiliate_platforms" :key="comp">
+                <li class="text-gray-700" x-text="'• ' + comp"></li>
+              </template>
+            </ul>
+          </div>
+          
+          <div x-show="results.competitive_intelligence.analytics && results.competitive_intelligence.analytics.length > 0">
+            <div class="font-semibold text-gray-900 mb-2">Analytics & Tags:</div>
+            <ul class="space-y-1">
+              <template x-for="comp in results.competitive_intelligence.analytics" :key="comp">
+                <li class="text-gray-700" x-text="'• ' + comp"></li>
+              </template>
+            </ul>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Contextual Intelligence (NEW!) -->
+      <div class="bg-gradient-to-r from-cyan-50 to-blue-50 rounded-2xl shadow-lg p-6 mb-6" x-show="results.contextual_intelligence && results.contextual_intelligence.opportunities && results.contextual_intelligence.opportunities.length > 0">
+        <h3 class="text-xl font-semibold text-gray-900 mb-4">🎯 Contextual Intelligence</h3>
+        
+        <div class="mb-4">
+          <div class="text-sm text-gray-600 mb-2">Focus: <span class="font-medium text-gray-900" x-text="results.contextual_intelligence.focus"></span></div>
+          <div class="text-sm text-gray-600">Audience: <span class="font-medium text-gray-900" x-text="results.contextual_intelligence.audience"></span></div>
+        </div>
+        
+        <!-- Active Sports Seasons -->
+        <div x-show="results.contextual_intelligence.sports_context && results.contextual_intelligence.sports_context.length > 0" class="mb-4">
+          <div class="font-semibold text-gray-900 mb-2">🏈 Active Sports Seasons:</div>
+          <div class="flex flex-wrap gap-2">
+            <template x-for="ctx in results.contextual_intelligence.sports_context" :key="ctx.sport">
+              <div class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm">
+                <span x-text="ctx.sport.toUpperCase()"></span> • <span x-text="ctx.phase.replace(/-/g, ' ')"></span>
+              </div>
+            </template>
+          </div>
+        </div>
+        
+        <!-- Current Opportunities -->
+        <div class="space-y-3">
+          <div class="font-semibold text-gray-900 mb-2">💡 Current Opportunities:</div>
+          <template x-for="(opp, index) in results.contextual_intelligence.opportunities.slice(0, 5)" :key="index">
+            <div class="bg-white rounded-lg p-4 border-l-4" :class="opp.urgency === 'critical' ? 'border-red-500' : opp.urgency === 'high' ? 'border-orange-500' : 'border-blue-500'">
+              <div class="flex items-start justify-between mb-2">
+                <div class="font-semibold text-gray-900" x-text="opp.type ? opp.type.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) : 'Opportunity'"></div>
+                <span class="px-2 py-1 text-xs rounded" :class="opp.urgency === 'critical' ? 'bg-red-100 text-red-700' : opp.urgency === 'high' ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700'" x-text="opp.urgency ? opp.urgency.toUpperCase() : 'INFO'"></span>
+              </div>
+              <div class="text-sm text-gray-700 mb-2" x-show="opp.recommendation" x-text="'→ ' + opp.recommendation"></div>
+              <div class="text-xs text-gray-600" x-show="opp.expected_lift">
+                <strong>Expected Lift:</strong> <span x-text="opp.expected_lift"></span>
+              </div>
+              <div class="text-xs text-gray-600" x-show="opp.duration">
+                <strong>Duration:</strong> <span x-text="opp.duration"></span>
+              </div>
+              <div class="text-xs text-gray-600" x-show="opp.rivals">
+                <strong>Rivals:</strong> <span x-text="Array.isArray(opp.rivals) ? opp.rivals.join(', ') : opp.rivals"></span>
+              </div>
+            </div>
+          </template>
+        </div>
+      </div>
+      
+      <!-- Search Strategies (NEW!) -->
+      <div class="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl shadow-lg p-6 mb-6" x-show="results.search_strategies && (results.search_strategies.fanatics.primary_search || results.search_strategies.amazon.primary_search)">
+        <h3 class="text-xl font-semibold text-gray-900 mb-4">🔍 Affiliate-Specific Search Strategies</h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Fanatics Strategy -->
+          <div x-show="results.search_strategies.fanatics.primary_search" class="bg-white rounded-lg p-5 border-2 border-purple-200">
+            <div class="flex items-center mb-3">
+              <div class="text-2xl mr-2">📦</div>
+              <div>
+                <div class="font-bold text-gray-900">Fanatics (Impact)</div>
+                <div class="text-xs text-gray-500">Structured catalog search</div>
+              </div>
+            </div>
+            
+            <div class="space-y-2 text-sm">
+              <div>
+                <div class="font-semibold text-purple-700">Primary Search:</div>
+                <div class="bg-purple-50 px-3 py-2 rounded font-mono text-sm" x-text="results.search_strategies.fanatics.primary_search"></div>
+              </div>
+              
+              <div x-show="results.search_strategies.fanatics.filters">
+                <div class="font-semibold text-purple-700">Filters:</div>
+                <div class="bg-purple-50 px-3 py-2 rounded">
+                  <div x-show="results.search_strategies.fanatics.filters.sport" x-text="'Sport: ' + results.search_strategies.fanatics.filters.sport"></div>
+                  <div x-show="results.search_strategies.fanatics.filters.team" x-text="'Team: ' + results.search_strategies.fanatics.filters.team"></div>
+                  <div x-show="results.search_strategies.fanatics.filters.tags" x-text="'Tags: ' + (Array.isArray(results.search_strategies.fanatics.filters.tags) ? results.search_strategies.fanatics.filters.tags.join(', ') : results.search_strategies.fanatics.filters.tags)"></div>
+                </div>
+              </div>
+              
+              <div>
+                <div class="font-semibold text-purple-700">Expected:</div>
+                <div class="text-gray-700" x-text="results.search_strategies.fanatics.expected_products + ' products'"></div>
+              </div>
+              
+              <div class="text-xs text-gray-600 italic" x-text="results.search_strategies.fanatics.reasoning"></div>
+            </div>
+          </div>
+          
+          <!-- Amazon Strategy -->
+          <div x-show="results.search_strategies.amazon.primary_search" class="bg-white rounded-lg p-5 border-2 border-pink-200">
+            <div class="flex items-center mb-3">
+              <div class="text-2xl mr-2">🛒</div>
+              <div>
+                <div class="font-bold text-gray-900">Amazon Associates</div>
+                <div class="text-xs text-gray-500">E-commerce search</div>
+              </div>
+            </div>
+            
+            <div class="space-y-2 text-sm">
+              <div>
+                <div class="font-semibold text-pink-700">Primary Search:</div>
+                <div class="bg-pink-50 px-3 py-2 rounded font-mono text-sm" x-text="results.search_strategies.amazon.primary_search"></div>
+              </div>
+              
+              <div x-show="results.search_strategies.amazon.keywords && results.search_strategies.amazon.keywords.length > 0">
+                <div class="font-semibold text-pink-700">Keywords:</div>
+                <div class="bg-pink-50 px-3 py-2 rounded">
+                  <div class="flex flex-wrap gap-1">
+                    <template x-for="keyword in results.search_strategies.amazon.keywords.slice(0, 6)" :key="keyword">
+                      <span class="px-2 py-1 bg-pink-100 text-pink-700 rounded text-xs" x-text="keyword"></span>
+                    </template>
+                  </div>
+                </div>
+              </div>
+              
+              <div>
+                <div class="font-semibold text-pink-700">Expected:</div>
+                <div class="text-gray-700" x-text="results.search_strategies.amazon.expected_products + ' products'"></div>
+              </div>
+              
+              <div class="text-xs text-gray-600 italic" x-text="results.search_strategies.amazon.reasoning"></div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="mt-4 bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">
+          <div class="flex items-start">
+            <div class="text-xl mr-2">💡</div>
+            <div class="text-sm">
+              <div class="font-semibold text-yellow-800 mb-1">Usage:</div>
+              <div class="text-yellow-700">Sally Agent should use these affiliate-specific strategies instead of generic searches for 3-4x CTR lift during high-context moments.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- SDK Health -->
+      <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-xl font-semibold text-gray-900">🏥 SDK Health Check</h3>
+          <span 
+            x-text="results.health_check.sdk_present ? '✅ DEPLOYED' : '❌ NOT DEPLOYED'"
+            :class="results.health_check.sdk_present ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold'"
+          ></span>
+        </div>
+        
+        <div x-show="results.health_check.sdk_present" class="space-y-2 text-sm">
+          <div class="flex justify-between">
+            <span class="text-gray-600">Detection Method:</span>
+            <span class="font-medium" x-text="results.health_check.detection_method"></span>
+          </div>
+          <div x-show="results.health_check.deployment_date" class="flex justify-between">
+            <span class="text-gray-600">Deployment Date:</span>
+            <span class="font-medium" x-text="new Date(results.health_check.deployment_date).toLocaleDateString()"></span>
+          </div>
+        </div>
+        
+        <div x-show="!results.health_check.sdk_present" class="mt-4">
+          <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+            <p class="text-sm text-red-800">
+              <strong>Action Required:</strong> Deploy Mula SDK before configuring targeting
+            </p>
+            <template x-for="error in results.health_check.errors">
+              <p class="text-xs text-red-600 mt-2" x-text="'• ' + error"></p>
+            </template>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Traffic Distribution -->
+      <div class="bg-white rounded-2xl shadow-lg p-6 mb-6" x-show="results.traffic_estimate && results.traffic_estimate.distribution">
+        <div class="flex items-center justify-between mb-6">
+          <h3 class="text-xl font-semibold text-gray-900">📈 Traffic Distribution</h3>
+          <div class="text-sm">
+            <span class="text-gray-600">Confidence:</span>
+            <span class="font-semibold" x-text="results.traffic_estimate.confidence + '%'"></span>
+          </div>
+        </div>
+        
+        <div class="space-y-3">
+          <template x-for="[sport, data] in Object.entries(results.traffic_estimate.distribution || {}).slice(0, 10)" :key="sport">
+            <div class="flex items-center">
+              <span class="w-32 text-sm font-medium text-gray-700" x-text="sport.toUpperCase()"></span>
+              <div class="flex-1 bg-gray-200 rounded-full h-8 relative overflow-hidden">
+                <div 
+                  class="bg-gradient-to-r from-blue-500 to-blue-600 h-8 rounded-full transition-all duration-500 flex items-center justify-end pr-3"
+                  :style="`width: ${data.percentage}%`"
+                >
+                  <span class="text-white text-sm font-semibold" x-text="data.percentage + '%'"></span>
+                </div>
+              </div>
+              <span class="ml-3 text-sm text-gray-500" x-text="'#' + data.rank"></span>
+            </div>
+          </template>
+        </div>
+        
+        <div class="mt-4 text-xs text-gray-500">
+          <span>Sources: </span>
+          <span x-text="(results.traffic_estimate.sources || []).join(', ')"></span>
+        </div>
+      </div>
+      
+      <!-- URL Patterns -->
+      <div class="bg-white rounded-2xl shadow-lg p-6 mb-6" x-show="results.url_patterns && results.url_patterns.length > 0">
+        <h3 class="text-xl font-semibold text-gray-900 mb-6">🎯 URL Patterns Discovered</h3>
+        
+        <div class="space-y-4">
+          <template x-for="pattern in results.url_patterns" :key="pattern.pattern">
+            <div class="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition">
+              <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center gap-2">
+                  <span class="font-mono text-sm font-semibold text-blue-600" x-text="pattern.pattern"></span>
+                  <span x-show="pattern.manual" class="px-2 py-1 bg-purple-100 text-purple-700 rounded text-xs font-medium">
+                    MANUAL
+                  </span>
+                </div>
+                <span 
+                  class="px-2 py-1 rounded text-xs font-medium"
+                  :class="pattern.manual ? 'bg-purple-100 text-purple-700' : pattern.confidence >= 70 ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'"
+                  x-text="pattern.manual ? '100% (manual)' : pattern.confidence + '% confidence'"
+                ></span>
+              </div>
+              <div class="text-sm text-gray-600 mb-1">
+                <strong>Sport:</strong> <span x-text="pattern.sport?.toUpperCase()"></span>
+              </div>
+              <div class="text-sm text-gray-600 mb-1">
+                <strong>Search:</strong> <span x-text="pattern.search_phrase"></span>
+              </div>
+              <div x-show="!pattern.manual" class="text-xs text-gray-500">
+                <span x-text="pattern.url_count"></span> URLs analyzed
+              </div>
+            </div>
+          </template>
+        </div>
+      </div>
+      
+      <!-- Ready-to-Deploy Commands -->
+      <div class="bg-white rounded-2xl shadow-lg p-6 mb-6" x-show="results.slack_commands">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-xl font-semibold text-gray-900">⚡ Ready-to-Deploy Targeting</h3>
+          <button 
+            @click="copyCommands()"
+            class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition text-sm"
+          >
+            📋 Copy Slack Commands
+          </button>
+        </div>
+        
+        <pre class="bg-gray-50 border border-gray-200 rounded-lg p-4 text-xs overflow-x-auto" x-text="results.slack_commands"></pre>
+      </div>
+      
+      <!-- Business Context -->
+      <div class="bg-white rounded-2xl shadow-lg p-6 mb-6" x-show="results.business_intelligence">
+        <h3 class="text-xl font-semibold text-gray-900 mb-6">🧠 Business Intelligence</h3>
+        
+        <div class="space-y-4">
+          <!-- Publisher Type -->
+          <div class="border-l-4 border-blue-500 pl-4 py-2">
+            <div class="text-sm font-semibold text-gray-500 uppercase mb-1">Publisher Type</div>
+            <div class="text-lg text-gray-900" x-text="formatBusinessField(results.business_intelligence.publisher_type, 'publisher_type')"></div>
+          </div>
+          
+          <!-- Revenue Model -->
+          <div class="border-l-4 border-green-500 pl-4 py-2">
+            <div class="text-sm font-semibold text-gray-500 uppercase mb-1">Revenue Model</div>
+            <div class="text-lg text-gray-900" x-text="formatBusinessField(results.business_intelligence.revenue_model, 'revenue_model')"></div>
+          </div>
+          
+          <!-- Content Focus -->
+          <div class="border-l-4 border-purple-500 pl-4 py-2">
+            <div class="text-sm font-semibold text-gray-500 uppercase mb-1">Content Focus</div>
+            <div class="text-lg text-gray-900" x-text="formatBusinessField(results.business_intelligence.content_focus, 'content_focus')"></div>
+          </div>
+          
+          <!-- Tech Stack -->
+          <div class="border-l-4 border-orange-500 pl-4 py-2">
+            <div class="text-sm font-semibold text-gray-500 uppercase mb-1">Tech Stack</div>
+            <div class="text-lg text-gray-900" x-text="formatBusinessField(results.business_intelligence.tech_stack, 'tech_stack')"></div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Recommendations -->
+      <div class="bg-white rounded-2xl shadow-lg p-6" x-show="results.recommendations && results.recommendations.length > 0">
+        <h3 class="text-xl font-semibold text-gray-900 mb-6">💡 Recommendations</h3>
+        
+        <div class="space-y-3">
+          <template x-for="rec in results.recommendations" :key="rec.category">
+            <div class="flex items-start space-x-3">
+              <span x-text="rec.priority"></span>
+              <div class="flex-1">
+                <div class="font-medium text-gray-900" x-text="rec.category"></div>
+                <div class="text-sm text-gray-600 mt-1" x-text="rec.message"></div>
+                <div class="text-sm text-blue-600 mt-1">→ <span x-text="rec.action"></span></div>
+              </div>
+            </div>
+          </template>
+        </div>
+      </div>
+      
+    </div>
+    
+  </div>
+  
+  <!-- Footer -->
+  <div class="max-w-6xl mx-auto px-6 py-8 text-center text-sm text-gray-500">
+    <p>🏄‍♂️ Granny knows the perfect moment to catch the wave</p>
+    <p class="mt-2">Built for Mula • v1.0.0</p>
+  </div>
+  
+  <script>
+    function grannyApp() {
+      return {
+        domain: '',
+        loading: false,
+        results: null,
+        error: null,
+        showManualPatterns: false,
+        manualPatterns: [],
+        
+        init() {
+          // Check if there's a domain in URL params
+          const params = new URLSearchParams(window.location.search);
+          const urlDomain = params.get('domain');
+          if (urlDomain) {
+            this.domain = urlDomain;
+            this.analyze();
+          }
+        },
+        
+        addManualPattern() {
+          this.manualPatterns.push({
+            pattern: '',
+            sport: '',
+            search_phrase: ''
+          });
+        },
+        
+        removeManualPattern(index) {
+          this.manualPatterns.splice(index, 1);
+        },
+        
+        async analyze() {
+          if (!this.domain) return;
+          
+          this.loading = true;
+          this.error = null;
+          this.results = null;
+          
+          try {
+            // Filter out empty manual patterns
+            const validManualPatterns = this.manualPatterns.filter(p => 
+              p.pattern && p.pattern.trim().length > 0
+            );
+            
+            const response = await fetch('/api/analyze', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ 
+                domain: this.domain,
+                manualPatterns: validManualPatterns.length > 0 ? validManualPatterns : null
+              })
+            });
+            
+            if (!response.ok) {
+              throw new Error(`Server error: ${response.statusText}`);
+            }
+            
+            const data = await response.json();
+            
+            if (data.error) {
+              throw new Error(data.error);
+            }
+            
+            this.results = data;
+            
+            // Update URL with domain
+            const url = new URL(window.location);
+            url.searchParams.set('domain', this.domain);
+            window.history.pushState({}, '', url);
+            
+          } catch (err) {
+            this.error = err.message;
+            console.error('Analysis error:', err);
+          } finally {
+            this.loading = false;
+          }
+        },
+        
+        copyCommands() {
+          if (!this.results.slack_commands) return;
+          navigator.clipboard.writeText(this.results.slack_commands);
+          alert('✅ Commands copied to clipboard!');
+        },
+        
+        downloadJSON() {
+          const dataStr = JSON.stringify(this.results, null, 2);
+          const dataBlob = new Blob([dataStr], { type: 'application/json' });
+          const url = URL.createObjectURL(dataBlob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = `${this.results.domain}-granny-analysis.json`;
+          link.click();
+          URL.revokeObjectURL(url);
+        },
+        
+        formatBusinessField(value, fieldType) {
+          if (!value) return 'Unknown';
+          
+          const translations = {
+            // Publisher Types
+            'sports_focused': 'Sports Publisher',
+            'content_publisher': 'Content Publisher',
+            'network': 'Network',
+            
+            // Revenue Models
+            'display_ads': 'Display Advertising',
+            'affiliate': 'Affiliate Marketing',
+            'subscription': 'Subscriptions',
+            'native_advertising': 'Native Advertising',
+            
+            // Content Focus
+            'sports': 'Sports',
+            'news': 'News',
+            'college sports': 'College Sports',
+            'recruiting': 'Recruiting Coverage',
+            'analysis': 'Analysis & Opinion',
+            'videos': 'Video Content',
+            'team coverage': 'Team Coverage',
+            'entertainment': 'Entertainment',
+            'lifestyle': 'Lifestyle',
+            'general': 'General Interest',
+            
+            // Tech Stack
+            'WordPress': 'WordPress',
+            'Custom CMS': 'Custom CMS',
+            'Google Tag Manager': 'Google Tag Manager',
+            'GAM': 'Google Ad Manager',
+            'Google Analytics': 'Google Analytics',
+            'React': 'React Framework',
+            'Vue.js': 'Vue.js Framework',
+            'unknown': 'Not Detected'
+          };
+          
+          if (Array.isArray(value)) {
+            return value
+              .map(item => translations[item] || item)
+              .join(' • ');
+          }
+          
+          return translations[value] || value;
+        }
+      }
+    }
+  </script>
+  
+  <style>
+    [x-cloak] { display: none !important; }
+  </style>
+  
+</body>
+</html>
+

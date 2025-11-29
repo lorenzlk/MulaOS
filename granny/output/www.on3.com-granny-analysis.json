@@ -1,0 +1,55 @@
+{
+  "domain": "www.on3.com",
+  "analyzed_at": "2025-11-29T00:27:23.696Z",
+  "health_check": {
+    "sdk_present": false,
+    "sdk_version": null,
+    "cdn_url": null,
+    "load_time_ms": null,
+    "checked_pages": [
+      {
+        "url": "https://www.on3.com",
+        "type": "homepage"
+      },
+      {
+        "url": "https://www.on3.com/teams/michigan-state-spartans/news/michigan-state-runs-ends-with-five-to-one-loss-to-stanford-in-elite-eight/",
+        "type": "article"
+      },
+      {
+        "url": "https://www.on3.com/news/texas-am-vs-texas-live-updates-latest-lone-star-showdown-score-highlights-analysis/",
+        "type": "article"
+      },
+      {
+        "url": "https://www.on3.com/teams/south-carolina-gamecocks/news/everything-lamont-paris-said-after-south-carolina-black-friday-win-over-charleston-southern/",
+        "type": "article"
+      }
+    ],
+    "detection_method": "not_found",
+    "deployment_date": null,
+    "errors": [
+      "Mula SDK script tag not found on homepage or article pages"
+    ],
+    "warnings": [
+      "SDK might be deployed via GTM (dynamic loading) - not detectable with static HTML parsing"
+    ]
+  },
+  "traffic_estimate": {
+    "total_urls": 0,
+    "distribution": {},
+    "sources": [
+      "sitemap",
+      "rss"
+    ],
+    "confidence": 60
+  },
+  "url_patterns": [],
+  "deployment_ready": false,
+  "recommendations": [
+    {
+      "priority": "🔴 CRITICAL",
+      "category": "SDK Deployment",
+      "message": "Mula SDK is not deployed. Cannot proceed with targeting configuration.",
+      "action": "Deploy SDK via GTM or direct script tag"
+    }
+  ]
+}

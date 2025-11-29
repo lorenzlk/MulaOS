@@ -1,0 +1,5 @@
+variant,variant_description,sessions,views,clicks,ctr_percent,chi_square_statistic,significance
+c00,Control (Current Layout + Mula Only),149740,149740,446,0.2978,745.6979,Significant (p < 0.05)
+c01,RevContent Monetization (Current Layout + Mula + RevContent),147433,147433,408,0.2767,779.0285,Significant (p < 0.05)
+c10,Optimized Layout (Optimized Layout + Mula Only),151306,151306,432,0.2855,780.2041,Significant (p < 0.05)
+c11,Optimized + RevContent (Optimized Layout + Mula + RevContent),149053,149053,406,0.2724,797.0897,Significant (p < 0.05)

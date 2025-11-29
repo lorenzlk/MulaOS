@@ -1,0 +1,7 @@
+{
+  "ApplicationName": "mula-realtime-analytics",
+  "CurrentApplicationVersionId": 3,
+  "ApplicationUpdate": {
+    "ApplicationCodeUpdate": "CREATE OR REPLACE STREAM \"SEARCH_PHRASE_STREAM\" (\n    \"search_phrase\" VARCHAR(64),\n    \"host\" VARCHAR(32),\n    \"event_time\" TIMESTAMP\n);\n\nCREATE OR REPLACE PUMP \"SEARCH_PHRASE_PUMP\" AS INSERT INTO \"SEARCH_PHRASE_STREAM\"\nSELECT STREAM \n    \"search_phrase\",\n    \"host\",\n    \"COL_timestamp\" as \"event_time\"\nFROM \"mula-realtime-events_001\"\nWHERE \"search_phrase\" IS NOT NULL\n    AND \"search_phrase\" <> ''\n    AND \"eventName\" = 'mula_widget_view';"
+  }
+}

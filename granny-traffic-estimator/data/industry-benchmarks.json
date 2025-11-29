@@ -1,0 +1,12 @@
+{
+  "multi_sport": {
+    "nfl": { "percentage": 38, "rank": 1 },
+    "nba": { "percentage": 19, "rank": 2 },
+    "cfb": { "percentage": 12, "rank": 3 },
+    "mlb": { "percentage": 10, "rank": 4 },
+    "tennis": { "percentage": 6, "rank": 5 },
+    "nascar": { "percentage": 5, "rank": 6 },
+    "other": { "percentage": 10, "rank": 7 }
+  }
+}
+

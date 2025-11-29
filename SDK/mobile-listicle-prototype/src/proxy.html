@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nordstrom Winter Sale 2025 - Harper's BAZAAR</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 16px;
+            font-family: Georgia, serif;
+            background: white;
+        }
+
+        article {
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        h2 {
+            font-size: 24px;
+            line-height: 1.3;
+            margin: 0 0 16px 0;
+            font-weight: normal;
+        }
+
+        img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .pin-button {
+            display: none; /* Hidden by default */
+            align-items: center;
+            gap: 6px;
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            cursor: pointer;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.2s ease;
+            margin-top: 12px;
+            margin-bottom: 16px;
+        }
+
+        .pin-button:hover {
+            transform: translateY(-1px);
+            background: rgba(0, 0, 0, 0.9);
+        }
+
+        .pin-button.pinned {
+            background: #30d158;
+        }
+
+        .pin-button.visible {
+            display: inline-flex;
+        }
+    </style>
+</head>
+<body>
+    <!-- Cloned site content -->
+    <article>
+        <h2>Max Mara Locri Wool & Cashmere Belted Coat</h2>
+        <button class="pin-button">
+            <svg width="16" height="16" viewBox="0 0 24 24" style="fill: currentColor;">
+                <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2zm0 15l-5-2.18L7 18V5h10v13z"/>
+            </svg>
+            Pin Item
+        </button>
+        <img src="https://hips.hearstapps.com/vader-prod.s3.amazonaws.com/1674589502-screen-shot-2023-01-24-at-3-11-25-pm-1674589491.png" alt="Max Mara Locri Wool & Cashmere Belted Coat">
+        <div class="price">NOW 25% OFF</div>
+        <p>If you're going to make one investment this season, let it be this cozy wrap coat. Made with a rich wool-cashmere blend, it's a timeless staple you'll own for years to come.</p>
+        
+        <!-- Widget 7 - Sticky Carousel -->
+        <div class="mula-widget-7 active">
+            <div class="mula-sticky-carousel">
+                <div class="mula-sticky-header">
+                    <div>
+                        <div class="mula-sticky-title">Related Products</div>
+                        <div class="mula-sticky-subtitle">You might also like</div>
+                    </div>
+                    <button class="mula-view-all">View All</button>
+                </div>
+                <div class="mula-sticky-track">
+                    <!-- Cards will be inserted here via JavaScript -->
+                </div>
+            </div>
+        </div>
+    </article>
+
+    <article>
+        <h2>Alex Mill Faye Pointelle Cardigan</h2>
+        <button class="pin-button">
+            <svg width="16" height="16" viewBox="0 0 24 24" style="fill: currentColor;">
+                <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2zm0 15l-5-2.18L7 18V5h10v13z"/>
+            </svg>
+            Pin Item
+        </button>
+        <img src="https://hips.hearstapps.com/vader-prod.s3.amazonaws.com/1674589502-screen-shot-2023-01-24-at-3-11-25-pm-1674589491.png" alt="Alex Mill Faye Pointelle Cardigan">
+        <div class="price">NOW 25% OFF</div>
+    </article>
+
+    <article>
+        <h2>Franco Sarto Marlow Slingback Kitten Heel</h2>
+        <button class="pin-button">
+            <svg width="16" height="16" viewBox="0 0 24 24" style="fill: currentColor;">
+                <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2zm0 15l-5-2.18L7 18V5h10v13z"/>
+            </svg>
+            Pin Item
+        </button>
+        <img src="https://hips.hearstapps.com/vader-prod.s3.amazonaws.com/1674589502-screen-shot-2023-01-24-at-3-11-25-pm-1674589491.png" alt="Franco Sarto Marlow Slingback Kitten Heel">
+        <div class="price">NOW 25% OFF</div>
+    </article>
+
+    <script>
+        // Listen for widget state changes from parent window
+        window.addEventListener('message', (event) => {
+            if (event.data.type === 'widgetStateChanged') {
+                // Handle Widget 2 buttons visibility
+                const buttons = document.querySelectorAll('.pin-button');
+                buttons.forEach(button => {
+                    button.classList.toggle('visible', event.data.widget === '2' && event.data.active);
+                });
+                
+                // Handle Widget 7 visibility
+                if (event.data.widget === '7') {
+                    const widget7 = document.querySelector('.mula-widget-7');
+                    if (widget7) {
+                        widget7.classList.toggle('active', event.data.active);
+                        console.log('Widget 7 visibility updated:', event.data.active);
+                    }
+                }
+            }
+        });
+
+        // Add click handlers to pin buttons
+        document.querySelectorAll('.pin-button').forEach((button, index) => {
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const isPinned = button.classList.contains('pinned');
+                if (isPinned) {
+                    button.classList.remove('pinned');
+                    button.innerHTML = `
+                        <svg width="16" height="16" viewBox="0 0 24 24" style="fill: currentColor;">
+                            <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2zm0 15l-5-2.18L7 18V5h10v13z"/>
+                        </svg>
+                        Pin Item
+                    `;
+                    window.parent.postMessage({
+                        type: 'pinStatusChanged',
+                        pinned: false,
+                        index: index
+                    }, '*');
+                } else {
+                    button.classList.add('pinned');
+                    button.innerHTML = `
+                        <svg width="16" height="16" viewBox="0 0 24 24" style="fill: currentColor;">
+                            <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/>
+                        </svg>
+                        Pinned
+                    `;
+                    window.parent.postMessage({
+                        type: 'pinStatusChanged',
+                        pinned: true,
+                        index: index,
+                        productTitle: button.closest('article').querySelector('h2').textContent,
+                        productImage: button.closest('article').querySelector('img').src
+                    }, '*');
+                }
+            });
+        });
+
+        // Make buttons visible if Widget 2 is already active
+        window.parent.postMessage({ type: 'proxyReady' }, '*');
+    </script>
+</body>
+</html> 

@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Widget 9 - Expandable Article Preview</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", sans-serif;
+            background-color: #f5f5f7;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        h1 {
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 24px;
+        }
+        
+        .container {
+            max-width: 375px; /* iPhone-sized container */
+            width: 100%;
+            padding: 10px;
+        }
+        
+        .return-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 8px 16px 8px 12px;
+            font-family: "SF Pro Text", -apple-system, BlinkMacSystemFont, sans-serif;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: all 0.2s ease;
+            text-decoration: none;
+            z-index: 1000;
+        }
+        
+        .return-button:hover {
+            background: rgba(0, 0, 0, 0.8);
+            transform: translateY(-1px);
+        }
+        
+        .return-button:active {
+            transform: translateY(0);
+        }
+        
+        /* Widget 9 - Expandable Article Preview */
+        .mula-widget-9 {
+            position: relative;
+            width: 100%;
+            margin: 25px 0;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", sans-serif;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        
+        .mula-article-container {
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            margin: 0 auto;
+            max-width: 100%;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+        
+        .mula-article-header {
+            position: relative;
+            height: 160px;
+            overflow: hidden;
+        }
+        
+        .mula-article-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+        
+        .mula-article-container:hover .mula-article-image {
+            transform: scale(1.05);
+        }
+        
+        .mula-article-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            font-size: 12px;
+            font-weight: 500;
+            padding: 6px 12px;
+            border-radius: 15px;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+        
+        .mula-article-number {
+            position: absolute;
+            bottom: 15px;
+            left: 15px;
+            background: rgba(255, 59, 48, 0.9);
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .mula-article-content {
+            padding: 16px;
+        }
+        
+        .mula-article-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            font-size: 12px;
+            color: #888;
+        }
+        
+        .mula-article-date {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .mula-article-author {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .mula-article-author-avatar {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .mula-article-title {
+            font-size: 18px;
+            font-weight: 600;
+            line-height: 1.3;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .mula-article-excerpt {
+            font-size: 15px;
+            line-height: 1.5;
+            color: #555;
+            margin-bottom: 15px;
+            height: 4.5em; /* Show 3 lines (1.5 * 3) */
+            overflow: hidden;
+            position: relative;
+            transition: height 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+        
+        .mula-article-excerpt::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 100%;
+            height: 30px;
+            background: linear-gradient(to top, white, transparent);
+            transition: opacity 0.4s ease;
+        }
+        
+        .mula-article-excerpt.expanded {
+            height: auto;
+        }
+        
+        .mula-article-excerpt.expanded::after {
+            opacity: 0;
+        }
+        
+        .mula-article-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+            border-top: 1px solid #f0f0f0;
+            margin-top: 10px;
+        }
+        
+        .mula-article-stats {
+            display: flex;
+            gap: 15px;
+            color: #888;
+            font-size: 14px;
+        }
+        
+        .mula-article-stat {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .mula-read-more {
+            background: transparent;
+            color: #007aff;
+            border: none;
+            font-size: 14px;
+            font-weight: 500;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .mula-read-more:hover {
+            background: rgba(0, 122, 255, 0.1);
+        }
+        
+        .mula-read-more-icon {
+            transition: transform 0.2s ease;
+        }
+        
+        .mula-read-more.expanded .mula-read-more-icon {
+            transform: rotate(180deg);
+        }
+        
+        .debug-info {
+            margin-top: 30px;
+            padding: 15px;
+            background-color: #e8e8e8;
+            border-radius: 8px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            width: 100%;
+            max-width: 500px;
+        }
+    </style>
+</head>
+<body>
+    <a href="playground.html" class="return-button" id="returnButton">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+        Return to Playground
+    </a>
+    
+    <h1>Expandable Article Preview Widget</h1>
+    
+    <div class="container">
+        <div class="mula-widget-9">
+            <div class="mula-article-container">
+                <div class="mula-article-header">
+                    <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Smart watches on display" class="mula-article-image">
+                    <div class="mula-article-badge">Tech Gadgets</div>
+                    <div class="mula-article-number">2</div>
+                </div>
+                <div class="mula-article-content">
+                    <div class="mula-article-meta">
+                        <div class="mula-article-date">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                            April 12, 2023
+                        </div>
+                        <div class="mula-article-author">
+                            <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Sarah Johnson" class="mula-article-author-avatar">
+                            Sarah Johnson
+                        </div>
+                    </div>
+                    
+                    <h2 class="mula-article-title">The Smartwatch That Tracks Your Stress Levels</h2>
+                    
+                    <div class="mula-article-excerpt" id="articleExcerpt">
+                        <p>In our countdown of the "5 Wearable Gadgets You Need This Year," this smartwatch stands out for its unique ability to monitor your stress levels throughout the day using advanced biometric sensors.</p>
+                        
+                        <p>Unlike other wearables that focus mainly on fitness, this device uses a combination of heart rate variability, skin conductance, and body temperature to gauge your stress levels in real-time, then offers guided breathing exercises when it detects rising tension.</p>
+                        
+                        <p>The interface is remarkably intuitive, with a color-coded system that makes it easy to understand your stress patterns at a glance. Blue indicates calm, yellow shows mild stress, and red alerts you to high stress levels that might require attention.</p>
+                        
+                        <p>Battery life is impressive too - up to 5 days on a single charge despite the advanced sensors constantly working in the background. And unlike many competitors, it doesn't require a subscription to access your stress data or historical patterns.</p>
+                        
+                        <p>For those trying to manage work-life balance or reduce anxiety, this might be the most important gadget you buy this year. The companion app even provides weekly reports showing how different activities and environments affect your stress levels.</p>
+                    </div>
+                    
+                    <div class="mula-article-actions">
+                        <div class="mula-article-stats">
+                            <div class="mula-article-stat">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                                3.2K
+                            </div>
+                            <div class="mula-article-stat">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+                                </svg>
+                                58
+                            </div>
+                        </div>
+                        
+                        <button class="mula-read-more" id="readMoreBtn">
+                            Read More
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mula-read-more-icon">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="debug-info">
+            <div id="debug-output">Debug information will appear here</div>
+        </div>
+    </div>
+    
+    <script>
+        // Hide Return to Playground button if inside an iframe (on the playground page)
+        function hideReturnButtonInIframe() {
+            if (window.self !== window.top) {
+                // We're in an iframe, hide the return button
+                const returnButton = document.getElementById('returnButton');
+                if (returnButton) {
+                    returnButton.style.display = 'none';
+                }
+                debugLog('In iframe mode, hiding return button');
+            } else {
+                debugLog('In standalone mode, showing return button');
+            }
+        }
+        
+        // Call on page load
+        hideReturnButtonInIframe();
+
+        // Debug log function - logs appear at the top
+        function debugLog(message) {
+            console.log(message); // Also log to console
+            const debugOutput = document.getElementById('debug-output');
+            const timestamp = new Date().toLocaleTimeString();
+            debugOutput.innerHTML = `[${timestamp}] ${message}\n` + debugOutput.innerHTML;
+        }
+        
+        debugLog('Expandable Article Preview Widget script loaded');
+        
+        // Article excerpt expand/collapse functionality
+        const articleExcerpt = document.getElementById('articleExcerpt');
+        const readMoreBtn = document.getElementById('readMoreBtn');
+        
+        // Measure original and full height for smooth transitions
+        let isExpanded = false;
+        
+        readMoreBtn.addEventListener('click', () => {
+            if (!isExpanded) {
+                // Expand article
+                articleExcerpt.classList.add('expanded');
+                readMoreBtn.classList.add('expanded');
+                readMoreBtn.querySelector('span').textContent = 'Read Less';
+                readMoreBtn.innerHTML = 'Read Less <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mula-read-more-icon"><polyline points="6 9 12 15 18 9"></polyline></svg>';
+                debugLog('Article expanded');
+            } else {
+                // Collapse article
+                articleExcerpt.classList.remove('expanded');
+                readMoreBtn.classList.remove('expanded');
+                readMoreBtn.innerHTML = 'Read More <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mula-read-more-icon"><polyline points="6 9 12 15 18 9"></polyline></svg>';
+                debugLog('Article collapsed');
+                
+                // Scroll back to top of article if needed
+                const articleContainer = document.querySelector('.mula-article-container');
+                articleContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+            
+            isExpanded = !isExpanded;
+        });
+        
+        // Track article view
+        setTimeout(() => {
+            debugLog('Article view tracked');
+            
+            // Update view count (would be an API call in a real app)
+            const viewCountElement = document.querySelector('.mula-article-stat:first-child');
+            if (viewCountElement) {
+                const currentCount = viewCountElement.textContent.trim();
+                const numericPart = currentCount.match(/\d+(\.\d+)?/)[0];
+                // Convert to number, add small increment, and format back
+                let newCount = parseFloat(numericPart) + 0.1;
+                viewCountElement.textContent = newCount.toFixed(1) + 'K';
+            }
+        }, 2000);
+        
+        // Add animation effects on load
+        document.addEventListener('DOMContentLoaded', () => {
+            const articleContainer = document.querySelector('.mula-article-container');
+            articleContainer.style.opacity = '0';
+            articleContainer.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                articleContainer.style.opacity = '1';
+                articleContainer.style.transform = 'translateY(0)';
+                debugLog('Article animation complete');
+            }, 300);
+        });
+    </script>
+</body>
+</html> 

@@ -1,0 +1,15 @@
+{
+  "name": "granny-url-crawler",
+  "version": "1.0.0",
+  "description": "URL pattern discovery for sports publishers",
+  "main": "src/index.js",
+  "scripts": {
+    "crawl": "node src/index.js"
+  },
+  "dependencies": {
+    "axios": "^1.6.0",
+    "xml2js": "^0.6.2",
+    "cheerio": "^1.0.0-rc.12"
+  }
+}
+

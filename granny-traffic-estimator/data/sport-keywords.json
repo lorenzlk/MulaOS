@@ -1,0 +1,17 @@
+{
+  "nfl": ["nfl", "football", "/nfl/", "patriots", "cowboys", "packers", "chiefs", "49ers", "bills", "ravens", "eagles", "bengals", "dolphins", "lions", "buccaneers", "saints"],
+  "nba": ["nba", "basketball", "/nba/", "lakers", "warriors", "celtics", "heat", "bulls", "knicks", "nets", "mavericks", "nuggets", "clippers", "bucks", "76ers"],
+  "cfb": ["college-football", "cfb", "/college-football/", "ncaa-football", "alabama", "ohio-state", "clemson", "georgia", "michigan", "lsu", "texas", "usc", "notre-dame"],
+  "mlb": ["mlb", "baseball", "/mlb/", "yankees", "dodgers", "red-sox", "cubs", "astros", "braves", "mets", "cardinals"],
+  "nhl": ["nhl", "hockey", "/nhl/", "bruins", "maple-leafs", "penguins", "canadiens", "blackhawks", "rangers"],
+  "tennis": ["tennis", "/tennis/", "wimbledon", "us-open", "french-open", "australian-open", "atp", "wta", "serena", "federer", "nadal", "djokovic"],
+  "golf": ["golf", "/golf/", "pga", "masters", "tiger-woods", "rory-mcilroy", "scottie-scheffler"],
+  "boxing": ["boxing", "/boxing/", "heavyweight", "tyson-fury", "canelo", "gervonta-davis", "ryan-garcia"],
+  "ufc": ["ufc", "mma", "/ufc/", "/mma/", "conor-mcgregor", "khabib", "jon-jones", "israel-adesanya"],
+  "nascar": ["nascar", "racing", "/nascar/", "daytona", "talladega", "kyle-busch"],
+  "soccer": ["soccer", "football", "/soccer/", "premier-league", "la-liga", "champions-league", "messi", "ronaldo", "mbappe"],
+  "wrestling": ["wwe", "wrestling", "/wwe/", "aew", "smackdown", "raw"],
+  "olympics": ["olympics", "/olympics/", "summer-olympics", "winter-olympics", "simone-biles", "usain-bolt"],
+  "wnba": ["wnba", "/wnba/", "caitlin-clark", "angel-reese", "breanna-stewart"]
+}
+

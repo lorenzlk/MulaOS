@@ -1,0 +1,290 @@
+{
+  "domain": "essentiallysports.com",
+  "analyzed_at": "2025-11-28T22:36:40.158Z",
+  "estimated_distribution": {
+    "other": {
+      "percentage": 97,
+      "rank": 1
+    },
+    "nfl": {
+      "percentage": 26,
+      "rank": 2
+    },
+    "boxing": {
+      "percentage": 19,
+      "rank": 3
+    },
+    "nba": {
+      "percentage": 15,
+      "rank": 4
+    },
+    "tennis": {
+      "percentage": 10,
+      "rank": 5
+    },
+    "golf": {
+      "percentage": 5,
+      "rank": 6
+    },
+    "mlb": {
+      "percentage": 5,
+      "rank": 7
+    },
+    "ufc": {
+      "percentage": 1,
+      "rank": 8
+    },
+    "soccer": {
+      "percentage": 0,
+      "rank": 9
+    },
+    "olympics": {
+      "percentage": 0,
+      "rank": 10
+    },
+    "nascar": {
+      "percentage": 0,
+      "rank": 11
+    },
+    "wrestling": {
+      "percentage": 0,
+      "rank": 12
+    },
+    "cfb": {
+      "percentage": 0,
+      "rank": 13
+    },
+    "wnba": {
+      "percentage": 0,
+      "rank": 14
+    },
+    "nhl": {
+      "percentage": 0,
+      "rank": 15
+    }
+  },
+  "confidence": 77,
+  "sources_used": [
+    "sitemap",
+    "rss",
+    "navigation"
+  ],
+  "recommendation": {
+    "priority_1": "other",
+    "priority_2": "nfl",
+    "priority_3": "boxing",
+    "recommendation": "Confidence is good. Use these priorities for deployment."
+  },
+  "raw_data": {
+    "rss": {
+      "source": "rss",
+      "total_items": 10,
+      "distribution": {
+        "boxing": {
+          "count": 4,
+          "percentage": 40,
+          "sample_urls": [
+            "https://www.essentiallysports.com/boxing-news-ben-whittaker-vs-benjamin-gavazi-stats-prediction-record-age-weight-height-reach-rankings-and-knockout-ratio/",
+            "https://www.essentiallysports.com/boxing-news-lorenzo-parra-vs-elijah-pierce-stats-and-prediction-record-age-height-weight-reach-rankings-and-knockout-ratio/",
+            "https://www.essentiallysports.com/boxing-news-molly-mccann-vs-ebonie-cotton-stats-and-prediction-record-age-height-weight-reach-rankings-and-knockout-ratio/"
+          ]
+        },
+        "tennis": {
+          "count": 2,
+          "percentage": 20,
+          "sample_urls": [
+            "https://www.essentiallysports.com/tennis-news-jessica-pegula-reacts-as-a-wta-star-turns-her-old-possessions-into-a-money-making-hustle/",
+            "https://www.essentiallysports.com/tennis-news-carlos-alcaraz-hits-back-at-critics-with-a-bold-take-on-exhibition-matches/"
+          ]
+        },
+        "golf": {
+          "count": 1,
+          "percentage": 10,
+          "sample_urls": [
+            "https://www.essentiallysports.com/golf-news-xander-schauffele-hilariously-mocked-after-his-unexpected-failure-at-skins-game/"
+          ]
+        },
+        "mlb": {
+          "count": 1,
+          "percentage": 10,
+          "sample_urls": [
+            "https://www.essentiallysports.com/mlb-baseball-news-heartbroken-brandon-nimmo-breaks-silence-after-mets-trade-as-david-stearns-eyes-risky-replacement/"
+          ]
+        },
+        "nba": {
+          "count": 2,
+          "percentage": 20,
+          "sample_urls": [
+            "https://www.essentiallysports.com/nba-active-basketball-news-minnesota-timberwolves-to-cut-ties-with-three-time-all-star-julius-randle-amid-calls-for-change-in-team-meeting-report/",
+            "https://www.essentiallysports.com/nba-active-basketball-news-jonathan-kuminga-offered-golden-state-warriors-escape-but-steve-kerr-prefers-trade-for-ninety-seven-million-star-nic-claxton/"
+          ]
+        }
+      },
+      "confidence": 70
+    },
+    "sitemap": {
+      "source": "sitemap",
+      "total_urls": 32347,
+      "distribution": {
+        "other": {
+          "count": 31312,
+          "percentage": 97,
+          "sample_urls": [
+            "https://www.essentiallysports.com/",
+            "https://www.essentiallysports.com/tag/big-john-mccarthy/",
+            "https://www.essentiallysports.com/tag/hangman-adam-page/"
+          ]
+        },
+        "tennis": {
+          "count": 171,
+          "percentage": 1,
+          "sample_urls": [
+            "https://www.essentiallysports.com/tag/atpworldtour/",
+            "https://www.essentiallysports.com/tag/serenawilliams/",
+            "https://www.essentiallysports.com/tag/wimbledon2016/"
+          ]
+        },
+        "soccer": {
+          "count": 41,
+          "percentage": 0,
+          "sample_urls": [
+            "https://www.essentiallysports.com/tag/barclays-premier-leagues/",
+            "https://www.essentiallysports.com/tag/barclays-premier-league/",
+            "https://www.essentiallysports.com/tag/caribbean-premier-league/"
+          ]
+        },
+        "olympics": {
+          "count": 38,
+          "percentage": 0,
+          "sample_urls": [
+            "https://www.essentiallysports.com/tag/2008-beijing-olympics/",
+            "https://www.essentiallysports.com/tag/2012-london-olympics/",
+            "https://www.essentiallysports.com/tag/2016-olympics/"
+          ]
+        },
+        "nba": {
+          "count": 118,
+          "percentage": 0,
+          "sample_urls": [
+            "https://www.essentiallysports.com/tag/2017-nba-playoffs/",
+            "https://www.essentiallysports.com/tag/2020-nba-draft/",
+            "https://www.essentiallysports.com/tag/2020-nba-playoffs/"
+          ]
+        },
+        "nascar": {
+          "count": 75,
+          "percentage": 0,
+          "sample_urls": [
+            "https://www.essentiallysports.com/tag/2021-nascar-cup-season/",
+            "https://www.essentiallysports.com/tag/2022-nascar-cup-series/",
+            "https://www.essentiallysports.com/tag/2023-nascar-cup-series/"
+          ]
+        },
+        "golf": {
+          "count": 61,
+          "percentage": 0,
+          "sample_urls": [
+            "https://www.essentiallysports.com/tag/2023-buick-lpga-shanghai/",
+            "https://www.essentiallysports.com/tag/2025-pga-championship/",
+            "https://www.essentiallysports.com/tag/and-rory-mcilroy/"
+          ]
+        },
+        "nfl": {
+          "count": 72,
+          "percentage": 0,
+          "sample_urls": [
+            "https://www.essentiallysports.com/tag/2024-nfl-draft/",
+            "https://www.essentiallysports.com/tag/american-football/",
+            "https://www.essentiallysports.com/tag/antoine-winflied-jr/"
+          ]
+        },
+        "wrestling": {
+          "count": 107,
+          "percentage": 0,
+          "sample_urls": [
+            "https://www.essentiallysports.com/tag/aew/",
+            "https://www.essentiallysports.com/tag/aew-all-out-2020/",
+            "https://www.essentiallysports.com/tag/aew-dark/"
+          ]
+        },
+        "cfb": {
+          "count": 66,
+          "percentage": 0,
+          "sample_urls": [
+            "https://www.essentiallysports.com/tag/alabama/",
+            "https://www.essentiallysports.com/tag/alabama-crimson-tide/",
+            "https://www.essentiallysports.com/tag/aria-brusch/"
+          ]
+        },
+        "wnba": {
+          "count": 4,
+          "percentage": 0,
+          "sample_urls": [
+            "https://www.essentiallysports.com/tag/angel-reese/",
+            "https://www.essentiallysports.com/tag/angel-reese-hailey-van-lith/",
+            "https://www.essentiallysports.com/tag/breanna-stewart/"
+          ]
+        },
+        "ufc": {
+          "count": 212,
+          "percentage": 1,
+          "sample_urls": [
+            "https://www.essentiallysports.com/tag/antonio-mammarella/",
+            "https://www.essentiallysports.com/tag/arjun-nimmala/",
+            "https://www.essentiallysports.com/tag/belal-muhammad/"
+          ]
+        },
+        "mlb": {
+          "count": 25,
+          "percentage": 0,
+          "sample_urls": [
+            "https://www.essentiallysports.com/tag/arizona-cardinals/",
+            "https://www.essentiallysports.com/tag/atlanta-braves/",
+            "https://www.essentiallysports.com/tag/baseball/"
+          ]
+        },
+        "boxing": {
+          "count": 35,
+          "percentage": 0,
+          "sample_urls": [
+            "https://www.essentiallysports.com/tag/boxing/",
+            "https://www.essentiallysports.com/tag/boxing-day/",
+            "https://www.essentiallysports.com/tag/boxing-news/"
+          ]
+        },
+        "nhl": {
+          "count": 10,
+          "percentage": 0,
+          "sample_urls": [
+            "https://www.essentiallysports.com/tag/hockey/",
+            "https://www.essentiallysports.com/tag/ice-hockey/",
+            "https://www.essentiallysports.com/tag/national-hockey-league/"
+          ]
+        }
+      },
+      "confidence": 75
+    },
+    "navigation": {
+      "source": "navigation",
+      "total_items": 3,
+      "distribution": {
+        "nfl": {
+          "count": 2,
+          "nav_items": [
+            "nfl",
+            "college football"
+          ],
+          "percentage": 67
+        },
+        "nba": {
+          "count": 1,
+          "nav_items": [
+            "nba"
+          ],
+          "percentage": 33
+        }
+      },
+      "confidence": 55
+    }
+  }
+}

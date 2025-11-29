@@ -1,0 +1,15 @@
+{
+  "name": "mula-grafana-updater",
+  "version": "1.0.0",
+  "description": "Script to automatically update Grafana dashboard with new search phrases",
+  "main": "update-grafana-dashboard.js",
+  "scripts": {
+    "update-dashboard": "node update-grafana-dashboard.js"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.1490.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

@@ -1,0 +1,47 @@
+:root {
+    /* Base Colors */
+    --mula-bg: #fff;
+    --mula-text: #000;
+    --mula-text-secondary: rgba(0, 0, 0, 0.5);
+    --mula-border: rgba(0, 0, 0, 0.08);
+    --mula-border-hover: rgba(255, 255, 255, 0.3);
+    
+    /* Like Button Colors */
+    --mula-like-fill: #fff;
+    --mula-like-stroke: #000;
+    
+    /* Interactive Elements */
+    --mula-scroll-indicator-bg: rgba(255, 255, 255, 0.15);
+    --mula-scroll-indicator-hover: rgba(255, 255, 255, 0.25);
+    --mula-scroll-indicator-active: rgba(255, 255, 255, 0.3);
+    --mula-like-button-bg: rgba(255, 255, 255, 0.5);
+    --mula-like-button-active: rgba(255, 55, 95, 0.8);
+    --mula-buy-button-bg: #fff;
+    --mula-buy-button-hover: #fff;
+    
+    /* Typography */
+    --mula-font-family: "europa",sans-serif;
+    --mula-font-size-base: 16px;
+    --mula-font-size-small: 14px;
+    --mula-font-size-large: 18px;
+    
+    /* Spacing */
+    --mula-spacing-xs: 4px;
+    --mula-spacing-sm: 8px;
+    --mula-spacing-md: 16px;
+    --mula-spacing-lg: 24px;
+    --mula-spacing-xl: 32px;
+    
+    /* Border Radius */
+    --mula-border-radius-sm: 4px;
+    --mula-border-radius-md: 8px;
+    --mula-border-radius-lg: 12px;
+    
+    /* TopShelf Border */
+    --mula-topshelf-border: 1px solid #ccc;
+    
+    /* Transitions */
+    --mula-transition-fast: 0.2s ease;
+    --mula-transition-normal: 0.3s ease;
+    --mula-transition-slow: 0.5s ease;
+}

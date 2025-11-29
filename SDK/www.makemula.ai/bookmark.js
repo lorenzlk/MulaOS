@@ -1,0 +1,1 @@
+javascript:(function() {     var script = document.createElement('script');     script.src = 'https://cdn.makemula.ai/js/mula.js';     script.id = 'mula-js-sdk';     script.setAttribute('data-tagId', 'dbce23f4-8c43-44eb-aa81-1db4095d5988');     script.async = true;     document.head.appendChild(script);     alert('Mula.js SDK script added!'); })();

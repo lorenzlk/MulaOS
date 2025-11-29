@@ -1,0 +1,21 @@
+:root {
+    /* Use the global variables with component-specific fallbacks */
+    --mula-font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", sans-serif;
+    --mula-bg: #121212;
+    --mula-text: #ffffff;
+    --mula-text-secondary: rgba(255, 255, 255, 0.5);
+    --mula-border: rgba(255, 255, 255, 0.08);
+    --mula-border-hover: rgba(255, 255, 255, 0.3);
+    --mula-scroll-indicator-bg: rgba(255, 255, 255, 0.15);
+    --mula-scroll-indicator-hover: rgba(255, 255, 255, 0.25);
+    --mula-scroll-indicator-active: rgba(255, 255, 255, 0.3);
+    --mula-like-button-bg: rgba(0, 0, 0, 0.5);
+    --mula-like-button-active: rgba(255, 55, 95, 0.8);
+    --mula-buy-button-bg: #000000;
+    --mula-buy-button-hover: #111111;
+    --mula-like-fill: #ffffff;
+    --mula-like-stroke: #ffffff;
+}
+mula-smartscroll:focus-visible {
+    outline: none;
+}

@@ -1,0 +1,7 @@
+{
+  "accountAccessType": "CURRENT_ACCOUNT",
+  "authenticationProviders": ["SSO"],
+  "permissionType": "SERVICE_MANAGED",
+  "workspaceName": "Mula-RealTime-Analytics",
+  "workspaceDescription": "Real-time analytics dashboard for Mula events"
+}

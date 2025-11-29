@@ -1,0 +1,48 @@
+<div class="container mt-4">
+  <div class="card">
+    <div class="card-header text-center">
+      <h2 class="card-title">{{tag.name}}</h2>
+    </div>
+    <div class="card-body">
+      <p class="text-muted">Tag ID: <strong>{{tag.id}}</strong></p>
+      <p class="text-muted">Domain: <strong>{{tag.domain}}</strong></p>
+      {{#if pages.length}}
+        <h1>Pages</h1>
+        <ul>
+          {{#each pages}}
+            <li><a href="/pages/{{this.id}}">{{this.url}}</a></li>
+          {{/each}}
+        </ul>
+        <h2>Your Tag</h2>
+        <textarea id="scriptTag" class="form-control" rows="3" readonly>
+  <script src="https://cdn.makemula.ai/js/mula.js" id="mula-js-sdk" data-tagId="{{tag.id}}" async></script>
+            </textarea>
+      {{else}}
+        <div class="form-group">
+          <label for="scriptTag">Embed Script:</label>
+          <div class="input-group">
+            <textarea id="scriptTag" class="form-control" rows="3" readonly>
+  <script src="https://cdn.makemula.ai/js/mula.js" id="mula-js-sdk" data-tagId="{{tag.id}}" async></script>
+            </textarea>
+            <button class="btn btn-primary" id="copyButton">Copy to Clipboard</button>
+          </div>
+        </div>
+      {{/if}}
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const copyButton = document.getElementById('copyButton');
+    const scriptTag = document.getElementById('scriptTag');
+    
+    copyButton.addEventListener('click', function () {
+      scriptTag.select(); // Select the textarea content
+      document.execCommand('copy'); // Copy to clipboard
+      // Show feedback
+      copyButton.textContent = 'Copied!';
+      setTimeout(() => (copyButton.textContent = 'Copy to Clipboard'), 2000);
+    });
+  });
+</script>

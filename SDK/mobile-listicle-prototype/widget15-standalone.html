@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Widget 15 Standalone - Vertical Product Feed</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", sans-serif;
+            background-color: #f5f5f7;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        h1 {
+            margin-bottom: 30px;
+            text-align: center;
+            font-weight: 500;
+            color: #1d1d1f;
+        }
+        
+        .container {
+            max-width: 600px;
+            width: 100%;
+        }
+        
+        /* Widget 15 - Vertical Product Feed */
+        .mula-widget-15 {
+            position: relative;
+            width: 100%;
+            margin: 25px auto;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", sans-serif;
+        }
+        
+        .mula-feed {
+            display: flex;
+            box-sizing: border-box;
+            gap: 24px;
+            flex-direction: column;
+            width: 100%;
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        .mula-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-direction: column;
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            width: 100%;
+            position: relative;
+        }
+        
+        .mula-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        }
+        
+        .mula-card-header {
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #f0f0f5;
+        }
+        
+        .mula-source-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #f0f0f5;
+            margin-right: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 12px;
+            color: #555;
+        }
+        
+        .mula-source-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .mula-card-image {
+            aspect-ratio: 4/3;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        
+        .mula-tag {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+        
+        .mula-card-content {
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .mula-card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #222;
+            margin: 0;
+            line-height: 1.4;
+        }
+        
+        .mula-card-description {
+            font-size: 14px;
+            color: #555;
+            margin: 0;
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .mula-card-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 8px;
+        }
+        
+        .mula-price {
+            font-weight: 600;
+            font-size: 18px;
+            color: #222;
+        }
+        
+        .mula-original-price {
+            font-size: 14px;
+            color: #999;
+            text-decoration: line-through;
+            margin-left: 6px;
+        }
+        
+        .mula-discount {
+            font-size: 13px;
+            color: #ff3b30;
+            font-weight: 500;
+        }
+        
+        .mula-rating {
+            display: flex;
+            align-items: center;
+        }
+        
+        .mula-stars {
+            color: #ff9500;
+            font-size: 14px;
+            margin-right: 4px;
+        }
+        
+        .mula-reviews {
+            font-size: 12px;
+            color: #777;
+        }
+        
+        .mula-card-actions {
+            display: flex;
+            border-top: 1px solid #f0f0f5;
+        }
+        
+        .mula-action-button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            background: transparent;
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        
+        .mula-action-button:hover {
+            background-color: #f5f5f7;
+        }
+        
+        .mula-action-button:first-child {
+            border-right: 1px solid #f0f0f5;
+        }
+        
+        .mula-action-button svg {
+            width: 16px;
+            height: 16px;
+        }
+        
+        .mula-feed-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding: 0 4px;
+        }
+        
+        .mula-feed-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .mula-feed-subtitle {
+            font-size: 14px;
+            color: #777;
+            font-weight: 400;
+        }
+        
+        .mula-view-toggle {
+            display: flex;
+            gap: 4px;
+        }
+        
+        .mula-view-toggle button {
+            background: none;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #777;
+        }
+        
+        .mula-view-toggle button.active {
+            background: #333;
+            color: white;
+        }
+        
+        /* For return to playground button */
+        .return-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 8px 16px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            font-family: "SF Pro Text", -apple-system, BlinkMacSystemFont, sans-serif;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            z-index: 1000;
+            text-decoration: none;
+        }
+        
+        .return-button:hover {
+            background-color: rgba(0, 0, 0, 0.8);
+            transform: translateY(-1px);
+        }
+        
+        .return-button:active {
+            transform: translateY(1px);
+        }
+        
+        /* Core responsive styles */
+        @media (max-width: 600px) {
+            .container {
+                padding: 0 10px;
+            }
+        }
+        
+        /* View toggle animation styles */
+        .mula-feed.grid-view {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+        
+        .mula-feed.list-view {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+        
+        .mula-feed.animating .mula-card {
+            opacity: 0;
+            transform: scale(0.8);
+        }
+        
+        .mula-feed.animating.grid-view .mula-card,
+        .mula-feed.animating.list-view .mula-card {
+            animation: cardRearrange 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        
+        @keyframes cardRearrange {
+            0% {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        /* Staggered animation for card appearance */
+        .mula-feed.animating .mula-card:nth-child(1) { animation-delay: 0.05s; }
+        .mula-feed.animating .mula-card:nth-child(2) { animation-delay: 0.1s; }
+        .mula-feed.animating .mula-card:nth-child(3) { animation-delay: 0.15s; }
+        .mula-feed.animating .mula-card:nth-child(4) { animation-delay: 0.2s; }
+        
+        /* Heart icon animation for product likes */
+        .mula-heart-button {
+            color: #777;
+            transition: all 0.3s ease;
+        }
+        
+        .mula-heart-button.active {
+            color: #ff3b30;
+        }
+        
+        .mula-heart-button.active svg {
+            animation: heartBeat 0.5s ease-in-out;
+        }
+        
+        @keyframes heartBeat {
+            0% { transform: scale(1); }
+            25% { transform: scale(1.2); }
+            50% { transform: scale(1); }
+            75% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        /* Overlay for feed refresh state */
+        .mula-feed.refreshing::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(3px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+        
+        /* Loading indicator with dark glass effect */
+        .mula-refresh-indicator {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            background: rgba(40, 40, 45, 0.65);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 20px 30px;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            min-width: 220px;
+            text-align: center;
+        }
+        
+        .mula-refresh-indicator.active {
+            opacity: 1;
+        }
+        
+        .mula-refresh-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid #fff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 16px;
+        }
+        
+        .mula-refresh-text {
+            font-size: 15px;
+            color: #fff;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Card shimmer animation for selective content refresh */
+        .mula-card {
+            position: relative;
+        }
+        
+        .mula-card.shimmer::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            border-radius: 12px;
+            z-index: 10;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        
+        .mula-card.shimmer::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                90deg,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0.4) 50%,
+                rgba(255, 255, 255, 0) 100%
+            );
+            z-index: 11;
+            animation: shimmerOverlayEffect 2s infinite;
+            transform: skewX(-20deg);
+            pointer-events: none;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        @keyframes shimmerOverlayEffect {
+            0% { transform: translateX(-150%) skewX(-20deg); }
+            100% { transform: translateX(150%) skewX(-20deg); }
+        }
+        
+        /* Notification toast with glass UI effect */
+        .mula-notification {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(40, 40, 45, 0.65);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 16px;
+            padding: 14px 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 1000;
+            max-width: 90%;
+            text-align: center;
+        }
+        
+        .mula-notification.active {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+        
+        .mula-notification-icon {
+            width: 24px;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .mula-notification-icon svg {
+            width: 14px;
+            height: 14px;
+            color: #30d158; /* Apple's green success color */
+        }
+    </style>
+</head>
+<body>
+    <!-- Return to Playground button -->
+    <a href="./playground.html" class="return-button" id="returnButton">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Return to Playground
+    </a>
+
+    <h1>Widget 15 - Vertical Product Feed</h1>
+    
+    <div class="container">
+        <div class="mula-widget-15">
+            <div class="mula-feed-header">
+                <div>
+                    <div class="mula-feed-title">Recommended Products</div>
+                    <div class="mula-feed-subtitle">Based on this article</div>
+                </div>
+                <div class="mula-view-toggle">
+                    <button class="active" data-view="list">List</button>
+                    <button data-view="grid">Grid</button>
+                </div>
+            </div>
+            
+            <div class="mula-feed" id="productFeed">
+                <!-- Product cards will be dynamically inserted here -->
+            </div>
+            
+            <!-- Refresh Indicator -->
+            <div class="mula-refresh-indicator" id="refreshIndicator">
+                <div class="mula-refresh-spinner"></div>
+                <div class="mula-refresh-text">Personalizing your curated products⊹ ࣪ ˖</div>
+            </div>
+            
+            <!-- Glass UI Notification -->
+            <div class="mula-notification" id="notification">
+                <div class="mula-notification-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                </div>
+                <div class="mula-notification-text">Recommendations updated based on your preferences!</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // State management for liked products
+            const likedProducts = new Set();
+            
+            // Product data for initial feed display
+            const products = [
+                {
+                    id: 1,
+                    title: "Cashmere Blend Scarf",
+                    brand: "Nordstrom",
+                    price: "$49.99",
+                    originalPrice: "$79.99",
+                    discount: "38% off",
+                    rating: 4.7,
+                    reviews: 348,
+                    image: "https://placehold.co/600x400/f8f9fa/495057?text=Cashmere+Scarf",
+                    tag: "Trending",
+                    source: "nordstrom.com",
+                    description: "Luxuriously soft cashmere blend scarf in a versatile neutral color that pairs well with any outfit. Perfect for chilly days."
+                },
+                {
+                    id: 2,
+                    title: "Faux Fur Hat",
+                    brand: "Michael Kors",
+                    price: "$58.00",
+                    originalPrice: "$85.00",
+                    discount: "32% off",
+                    rating: 4.5,
+                    reviews: 192,
+                    image: "https://placehold.co/600x400/f8f9fa/495057?text=Faux+Fur+Hat",
+                    tag: "Editor's Choice",
+                    source: "michaelkors.com",
+                    description: "This plush faux fur hat adds a touch of luxury to any cold-weather outfit while keeping you warm and stylish."
+                },
+                {
+                    id: 3,
+                    title: "Wool Mittens",
+                    brand: "Anthropologie",
+                    price: "$32.00",
+                    originalPrice: "$48.00",
+                    discount: "33% off",
+                    rating: 4.3,
+                    reviews: 156,
+                    image: "https://placehold.co/600x400/f8f9fa/495057?text=Wool+Mittens",
+                    tag: "Great Gift",
+                    source: "anthropologie.com",
+                    description: "Handcrafted wool mittens with fleece lining for maximum warmth and comfort. Available in multiple colors and patterns."
+                },
+                {
+                    id: 4,
+                    title: "Fleece Neck Gaiter",
+                    brand: "The North Face",
+                    price: "$29.99",
+                    originalPrice: "$39.99",
+                    discount: "25% off",
+                    rating: 4.8,
+                    reviews: 423,
+                    image: "https://placehold.co/600x400/f8f9fa/495057?text=Neck+Gaiter",
+                    tag: "Top Rated",
+                    source: "thenorthface.com",
+                    description: "Versatile fleece neck gaiter that can be worn as a neck warmer, face covering, or headband. Perfect for outdoor activities."
+                }
+            ];
+            
+            /**
+             * Creates a visual star rating based on numeric value
+             * @param {number} rating - Rating value (0-5)
+             * @return {string} HTML string with star characters
+             */
+            function createStarRating(rating) {
+                const fullStars = Math.floor(rating);
+                const hasHalfStar = rating % 1 >= 0.5;
+                const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+                
+                let starsHTML = '';
+                for (let i = 0; i < fullStars; i++) {
+                    starsHTML += '★';
+                }
+                if (hasHalfStar) {
+                    starsHTML += '★';
+                }
+                for (let i = 0; i < emptyStars; i++) {
+                    starsHTML += '☆';
+                }
+                
+                return starsHTML;
+            }
+            
+            /**
+             * Extracts first letter of domain for source icon
+             * @param {string} source - Domain name (e.g., "example.com")
+             * @return {string} Uppercase first letter
+             */
+            function getSourceInitial(source) {
+                return source.charAt(0).toUpperCase();
+            }
+            
+            // Main product feed container reference
+            const productFeed = document.getElementById('productFeed');
+            
+            /**
+             * Renders all product cards in the feed
+             * Maintains liked state between re-renders
+             */
+            function renderProducts() {
+                productFeed.innerHTML = '';
+                
+                products.forEach(product => {
+                    const card = document.createElement('div');
+                    card.className = 'mula-card';
+                    card.dataset.productId = product.id;
+                    
+                    // Preserve liked state for each product
+                    const isLiked = likedProducts.has(product.id);
+                    
+                    card.innerHTML = `
+                        <div class="mula-card-header">
+                            <div class="mula-source-icon">${getSourceInitial(product.source)}</div>
+                            <div class="mula-source-name">${product.source}</div>
+                        </div>
+                        <div class="mula-card-image" style="background-image: url('${product.image}')">
+                            <div class="mula-tag">${product.tag}</div>
+                        </div>
+                        <div class="mula-card-content">
+                            <h3 class="mula-card-title">${product.title}</h3>
+                            <p class="mula-card-description">${product.description}</p>
+                            <div class="mula-card-meta">
+                                <div>
+                                    <span class="mula-price">${product.price}</span>
+                                    <span class="mula-original-price">${product.originalPrice}</span>
+                                    <div class="mula-discount">${product.discount}</div>
+                                </div>
+                                <div class="mula-rating">
+                                    <div class="mula-stars">${createStarRating(product.rating)}</div>
+                                    <div class="mula-reviews">(${product.reviews})</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mula-card-actions">
+                            <button class="mula-action-button mula-view-button">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                                View Details
+                            </button>
+                            <button class="mula-action-button mula-heart-button ${isLiked ? 'active' : ''}">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="${isLiked ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                                </svg>
+                                ${isLiked ? 'Liked' : 'Like'}
+                            </button>
+                        </div>
+                    `;
+                    
+                    productFeed.appendChild(card);
+                    
+                    // Add event handlers for card interactions
+                    setupCardEventListeners(card, product);
+                });
+            }
+            
+            /**
+             * Attaches event listeners to product card elements
+             * @param {HTMLElement} card - Card element to attach listeners to
+             * @param {Object} product - Product data associated with the card
+             */
+            function setupCardEventListeners(card, product) {
+                // View details button
+                const viewButton = card.querySelector('.mula-view-button');
+                viewButton.addEventListener('click', e => {
+                    e.stopPropagation();
+                    console.log(`View details for ${product.title}`);
+                    alert(`View details for ${product.title}`);
+                });
+                
+                // Like button with heart icon
+                const heartButton = card.querySelector('.mula-heart-button');
+                heartButton.addEventListener('click', e => {
+                    e.stopPropagation();
+                    
+                    if (heartButton.classList.contains('active')) {
+                        // Unlike product
+                        heartButton.classList.remove('active');
+                        heartButton.innerHTML = `
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                            </svg>
+                            Like
+                        `;
+                        console.log(`Unliked ${product.title}`);
+                        
+                        likedProducts.delete(product.id);
+                    } else {
+                        // Like product
+                        heartButton.classList.add('active');
+                        heartButton.innerHTML = `
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                            </svg>
+                            Liked
+                        `;
+                        console.log(`Liked ${product.title}`);
+                        
+                        likedProducts.add(product.id);
+                        
+                        // Personalize recommendations based on liked product
+                        simulateRefresh(product.id);
+                    }
+                });
+                
+                // Entire card click for details view
+                card.addEventListener('click', e => {
+                    if (!e.target.closest('.mula-action-button')) {
+                        console.log(`Clicked on ${product.title} card`);
+                        window.open('#', '_blank');
+                    }
+                });
+            }
+            
+            // Initialize product feed on page load
+            renderProducts();
+            
+            // Toggle between list and grid view
+            const viewToggleButtons = document.querySelectorAll('.mula-view-toggle button');
+            viewToggleButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Update active button styling
+                    viewToggleButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const viewType = this.dataset.view;
+                    
+                    // Start animation sequence for smooth transition
+                    productFeed.classList.add('animating');
+                    productFeed.classList.remove('grid-view', 'list-view');
+                    
+                    // Allow fade-out animation to complete before switching layout
+                    setTimeout(() => {
+                        productFeed.classList.add(viewType === 'grid' ? 'grid-view' : 'list-view');
+                        
+                        // Remove animation class after transition completes
+                        setTimeout(() => {
+                            productFeed.classList.remove('animating');
+                        }, 600);
+                    }, 300);
+                });
+            });
+            
+            /**
+             * Hides return button when widget is embedded in an iframe
+             * Prevents duplicate navigation controls in the playground
+             */
+            function hideReturnButtonInIframe() {
+                if (window.self !== window.top) {
+                    const returnButton = document.getElementById('returnButton');
+                    if (returnButton) {
+                        returnButton.style.display = 'none';
+                    }
+                    console.log('Running in iframe mode');
+                }
+            }
+            
+            // Check for iframe context on page load
+            hideReturnButtonInIframe();
+            
+            /**
+             * Simulates refreshing recommendations based on user interactions
+             * Applies animations to cards being updated and shows loading indicators
+             * @param {number} likedProductId - ID of the product that was liked
+             */
+            function simulateRefresh(likedProductId) {
+                const refreshIndicator = document.getElementById('refreshIndicator');
+                const notification = document.getElementById('notification');
+                
+                // Show refresh indicator
+                refreshIndicator.classList.add('active');
+                
+                // Get all cards and find the liked card's position
+                const allCards = document.querySelectorAll('.mula-card');
+                let likedCardIndex = -1;
+                
+                allCards.forEach((card, index) => {
+                    if (parseInt(card.dataset.productId) === likedProductId) {
+                        likedCardIndex = index;
+                    }
+                });
+                
+                // Apply shimmer effect only to cards after the liked card
+                if (likedCardIndex >= 0) {
+                    // Clear any existing shimmer effects
+                    allCards.forEach(card => card.classList.remove('shimmer'));
+                    
+                    // Add shimmer only to cards that will be refreshed
+                    allCards.forEach((card, index) => {
+                        if (index > likedCardIndex) {
+                            card.classList.add('shimmer');
+                        }
+                    });
+                }
+                
+                // Simulate API delay for personalization processing
+                setTimeout(() => {
+                    // Available product recommendations for personalization
+                    const newProducts = [
+                        {
+                            id: 5,
+                            title: "Premium Wool Beanie",
+                            brand: "North Face",
+                            price: "$39.99",
+                            originalPrice: "$59.99",
+                            discount: "33% off",
+                            rating: 4.9,
+                            reviews: 211,
+                            image: "https://placehold.co/600x400/f8f9fa/495057?text=Premium+Beanie",
+                            tag: "Similar Style",
+                            source: "northface.com",
+                            description: "Ultra-soft premium wool beanie with thermal lining for maximum warmth in cold conditions."
+                        },
+                        {
+                            id: 6,
+                            title: "Thermal Neck Warmer",
+                            brand: "Columbia",
+                            price: "$24.99",
+                            originalPrice: "$34.99",
+                            discount: "29% off",
+                            rating: 4.7,
+                            reviews: 183,
+                            image: "https://placehold.co/600x400/f8f9fa/495057?text=Thermal+Neck+Warmer",
+                            tag: "Recommended",
+                            source: "columbia.com",
+                            description: "Versatile thermal neck warmer that can be worn in multiple ways for protection against the elements."
+                        },
+                        {
+                            id: 7,
+                            title: "Merino Wool Socks",
+                            brand: "SmartWool",
+                            price: "$21.99",
+                            originalPrice: "$29.99",
+                            discount: "27% off",
+                            rating: 4.8,
+                            reviews: 247,
+                            image: "https://placehold.co/600x400/f8f9fa/495057?text=Merino+Wool+Socks",
+                            tag: "Based on Likes",
+                            source: "smartwool.com",
+                            description: "Premium merino wool socks that provide exceptional comfort and moisture-wicking properties for all-day wear."
+                        },
+                        {
+                            id: 8,
+                            title: "Leather Touchscreen Gloves",
+                            brand: "UGG",
+                            price: "$79.99",
+                            originalPrice: "$110.00",
+                            discount: "27% off",
+                            rating: 4.6,
+                            reviews: 168,
+                            image: "https://placehold.co/600x400/f8f9fa/495057?text=Touchscreen+Gloves",
+                            tag: "Premium Pick",
+                            source: "ugg.com",
+                            description: "Luxurious leather gloves with touchscreen capability, allowing you to use your devices without removing them."
+                        },
+                        {
+                            id: 9,
+                            title: "Waterproof Winter Hat",
+                            brand: "Outdoor Research",
+                            price: "$45.99",
+                            originalPrice: "$65.00",
+                            discount: "29% off",
+                            rating: 4.7,
+                            reviews: 132,
+                            image: "https://placehold.co/600x400/f8f9fa/495057?text=Waterproof+Hat",
+                            tag: "Weather Resistant",
+                            source: "outdoorresearch.com",
+                            description: "Technical winter hat with waterproof exterior and thermal lining to keep you warm and dry in harsh conditions."
+                        },
+                        {
+                            id: 10,
+                            title: "Cashmere-lined Mittens",
+                            brand: "Burberry",
+                            price: "$125.00",
+                            originalPrice: "$175.00",
+                            discount: "29% off",
+                            rating: 4.9,
+                            reviews: 87,
+                            image: "https://placehold.co/600x400/f8f9fa/495057?text=Cashmere+Mittens",
+                            tag: "Luxury Item",
+                            source: "burberry.com",
+                            description: "Elegant wool mittens with ultra-soft cashmere lining for the ultimate combination of warmth and luxury."
+                        },
+                        {
+                            id: 11,
+                            title: "Heated Ski Socks",
+                            brand: "Hotronic",
+                            price: "$89.99",
+                            originalPrice: "$129.99",
+                            discount: "31% off",
+                            rating: 4.6,
+                            reviews: 142,
+                            image: "https://placehold.co/600x400/f8f9fa/495057?text=Heated+Socks",
+                            tag: "Tech Innovation",
+                            source: "hotronic.com",
+                            description: "Battery-powered heated socks that provide up to 8 hours of continuous warmth for winter sports and outdoor activities."
+                        }
+                    ];
+                    
+                    // Refresh products after the liked card
+                    if (likedCardIndex !== -1 && likedCardIndex < products.length - 1) {
+                        // Preserve products up to and including the liked card
+                        const productsBeforeLiked = products.slice(0, likedCardIndex + 1);
+                        
+                        // Determine which products need to be replaced
+                        const productsToReplace = products.slice(likedCardIndex + 1);
+                        const numToReplace = productsToReplace.length;
+                        
+                        // Select personalized products without repetition
+                        const selectedNewProducts = [];
+                        const availableIndices = Array.from(Array(newProducts.length).keys());
+                        
+                        // Randomly select products from the recommendations pool
+                        for (let i = 0; i < numToReplace; i++) {
+                            if (availableIndices.length === 0) break;
+                            
+                            const randomIndex = Math.floor(Math.random() * availableIndices.length);
+                            const productIndex = availableIndices[randomIndex];
+                            
+                            availableIndices.splice(randomIndex, 1);
+                            selectedNewProducts.push(newProducts[productIndex]);
+                        }
+                        
+                        // Update product array with personalized recommendations
+                        products.length = 0;
+                        products.push(...productsBeforeLiked, ...selectedNewProducts);
+                    }
+                    
+                    // Complete refresh process after loading delay
+                    setTimeout(() => {
+                        refreshIndicator.classList.remove('active');
+                        
+                        // Remove shimmer effects
+                        allCards.forEach(card => {
+                            card.classList.remove('shimmer');
+                        });
+                        
+                        // Re-render products with updated data
+                        renderProducts();
+                        
+                        // Animate new cards with staggered entrance
+                        setTimeout(() => {
+                            const updatedCards = document.querySelectorAll('.mula-card');
+                            updatedCards.forEach((card, index) => {
+                                if (index > likedCardIndex) {
+                                    // Start with invisible cards
+                                    card.style.opacity = '0';
+                                    card.style.transform = 'translateY(20px)';
+                                    
+                                    // Stagger animation timing for natural flow
+                                    setTimeout(() => {
+                                        card.style.transition = 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)';
+                                        card.style.opacity = '1';
+                                        card.style.transform = 'translateY(0)';
+                                    }, 100 + (index - likedCardIndex) * 100);
+                                }
+                            });
+                            
+                            // Show success notification
+                            notification.classList.add('active');
+                            
+                            // Auto-dismiss notification after delay
+                            setTimeout(() => {
+                                notification.classList.remove('active');
+                            }, 4000);
+                        }, 100);
+                    }, 2000);
+                }, 1000);
+            }
+        });
+    </script>
+</body>
+</html> 

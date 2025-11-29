@@ -1,0 +1,49 @@
+name: Deploy WWW to Heroku
+
+on:
+  workflow_dispatch:  # Allows manual triggering from GitHub CLI
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.ref || github.ref_name }}
+
+      - name: Install Heroku CLI
+        run: curl https://cli-assets.heroku.com/install.sh | sh
+
+      - name: Authenticate with Heroku
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+        run: |
+          heroku auth:token
+
+      - name: Add Heroku Git Remote
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+          HEROKU_APP_NAME: ${{ secrets.HEROKU_APP_NAME }}
+        run: |
+          git remote add heroku https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME.git || true
+          git fetch heroku || true
+
+      - name: Deploy only `www.makemula.ai` subdirectory
+        env:
+          HEROKU_APP_NAME: ${{ secrets.HEROKU_APP_NAME }}
+        run: |
+          # Create a temporary branch for deployment
+          git push heroku `git subtree split --prefix www.makemula.ai HEAD`:refs/heads/main --force
+
+      # - name: Run Heroku Migrations (if applicable)
+      #   env:
+      #     HEROKU_APP_NAME: ${{ secrets.HEROKU_APP_NAME }}
+      #   run: |
+      #     heroku run --app $HEROKU_APP_NAME npm run migrate
+
+      # - name: Restart Heroku Dynos
+      #   env:
+      #     HEROKU_APP_NAME: ${{ secrets.HEROKU_APP_NAME }}
+      #   run: |
+      #     heroku restart --app $HEROKU_APP_NAME

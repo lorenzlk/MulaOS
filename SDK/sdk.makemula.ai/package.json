@@ -1,0 +1,32 @@
+{
+  "name": "sdk.makemula.ai",
+  "version": "1.57.9",
+  "description": "makemula.ai js sdk and client-side optimization toolkit",
+  "main": "index.js",
+  "scripts": {
+    "test": "true",
+    "build": "npm run-script build -w svelte-components && npm run gulp",
+    "gulp": "rm -rf dist && gulp mustache",
+    "version": "auto-changelog -p -l false --template keepachangelog && git add . && git commit -m \"chore(release): update CHANGELOG.md\"",
+    "start": "node app.js",
+    "postversion": "git tag sdk-v$(npm pkg get version | tr -d '\"')"
+  },
+  "author": "kale.mcnaney@offlinestudio.com",
+  "license": "ISC",
+  "devDependencies": {
+    "auto-changelog": "^2.5.0",
+    "dotenv": "^16.4.7",
+    "gulp": "^5.0.0",
+    "gulp-minify": "^3.1.0",
+    "gulp-mustache": "^5.0.0"
+  },
+  "workspaces": [
+    "svelte-components"
+  ],
+  "dependencies": {
+    "express": "^4.21.2"
+  },
+  "publishConfig": {
+    "tag": "sdk"
+  }
+}

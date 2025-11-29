@@ -1,0 +1,23 @@
+Sitemap: https://store.harpersbazaar.com/media/harpersbazaar_sitemap.xml
+
+User-agent: *
+Crawl-delay: 5
+Disallow: /lib/
+Disallow: /*.php$
+Disallow: /pkginfo/
+Disallow: /report/
+Disallow: /var/
+Disallow: /catalog/
+Disallow: /customer/
+Disallow: /sendfriend/
+Disallow: /review/
+Disallow: /*SID=
+Disallow: /*?color=*
+Disallow: /*?price=*
+Disallow: /*?color=*&price=*
+Disallow: /*?cat=*
+Disallow: /checkout/
+Allow: /*
+
+User-agent: Googlebot-image
+Allow:  /media/*

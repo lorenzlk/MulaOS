@@ -1,0 +1,18 @@
+{
+  "name": "beacon-kinesis-firehose-transformer",
+  "version": "1.0.0",
+  "main": "index.mjs",
+  "scripts": {
+    "test": "true",
+    "build": "rm function.zip && zip -r function.zip ."
+  },
+  "type": "module",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "aws-sdk": "^2.1692.0",
+    "ioredis": "^5.4.2"
+  }
+}

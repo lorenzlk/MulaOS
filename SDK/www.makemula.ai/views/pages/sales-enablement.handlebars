@@ -1,0 +1,188 @@
+<div class="row">
+  <div class="col-lg-8 mx-auto">
+    <div class="card shadow">
+      <div class="card-header bg-primary text-white">
+        <h2 class="mb-0">
+          <i class="bi bi-tools me-2"></i>
+          Sales Enablement Tool
+        </h2>
+      </div>
+      <div class="card-body">
+        <div class="alert alert-info">
+          <h5><i class="bi bi-info-circle me-2"></i>What is the Sales Enablement Tool?</h5>
+          <p class="mb-0">
+            The Sales Enablement Tool allows you to visually place Mula widgets (TopShelf and SmartScroll) 
+            on any webpage by hovering over elements and clicking to insert. This is perfect for testing 
+            widget placements and demonstrating Mula's capabilities to clients.
+          </p>
+        </div>
+
+        <h4 class="mt-4 mb-3">How to Install</h4>
+        <div class="row">
+          <div class="col-md-6">
+            <h5>Method 1: Drag & Drop (Recommended)</h5>
+            <ol>
+              <li>Drag the button below to your browser's bookmarks bar</li>
+              <li>Navigate to any webpage where you want to test Mula widgets</li>
+              <li>Click the bookmarklet in your bookmarks bar</li>
+              <li>The Sales Enablement Tool will activate and appear on the page</li>
+            </ol>
+          </div>
+          <div class="col-md-6">
+            <h5>Method 2: Copy & Paste</h5>
+            <ol>
+              <li>Copy the JavaScript code below</li>
+              <li>Open your browser's developer console (F12)</li>
+              <li>Paste the code and press Enter</li>
+              <li>The tool will activate immediately</li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="text-center my-4">
+          <div class="bookmarklet-container">
+            <a id="bookmarklet-btn"
+               data-bookmarklet="javascript:(function(){var script=document.createElement('script');script.src='https://app.makemula.ai/sales-enablement/page?url='+encodeURIComponent(window.location.href);script.async=true;document.head.appendChild(script);})();"
+               class="btn btn-success btn-lg bookmarklet-btn" 
+               draggable="true" 
+               ondragstart="event.dataTransfer.setData('text/plain', this.getAttribute('data-bookmarklet'))">
+              <i class="bi bi-drag-indicator me-2"></i>
+              🛠️ Mula Sales Tool
+            </a>
+            <p class="text-muted mt-2">
+              <small>Drag this button to your bookmarks bar</small>
+            </p>
+          </div>
+        </div>
+
+        <div class="mt-4">
+          <h5>JavaScript Code (for console use):</h5>
+          <div class="bg-light p-3 rounded">
+            <textarea class="form-control" rows="8" readonly style="font-family: monospace; font-size: 0.8rem; resize: none;">javascript:(function(){var script=document.createElement('script');script.src='https://app.makemula.ai/sales-enablement/page?url='+encodeURIComponent(window.location.href);script.async=true;document.head.appendChild(script);})();</textarea>
+            <button class="btn btn-sm btn-outline-primary ms-2 mt-2" onclick="copyToClipboard(document.getElementById('bookmarklet-btn').getAttribute('data-bookmarklet'))">
+              <i class="bi bi-clipboard"></i> Copy
+            </button>
+          </div>
+        </div>
+
+        <div class="mt-4">
+          <h4>How to Use the Tool</h4>
+          <div class="row">
+            <div class="col-md-6">
+              <h5><i class="bi bi-1-circle me-2"></i>Select Widget Type</h5>
+              <p>Choose between TopShelf or SmartScroll widget from the tool panel that appears in the top-right corner.</p>
+            </div>
+            <div class="col-md-6">
+              <h5><i class="bi bi-2-circle me-2"></i>Hover & Click</h5>
+              <p>Hover over any element on the page to highlight it, then click to insert the selected widget.</p>
+            </div>
+            <div class="col-md-6">
+              <h5><i class="bi bi-3-circle me-2"></i>Widget Appears</h5>
+              <p>The widget will be inserted below the selected element with a dashed border and label.</p>
+            </div>
+            <div class="col-md-6">
+              <h5><i class="bi bi-4-circle me-2"></i>Products Load</h5>
+              <p>The widget will automatically fetch and display relevant products from Mula's database.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="alert alert-warning mt-4">
+          <h5><i class="bi bi-exclamation-triangle me-2"></i>Important Notes</h5>
+          <ul class="mb-0">
+            <li><strong>Prerequisite:</strong> The target page must be "Mulaized" (processed by our backend and associated with keyword searches) before you can place widgets. You can Mulaize a page by submitting its URL at <a href="http://app.makemula.ai/pages" target="_blank">app.makemula.ai/pages</a> or using the <code>/mulaize &lt;URL&gt;</code> command in Slack.</li>
+            <li>This tool is for testing and demonstration purposes only</li>
+            <li>Widgets inserted with this tool are temporary and will disappear on page refresh</li>
+            <li>Make sure the target website allows JavaScript execution</li>
+            <li>Some websites may block bookmarklets for security reasons</li>
+          </ul>
+        </div>
+
+        <div class="text-center mt-4">
+          <a href="/pages" class="btn btn-primary">
+            <i class="bi bi-arrow-left me-2"></i>
+            Back to Pages
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.bookmarklet-container {
+  padding: 20px;
+  border: 2px dashed #28a745;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #f8fff9 0%, #e8f5e8 100%);
+}
+
+.bookmarklet-btn {
+  font-size: 1.1rem;
+  padding: 15px 30px;
+  border-radius: 25px;
+  box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+  transition: all 0.3s ease;
+  cursor: grab;
+}
+
+.bookmarklet-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+}
+
+.bookmarklet-btn:active {
+  cursor: grabbing;
+}
+
+.bookmarklet-btn:focus {
+  box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+}
+
+code {
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+</style>
+
+<script>
+function copyToClipboard(text) {
+  navigator.clipboard.writeText(text).then(function() {
+    const button = event.target.closest('button');
+    const originalText = button.innerHTML;
+    button.innerHTML = '<i class="bi bi-check"></i> Copied!';
+    button.classList.remove('btn-outline-primary');
+    button.classList.add('btn-success');
+    
+    setTimeout(function() {
+      button.innerHTML = originalText;
+      button.classList.remove('btn-success');
+      button.classList.add('btn-outline-primary');
+    }, 2000);
+  }).catch(function(err) {
+    console.error('Could not copy text: ', err);
+    alert('Failed to copy to clipboard. Please copy manually.');
+  });
+}
+
+// Add visual feedback for drag operations
+document.addEventListener('DOMContentLoaded', function() {
+  const bookmarkletBtn = document.querySelector('.bookmarklet-btn');
+  
+  // Set the href attribute from data-bookmarklet
+  if (bookmarkletBtn) {
+    const bookmarkletCode = bookmarkletBtn.getAttribute('data-bookmarklet');
+    bookmarkletBtn.href = bookmarkletCode;
+  }
+  
+  bookmarkletBtn.addEventListener('dragstart', function(e) {
+    this.style.opacity = '0.5';
+    this.style.transform = 'scale(0.95)';
+  });
+  
+  bookmarkletBtn.addEventListener('dragend', function(e) {
+    this.style.opacity = '1';
+    this.style.transform = 'scale(1)';
+  });
+});
+</script> 

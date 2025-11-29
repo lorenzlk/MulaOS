@@ -1,0 +1,264 @@
+# Cursor AI Instructions
+
+
+
+## CRITICAL: Memory Bank First
+
+**Before starting ANY work or responding to ANY request, you MUST:**
+
+1. Read ALL core memory bank files in `memory-bank/`:
+
+   - `projectbrief.md` - Foundation and project scope
+
+   - `productContext.md` - Why this exists and how it should work
+
+   - `activeContext.md` - Current work focus and recent changes
+
+   - `systemPatterns.md` - Architecture and technical patterns
+
+   - `techContext.md` - Technologies and setup
+
+   - `progress.md` - Current status and what's left to build
+
+   - `ai_instructions.md` - Workflow and ground rules
+
+2. Check for relevant experiment documentation in `memory-bank/experiments/` if applicable
+
+3. Understand the full context before making any changes or recommendations
+
+## Workflow Rules
+
+### Always Plan Before Implementing
+
+- **NEVER** jump straight to code changes
+
+- Follow this sequence: Understand → Plan → Document → Get Approval → Implement
+
+- See `memory-bank/ai_instructions.md` for complete planning process
+
+### Memory Bank Updates
+
+- Update `activeContext.md` during planning and implementation
+
+- Update `progress.md` after completing work
+
+- Document new patterns in `systemPatterns.md`
+
+- Update `techContext.md` for new technologies
+
+### Code Quality
+
+- Follow existing patterns and conventions
+
+- Test changes thoroughly
+
+- Document all decisions and rationale
+
+## Quick Reference
+
+**Memory Bank Location**: `memory-bank/`
+
+**Core Files to Read**:
+
+- `projectbrief.md`
+
+- `productContext.md`
+
+- `activeContext.md` ⭐ (most important for current state)
+
+- `systemPatterns.md`
+
+- `techContext.md`
+
+- `progress.md`
+
+- `ai_instructions.md`
+
+**When user says "update memory bank"**: Review ALL memory bank files, even if some don't need updates.
+
+---
+
+**Remember**: This project uses a Memory Bank system because context resets between sessions. The Memory Bank is the single source of truth. Always read it first.
+
+## System Architecture Overview
+
+### Product Overview
+
+Mula is an **AI-powered operating system for publishers**. It combines content analysis, generative AI, dynamic deployment, personalization, and analytics into a unified workflow that drives **affiliate revenue, ad monetization, and engagement**.
+
+The system is architected around **specialized AI Agents**. Each agent represents a functional area and maps directly to **workers and helpers** in the SDK.
+
+### The Agents
+
+1. **Granny** → Publisher intelligence (contextual, business, technical, temporal)
+   - Named after LeRoy "Granny" Grannis, legendary surf photographer
+   - The "superfan + insider" who knows the pulse of each publisher's business
+   - Combines sports context, onboarding intelligence, and business strategy
+2. **Weston** → Content analysis & taxonomy
+3. **Sally** → Generative AI & product discovery
+4. **Taka** → Dynamic deployment & control
+5. **Andy** → Analytics & reporting
+6. **Occy** → Monetization & optimization
+7. **Cal** → Experimentation & A/B testing
+
+#### 0. Granny Agent — Publisher Intelligence
+
+**Role:** Understands each publisher's business holistically - like a superfan (knows what's happening NOW) + insider (knows what's NEXT).
+
+**Intelligence Domains:**
+- **Contextual Intelligence** → Real-time pulse (sports events, seasonal trends, cultural moments, emotional state)
+- **Business Intelligence** → Strategic understanding (revenue model, market position, segmentation, forecasting)
+- **Technical Intelligence** → Implementation context (tech stack, site structure, deployment readiness)
+- **Temporal Intelligence** → Predictive opportunities (upcoming events, seasonal peaks, revenue windows)
+
+**Key Capabilities:**
+- **Sports Context Detection** (ESPN API) → Championships, rivalries, playoff moments
+- **Automated Publisher Discovery** → Tech stack, site structure, placement recommendations in 30 minutes
+- **Business Model Analysis** → Revenue streams, market positioning, deal structuring
+- **Proactive Opportunity Alerts** → "Rivalry week in 3 days, switch to rivalry feed"
+
+**Value for Publishers:**
+- **2-3x CTR lift** during high-context moments (championships, rivalry games)
+- **3-day onboarding** vs. 2-3 weeks manual discovery
+- **Proactive revenue capture** during seasonal/event peaks
+- **Automated intelligence** - no manual monitoring required
+
+**Integration:** Granny provides contextual intelligence to all other agents:
+- **Sally** → "It's rivalry week, search for 'Beat Michigan' merchandise"
+- **Taka** → "Traffic spike incoming, prioritize mobile placement"
+- **Occy** → "Championship win, capitalize on 72-hour celebration window"
+- **Andy** → "Compare rivalry week performance vs. baseline"
+
+---
+
+#### 1. Weston Agent — Content Analysis
+
+**Role:** Crawls pages, builds taxonomies, identifies injection points.
+
+**Workers:**
+- **taxonomyAnalysisWorker** → Analyzes URL paths + article sections, reports high-reach categories to Slack.
+- **siteSearchWorker** → Surfaces top search phrases + URLs from site traffic.
+- **searchWorker** → Runs orchestrated affiliate product searches, guided by LLM strategy.
+
+**Helpers:** Crawler.js, SearchOrchestrator.js, SiteTargetingHelpers.js, KeywordHelpers.js
+
+**Value for Publishers:**
+- Identifies trending content categories.
+- Surfaces audience demand (what readers search for).
+- Powers placement of highly relevant product feeds.
+
+#### 2. Sally Agent — Generative AI & Product Discovery
+
+**Role:** Uses affiliate catalogs + AI to generate and refine product recommendations.
+
+**Workers:**
+- **searchWorker** → Adaptive product search with OpenAI-guided strategy (keywords, indexes).
+- **keywordFeedbackWorker** → Slack-driven keyword review loop, proposes better targeting terms.
+- **productFeedbackWorker** → Handles editorial feedback on product sets, restarts orchestrated search.
+
+**Helpers:** ProductHelpers.js, PageApprovalHelpers.js
+
+**Context from Granny:**
+- **Sports Context** → "Rivalry week: switch to 'Beat Michigan' merchandise"
+- **Seasonal Context** → "Q4 holidays: prioritize gift guides and celebration items"
+- **Emotional State** → "Championship win: focus on celebration/championship gear"
+
+**Value for Publishers:**
+- Ensures product feeds align with editorial standards.
+- Human-in-the-loop oversight for AI-generated results.
+- Continuous improvement loop via Slack approvals.
+- **Context-aware product discovery** → Right products at the right moment.
+
+#### 3. Taka Agent — Deployment & Control
+
+**Role:** Dynamically places feeds into site layouts, supports infinite scroll, and allows Slack-based control.
+
+**Workers:**
+- **nextPageBuildWorker** → Builds SmartScroll "next page" recs, crawls metadata, uploads manifest.json to S3.
+- **siteSearchWorker** → Surfaces products into targeted slots across site structure.
+
+**Helpers:** SiteTargetingHelpers.js, SlackHelpers.js
+
+**Context from Granny:**
+- **Traffic Predictions** → "Spike incoming in 3 days, optimize mobile placement"
+- **Site Intelligence** → "Use end-of-article injection (85% viewability)"
+- **Deployment Readiness** → "WordPress + GAM, low-risk deployment"
+
+**Value for Publishers:**
+- Automates dynamic feed injection.
+- Supports "endless scroll" experiences.
+- Enables non-technical control via Slack commands.
+- **Context-aware deployment** → Right placement at the right time.
+
+#### 4. Andy Agent — Analytics & Reporting
+
+**Role:** Delivers publisher-facing performance reports and engagement insights.
+
+**Workers:**
+- **performanceReportWorker** → Time-series charts of KPIs (views, clicks, ad views). Integrates Impact API for RPM calc.
+- **engagementReportWorker** → Cohort analysis (with vs. without Mula). Reports time on page, scroll depth, lift %.
+- **productPerformanceWorker** → Ranks top products by views, clicks, engagement.
+- **subidReportWorker** → Generates affiliate SubID sales reports via Impact API.
+
+**Helpers:** AthenaUtils.js, LoggingHelpers.js, SlackHelpers.js
+
+**Context from Granny:**
+- **Comparative Analysis** → "Compare rivalry week vs. baseline performance"
+- **Segmentation** → "Break down metrics by seasonal peaks vs. normal periods"
+- **Business Goals** → "Report on KPIs aligned with publisher priorities"
+
+**Value for Publishers:**
+- Clear proof of incremental lift.
+- Daily/weekly Slack reports for visibility.
+- SKU-level revenue attribution.
+- **Context-aware analytics** → Understand WHY performance changed.
+
+#### 5. Occy Agent — Monetization & Optimization
+
+**Role:** Maximizes revenue via affiliate catalogs, ad integrations, and optimization strategies.
+
+**Workers:**
+- **clickUrlsWorker** → Tracks which content URLs drive affiliate clicks.
+- **productPerformanceWorker** → Provides SKU-level engagement metrics.
+- **taxonomyAnalysisWorker** → Surfaces high-reach categories for targeting/ads.
+
+**Helpers:** SearchStrategy.js, ProductHelpers.js
+
+**Context from Granny:**
+- **Opportunity Windows** → "Championship win: 72-hour celebration window, increase density"
+- **Business Goals** → "Publisher prioritizes affiliate over ads, optimize for clicks"
+- **Seasonal Strategy** → "Q4 peak: focus on high-AOV gift items"
+
+**Value for Publishers:**
+- Balances explore vs. exploit in feed ordering.
+- Mixes affiliate sales + ad monetization.
+- Data-driven targeting of high-value categories.
+- **Context-aware monetization** → Maximum revenue at peak moments.
+
+#### 6. Cal Agent — Experimentation & A/B Testing
+
+**Role:** Tests new widget variations, ordering, and layouts.
+
+**Workers:**
+- **abTestQueue** (from worker.js) → Runs SmartScroll A/B tests, reports results via Slack.
+
+**Helpers:** SearchStrategy.js, SlackHelpers.js
+
+**Context from Granny:**
+- **Test Timing** → "Run rivalry feed test during next big game (controlled conditions)"
+- **Segmentation** → "Test mobile vs. desktop placement strategies separately"
+- **Business Impact** → "Measure lift against publisher's revenue goals"
+
+**Value for Publishers:**
+- Proves which widget design/placement performs best.
+- Provides safe experimentation framework for Mula UI.
+- **Context-aware testing** → Tests that matter, when they matter.
+
+### External Dependencies
+
+- **Redis (Bull queues)** → backbone of worker orchestration.
+- **Athena + S3** → query + store raw event data.
+- **Postgres** → stores search phrases + models.
+- **Impact API** → affiliate SubID sales data.
+- **Slack** → delivery layer for insights + human oversight.
+

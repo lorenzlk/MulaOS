@@ -1,0 +1,67 @@
+<div class="container mt-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="mb-0">New Search</h2>
+        </div>
+        <div class="card-body">
+          {{#if error}}
+            <div class="alert alert-danger">{{error}}</div>
+          {{/if}}
+          <form action="/searches" method="POST">
+            <div class="mb-3">
+              <label for="phrase" class="form-label">Search Phrase</label>
+              <input type="text" class="form-control" id="phrase" name="phrase" value="{{phrase}}" required>
+              <div class="form-text">Enter a search phrase to find related products.</div>
+            </div>
+            <div class="mb-3">
+              <label for="credentialId" class="form-label">Credentials <span class="text-danger">*</span></label>
+              <select class="form-select" id="credentialId" name="credentialId" required>
+                <option value="" disabled selected>-- Select Credentials --</option>
+                <optgroup label="Amazon Credentials">
+                  {{#each amazonCredentials}}
+                  <option value="{{this.id}}" data-platform="amazon" {{#if (eq ../credentialId this.id)}}selected{{/if}}>{{this.name}}</option>
+                  {{/each}}
+                </optgroup>
+                <optgroup label="Impact Credentials">
+                  {{#each impactCredentials}}
+                  <option value="{{this.id}}" data-platform="fanatics" {{#if (eq ../credentialId this.id)}}selected{{/if}}>{{this.name}}</option>
+                  {{/each}}
+                </optgroup>
+              </select>
+              <div class="form-text">Select which credentials to use for this search. The platform will be determined automatically.</div>
+            </div>
+            <input type="hidden" id="platform" name="platform" value="">
+            <div class="d-flex justify-content-between">
+              <a href="/searches" class="btn btn-secondary">Cancel</a>
+              <button type="submit" class="btn btn-primary">Create Search</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const credentialSelect = document.getElementById('credentialId');
+  const platformInput = document.getElementById('platform');
+  
+  function updatePlatform() {
+    const selectedOption = credentialSelect.options[credentialSelect.selectedIndex];
+    if (selectedOption && selectedOption.dataset.platform) {
+      platformInput.value = selectedOption.dataset.platform;
+    } else {
+      platformInput.value = '';
+    }
+  }
+  
+  // Initial state
+  updatePlatform();
+  
+  // Listen for changes
+  credentialSelect.addEventListener('change', updatePlatform);
+});
+</script>

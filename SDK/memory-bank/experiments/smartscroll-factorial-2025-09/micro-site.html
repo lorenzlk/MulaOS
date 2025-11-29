@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartScroll 2x2 Factorial A/B Test - Mobile Docs</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f8f9fa;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 0;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .header p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .nav {
+            background: white;
+            padding: 15px 20px;
+            border-bottom: 1px solid #e9ecef;
+            position: sticky;
+            top: 100px;
+            z-index: 99;
+        }
+
+        .nav-list {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .nav-item {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-left: 4px solid #667eea;
+        }
+
+        .section h2 {
+            color: #667eea;
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .section h3 {
+            color: #495057;
+            font-size: 1.1rem;
+            margin: 20px 0 10px 0;
+            font-weight: 600;
+        }
+
+        .section h4 {
+            color: #6c757d;
+            font-size: 1rem;
+            margin: 15px 0 8px 0;
+            font-weight: 500;
+        }
+
+        .section p {
+            margin-bottom: 12px;
+            font-size: 0.95rem;
+        }
+
+        .section ul, .section ol {
+            margin: 10px 0 15px 20px;
+        }
+
+        .section li {
+            margin-bottom: 6px;
+            font-size: 0.95rem;
+        }
+
+        .highlight-box {
+            background: #e3f2fd;
+            border: 1px solid #bbdefb;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .highlight-box h4 {
+            color: #1976d2;
+            margin-top: 0;
+        }
+
+        .code-block {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+
+        .variant-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .variant-card {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .variant-card h4 {
+            color: #667eea;
+            margin: 0 0 8px 0;
+            font-size: 1rem;
+        }
+
+        .variant-card p {
+            margin: 0;
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+
+        .metric-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+
+        .metric-card h4 {
+            color: white;
+            margin: 0 0 8px 0;
+        }
+
+        .metric-card p {
+            margin: 0;
+            opacity: 0.9;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin: 5px 5px 5px 0;
+        }
+
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .status-complete {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .toc {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .toc h3 {
+            margin: 0 0 10px 0;
+            color: #495057;
+        }
+
+        .toc ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .toc li {
+            margin-bottom: 5px;
+        }
+
+        .toc a {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .toc a:hover {
+            text-decoration: underline;
+        }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            display: none;
+        }
+
+        .back-to-top:hover {
+            background: #5a6fd8;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.3rem;
+            }
+            
+            .nav-list {
+                justify-content: center;
+            }
+            
+            .nav-item {
+                font-size: 0.8rem;
+                padding: 6px 12px;
+            }
+            
+            .variant-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .content {
+                padding: 15px;
+            }
+            
+            .section {
+                padding: 15px;
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>SmartScroll 2x2 Factorial A/B Test</h1>
+            <p>September 2025 - Mobile Documentation</p>
+        </div>
+
+        <div class="nav">
+            <ul class="nav-list">
+                <li class="nav-item active" onclick="showSection('overview')">Overview</li>
+                <li class="nav-item" onclick="showSection('design')">Design</li>
+                <li class="nav-item" onclick="showSection('implementation')">Implementation</li>
+                <li class="nav-item" onclick="showSection('testing')">Testing</li>
+                <li class="nav-item" onclick="showSection('analytics')">Analytics</li>
+                <li class="nav-item" onclick="showSection('revcontent')">RevContent</li>
+                <li class="nav-item" onclick="showSection('assumptions')">Assumptions</li>
+            </ul>
+        </div>
+
+        <div class="content">
+            <!-- Overview Section -->
+            <div id="overview" class="section">
+                <h2>📊 Experiment Overview</h2>
+                
+                <div class="highlight-box">
+                    <h4>Quick Summary</h4>
+                    <p><strong>Type:</strong> 2x2 Factorial Design<br>
+                    <strong>Publisher:</strong> on3.com (www.on3.com)<br>
+                    <strong>Duration:</strong> 3-4 weeks<br>
+                    <strong>Traffic Split:</strong> 25% per variant</p>
+                </div>
+
+                <h3>🎯 Variants</h3>
+                <div class="variant-grid">
+                    <div class="variant-card">
+                        <h4>c00 (Control)</h4>
+                        <p>Horizontal layout + Mula monetization</p>
+                    </div>
+                    <div class="variant-card">
+                        <h4>c10 (New Layout)</h4>
+                        <p>Vertical layout + Mula monetization</p>
+                    </div>
+                    <div class="variant-card">
+                        <h4>c01 (RevContent)</h4>
+                        <p>Horizontal layout + RevContent monetization</p>
+                    </div>
+                    <div class="variant-card">
+                        <h4>c11 (Both New)</h4>
+                        <p>Vertical layout + RevContent monetization</p>
+                    </div>
+                </div>
+
+                <h3>📈 Key Metrics</h3>
+                <div class="metric-card">
+                    <h4>Click-Through Rate (CTR)</h4>
+                    <p>mula_store_click / mula_in_view</p>
+                </div>
+                <div class="metric-card">
+                    <h4>Revenue Per Session (RPS)</h4>
+                    <p>total_revenue / sessions_by_variant</p>
+                </div>
+
+                <h3>🎯 Expected Outcomes</h3>
+                <ul>
+                    <li><strong>Main effects:</strong> Layout impact, Monetization impact</li>
+                    <li><strong>Interaction effects:</strong> Does new layout work better with RevContent?</li>
+                    <li><strong>Statistical power:</strong> 80% power to detect 20% lift (α=0.05)</li>
+                </ul>
+
+                <h3>📋 Status</h3>
+                <span class="status-badge status-complete">Planning Complete</span>
+                <span class="status-badge status-pending">Implementation</span>
+                <span class="status-badge status-pending">Target Launch: TBD</span>
+            </div>
+
+            <!-- Design Section -->
+            <div id="design" class="section hidden">
+                <h2>🧪 Experimental Design</h2>
+                
+                <h3>Design Type</h3>
+                <p><strong>2x2 Factorial Design</strong> - Tests two factors simultaneously with all combinations</p>
+
+                <h3>Factors</h3>
+                <div class="highlight-box">
+                    <h4>1. Layout Factor</h4>
+                    <ul>
+                        <li><strong>Control:</strong> Current horizontal card layout (4:3 aspect ratio)</li>
+                        <li><strong>Treatment:</strong> New vertical card layout (2:3 aspect ratio)</li>
+                    </ul>
+                </div>
+
+                <div class="highlight-box">
+                    <h4>2. Monetization Factor</h4>
+                    <ul>
+                        <li><strong>Control:</strong> Mula monetization (existing affiliate system)</li>
+                        <li><strong>Treatment:</strong> RevContent monetization (new partner)</li>
+                    </ul>
+                </div>
+
+                <h3>Traffic Allocation</h3>
+                <ul>
+                    <li><strong>Equal Split:</strong> 25% per variant (2,500 impressions/day per cell)</li>
+                    <li><strong>Total Traffic:</strong> ~10,000 viewable impressions/day on on3.com</li>
+                    <li><strong>Publisher Scope:</strong> on3.com only (www.on3.com primary subdomain)</li>
+                </ul>
+
+                <h3>Statistical Power Analysis</h3>
+                <div class="highlight-box">
+                    <h4>Baseline Assumptions</h4>
+                    <ul>
+                        <li><strong>Daily Impressions:</strong> ~10,000 viewable impressions</li>
+                        <li><strong>Baseline CTR:</strong> ~1.0% (100 clicks/day total)</li>
+                        <li><strong>Per Cell Traffic:</strong> ~2,500 impressions/day</li>
+                    </ul>
+                </div>
+
+                <div class="highlight-box">
+                    <h4>Minimum Detectable Effect (MDE)</h4>
+                    <ul>
+                        <li><strong>Target MDE:</strong> +20% lift (CTR from 1.0% → 1.2%)</li>
+                        <li><strong>Statistical Power:</strong> 80%</li>
+                        <li><strong>Significance Level:</strong> α = 0.05</li>
+                    </ul>
+                </div>
+
+                <h3>Expected Runtime</h3>
+                <ul>
+                    <li><strong>Main Effects:</strong> ~18-23 days (3+ weeks)</li>
+                    <li><strong>Interaction Effects:</strong> ~20-26 days (3-4 weeks)</li>
+                    <li><strong>Conservative Estimate:</strong> 4 weeks for full analysis</li>
+                </ul>
+
+                <h3>Experimental Hypotheses</h3>
+                <div class="highlight-box">
+                    <h4>Main Effects</h4>
+                    <ol>
+                        <li><strong>Layout Effect (H1):</strong> Vertical layout will improve CTR vs horizontal</li>
+                        <li><strong>Monetization Effect (H2):</strong> RevContent will improve RPS vs Mula</li>
+                    </ol>
+                </div>
+
+                <div class="highlight-box">
+                    <h4>Interaction Effects</h4>
+                    <ol start="3">
+                        <li><strong>Layout × Monetization (H3):</strong> Vertical layout + RevContent will have synergistic effects</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- Implementation Section -->
+            <div id="implementation" class="section hidden">
+                <h2>⚙️ Implementation Plan</h2>
+                
+                <h3>Architecture Overview</h3>
+                <div class="highlight-box">
+                    <h4>Components to Modify</h4>
+                    <ol>
+                        <li><strong>ABTest.js</strong> - Experiment configuration and variant assignment</li>
+                        <li><strong>SmartScroll.svelte</strong> - Layout variants and RevContent integration</li>
+                        <li><strong>Analytics Queries</strong> - New Athena queries for factorial analysis</li>
+                        <li><strong>Revenue Attribution</strong> - Multi-partner revenue tracking system</li>
+                    </ol>
+                </div>
+
+                <h3>Implementation Phases</h3>
+                
+                <div class="highlight-box">
+                    <h4>Phase 1: ABTest.js Configuration</h4>
+                    <p><strong>Goal:</strong> Set up factorial experiment configuration</p>
+                    <ul>
+                        <li>Domain filtering (on3.com only)</li>
+                        <li>Variant assignment logic</li>
+                        <li>Query string overrides</li>
+                        <li>Factor extraction functions</li>
+                    </ul>
+                </div>
+
+                <div class="highlight-box">
+                    <h4>Phase 2: SmartScroll Layout Variants</h4>
+                    <p><strong>Goal:</strong> Implement vertical card layout variant</p>
+                    <ul>
+                        <li>New vertical card layout (2:3 aspect ratio)</li>
+                        <li>Preserve responsive behavior</li>
+                        <li>Maintain existing button logic</li>
+                        <li>CSS-based layout switching</li>
+                    </ul>
+                </div>
+
+                <div class="highlight-box">
+                    <h4>Phase 3: RevContent Integration</h4>
+                    <p><strong>Goal:</strong> Integrate RevContent monetization partner</p>
+                    <ul>
+                        <li>Widget ID: 287645, Publisher ID: 198204</li>
+                        <li>Script injection in head</li>
+                        <li>SubId tracking for attribution</li>
+                        <li>Every 3rd product card placement</li>
+                    </ul>
+                </div>
+
+                <div class="highlight-box">
+                    <h4>Phase 4: Revenue Attribution System</h4>
+                    <p><strong>Goal:</strong> Track revenue from both Mula and RevContent</p>
+                    <ul>
+                        <li>Mula: Impact API with subId2 parameter</li>
+                        <li>RevContent: Sub ID Stats API</li>
+                        <li>30-day attribution window</li>
+                        <li>Multi-partner revenue service</li>
+                    </ul>
+                </div>
+
+                <h3>Key Implementation Details</h3>
+                <div class="code-block">// Domain filtering function
+function isOn3Domain() {
+    if (typeof window === 'undefined') return false;
+    return window.location.hostname.includes('on3.com');
+}
+
+// Factorial variant assignment
+function getFactorialVariant(sessionId, experimentName, variants) {
+    if (!isOn3Domain()) return 'control';
+    
+    // Check query string override
+    const url = new URL(window.location.href);
+    const queryOverride = url.searchParams.get('mulaABTest');
+    if (queryOverride && variants.includes(queryOverride)) {
+        return queryOverride;
+    }
+    
+    // Deterministic assignment based on session ID
+    const hash = simpleHash(sessionId + experimentName);
+    const index = hash % variants.length;
+    return variants[index];
+}</div>
+
+                <h3>Deployment Plan</h3>
+                <ol>
+                    <li><strong>Pre-Deployment:</strong> Code review, testing, revenue validation</li>
+                    <li><strong>Canary Release:</strong> 5% traffic to test variants</li>
+                    <li><strong>Gradual Rollout:</strong> Increase to 25% per variant over 24 hours</li>
+                    <li><strong>Full Launch:</strong> 100% traffic to experiment variants</li>
+                </ol>
+            </div>
+
+            <!-- Testing Section -->
+            <div id="testing" class="section hidden">
+                <h2>🧪 Testing Strategy</h2>
+                
+                <h3>Testing Phases</h3>
+                
+                <div class="highlight-box">
+                    <h4>Phase 1: Development Testing</h4>
+                    <ul>
+                        <li><strong>Unit Testing:</strong> ABTest.js, SmartScroll variants, RevContent integration</li>
+                        <li><strong>Integration Testing:</strong> End-to-end flow, cross-browser testing</li>
+                        <li><strong>Performance Testing:</strong> Core Web Vitals, load time testing</li>
+                    </ul>
+                </div>
+
+                <div class="highlight-box">
+                    <h4>Phase 2: Staging Testing</h4>
+                    <ul>
+                        <li><strong>Environment:</strong> staging.on3.com or test subdomain</li>
+                        <li><strong>Test Scenarios:</strong> All 4 variants, revenue attribution, error handling</li>
+                        <li><strong>Data:</strong> Real product feeds and RevContent ads</li>
+                    </ul>
+                </div>
+
+                <div class="highlight-box">
+                    <h4>Phase 3: Canary Deployment</h4>
+                    <ul>
+                        <li><strong>Strategy:</strong> 5% → 10% → 25% → 50% → 100%</li>
+                        <li><strong>Monitoring:</strong> Error rates, performance, revenue, UX</li>
+                        <li><strong>Rollback Plan:</strong> Immediate rollback if issues detected</li>
+                    </ul>
+                </div>
+
+                <h3>Testing Tools</h3>
+                
+                <div class="highlight-box">
+                    <h4>Query String Testing</h4>
+                    <div class="code-block">?mulaABTest=c00  // Control: horizontal + Mula
+?mulaABTest=c10  // New layout: vertical + Mula
+?mulaABTest=c01  // RevContent: horizontal + RevContent
+?mulaABTest=c11  // Both: vertical + RevContent
+?mulaQaVersion=factorial-test</div>
+                </div>
+
+                <div class="highlight-box">
+                    <h4>Browser Console Testing</h4>
+                    <div class="code-block">// Debug experiment assignment
+window.debugExperiment = function() {
+    console.log('Experiment Status:', {
+        domain: window.location.hostname,
+        sessionId: window.Mula.sessionId,
+        experiment: window.Mula.experiment,
+        variant: window.Mula.variant
+    });
+};</div>
+                </div>
+
+                <h3>Test Cases</h3>
+                <ul>
+                    <li><strong>Variant Assignment:</strong> Verify correct variant assignment and overrides</li>
+                    <li><strong>Layout Variants:</strong> Test horizontal vs vertical layout rendering</li>
+                    <li><strong>RevContent Integration:</strong> Test script injection and widget rendering</li>
+                    <li><strong>Event Tracking:</strong> Verify all events are tracked correctly</li>
+                    <li><strong>Performance:</strong> Ensure no negative Core Web Vitals impact</li>
+                    <li><strong>Revenue Attribution:</strong> Test Mula and RevContent attribution</li>
+                </ul>
+
+                <h3>Monitoring & Alerts</h3>
+                <div class="highlight-box">
+                    <h4>Critical Alerts</h4>
+                    <ul>
+                        <li>JavaScript errors in experiment code</li>
+                        <li>API failures (RevContent, Impact)</li>
+                        <li>Revenue attribution issues</li>
+                        <li>Performance degradation</li>
+                    </ul>
+                </div>
+
+                <div class="highlight-box">
+                    <h4>Warning Alerts</h4>
+                    <ul>
+                        <li>Traffic imbalance (>5% deviation)</li>
+                        <li>Low sample size</li>
+                        <li>High error rate (>1%)</li>
+                        <li>Revenue discrepancy</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Analytics Section -->
+            <div id="analytics" class="section hidden">
+                <h2>📊 Analytics & Reporting</h2>
+                
+                <h3>Key Metrics</h3>
+                
+                <div class="metric-card">
+                    <h4>Primary Metrics</h4>
+                    <p><strong>CTR:</strong> mula_store_click / mula_in_view<br>
+                    <strong>RPS:</strong> total_revenue / sessions_by_variant</p>
+                </div>
+
+                <div class="metric-card">
+                    <h4>Secondary Metrics</h4>
+                    <p>Viewport Visibility Rate, Session Duration, Scroll Depth, Load Performance</p>
+                </div>
+
+                <h3>Athena Queries</h3>
+                
+                <div class="highlight-box">
+                    <h4>1. Factorial CTR Analysis</h4>
+                    <p><strong>File:</strong> smartscroll-factorial-ctr.sql</p>
+                    <p>Analyzes click-through rates by variant with statistical significance using chi-square tests.</p>
+                </div>
+
+                <div class="highlight-box">
+                    <h4>2. Revenue Attribution Analysis</h4>
+                    <p><strong>File:</strong> smartscroll-factorial-revenue.sql</p>
+                    <p>Analyzes revenue per session by variant, combining Mula and RevContent data.</p>
+                </div>
+
+                <div class="highlight-box">
+                    <h4>3. Statistical Significance Analysis</h4>
+                    <p><strong>File:</strong> smartscroll-factorial-stats.sql</p>
+                    <p>Performs ANOVA and interaction effect analysis for factorial design.</p>
+                </div>
+
+                <h3>Revenue Attribution System</h3>
+                
+                <div class="highlight-box">
+                    <h4>Multi-Partner Revenue Tracking</h4>
+                    <ul>
+                        <li><strong>Mula:</strong> Impact API with subId2 parameter (30-day window)</li>
+                        <li><strong>RevContent:</strong> Sub ID Stats API with test/variant breakdown (30-day window)</li>
+                        <li><strong>Combined:</strong> Revenue service aggregates both sources by variant</li>
+                    </ul>
+                </div>
+
+                <h3>Statistical Analysis</h3>
+                <ul>
+                    <li><strong>Main Effects:</strong> Layout effect, Monetization effect</li>
+                    <li><strong>Interaction Effects:</strong> Layout × Monetization interaction</li>
+                    <li><strong>Tests:</strong> Chi-square for CTR, ANOVA for RPS, Factorial ANOVA for interactions</li>
+                    <li><strong>Correction:</strong> Bonferroni correction for multiple testing</li>
+                </ul>
+
+                <h3>Reporting Dashboard</h3>
+                <ul>
+                    <li><strong>Daily Metrics:</strong> CTR by variant, RPS by variant, statistical significance</li>
+                    <li><strong>Weekly Reports:</strong> Experiment progress, statistical power, revenue attribution</li>
+                    <li><strong>Final Analysis:</strong> Winner determination, business impact, recommendations</li>
+                </ul>
+
+                <h3>Data Quality Monitoring</h3>
+                <ul>
+                    <li><strong>Traffic Distribution:</strong> Ensure 25% per variant</li>
+                    <li><strong>Event Completeness:</strong> Verify all events tracked</li>
+                    <li><strong>Revenue Attribution:</strong> Cross-check Mula and RevContent data</li>
+                    <li><strong>Statistical Power:</strong> Monitor sample size accumulation</li>
+                </ul>
+            </div>
+
+            <!-- RevContent Section -->
+            <div id="revcontent" class="section hidden">
+                <h2>💰 RevContent Integration</h2>
+                
+                <h3>Configuration</h3>
+                <div class="highlight-box">
+                    <h4>Widget Details</h4>
+                    <ul>
+                        <li><strong>Widget ID:</strong> 287645</li>
+                        <li><strong>Publisher ID:</strong> 198204</li>
+                        <li><strong>Widget Type:</strong> 300x250 display ad</li>
+                        <li><strong>Placement:</strong> Every 3rd product card in SmartScroll feed</li>
+                    </ul>
+                </div>
+
+                <div class="highlight-box">
+                    <h4>SubId Tracking</h4>
+                    <ul>
+                        <li><strong>Test Name:</strong> MULA_AB_2025_09</li>
+                        <li><strong>Variant Labels:</strong> c00, c10, c01, c11</li>
+                        <li><strong>Purpose:</strong> Revenue attribution by experiment variant</li>
+                    </ul>
+                </div>
+
+                <h3>Implementation</h3>
+                
+                <div class="highlight-box">
+                    <h4>Script Injection</h4>
+                    <div class="code-block">function injectRevContentScript(variant) {
+    if (window.rcws) return; // Prevent duplicate
+    
+    window.rcws = window.rcws || {};
+    window.rcws.subIds = {
+        287645: {
+            test: 'MULA_AB_2025_09',
+            variant: variant
+        }
+    };
+    
+    const script = document.createElement('script');
+    script.src = 'https://delivery.revcontent.com/198204/287645/widget.js';
+    document.head.appendChild(script);
+}</div>
+                </div>
+
+                <h3>Revenue Attribution</h3>
+                
+                <div class="highlight-box">
+                    <h4>RevContent API Integration</h4>
+                    <ul>
+                        <li><strong>Endpoint:</strong> https://api.revcontent.io/stats/publisher/widgets/subids</li>
+                        <li><strong>Authentication:</strong> OAuth2 Client Credentials</li>
+                        <li><strong>Attribution Window:</strong> 30 days</li>
+                        <li><strong>Data Source:</strong> External API calls</li>
+                    </ul>
+                </div>
+
+                <h3>Testing Strategy</h3>
+                <ul>
+                    <li><strong>Development:</strong> Script injection, SubId tracking, widget rendering, API integration</li>
+                    <li><strong>Production:</strong> Canary deployment, revenue validation, performance monitoring</li>
+                    <li><strong>Query String:</strong> ?mulaABTest=c01 (RevContent horizontal), ?mulaABTest=c11 (RevContent vertical)</li>
+                </ul>
+
+                <h3>Error Handling</h3>
+                <ul>
+                    <li><strong>Script Loading Failures:</strong> Fallback to Mula monetization</li>
+                    <li><strong>API Failures:</strong> Return zero revenue for affected variants</li>
+                    <li><strong>Monitoring:</strong> Script load success rate, widget render rate, API success rate</li>
+                </ul>
+
+                <h3>Success Criteria</h3>
+                <ul>
+                    <li><strong>Technical:</strong> 99%+ script loads, 95%+ widget renders, 99%+ API calls</li>
+                    <li><strong>Business:</strong> Accurate revenue tracking, competitive RPM, no UX impact</li>
+                </ul>
+            </div>
+
+            <!-- Assumptions Section -->
+            <div id="assumptions" class="section hidden">
+                <h2>📐 MDE Assumptions</h2>
+                
+                <h3>Baseline Scale</h3>
+                <div class="highlight-box">
+                    <ul>
+                        <li>~<strong>10,000 viewable impressions/day</strong></li>
+                        <li>~<strong>100 clicks/day total</strong> ⇒ ~<strong>1.0% CTR</strong> baseline</li>
+                        <li>Split evenly into 4 cells ⇒ ~<strong>2,500 impressions/day per cell</strong></li>
+                    </ul>
+                </div>
+
+                <h3>A/B Test (One Variant vs Control)</h3>
+                <div class="highlight-box">
+                    <ul>
+                        <li><strong>MDE = +20%</strong> (CTR from 1.0% → 1.2% or RPM equivalent)</li>
+                        <li><strong>80% power, α=0.05</strong></li>
+                        <li><strong>Sample needed:</strong> ~42.7k impressions per arm</li>
+                        <li><strong>Runtime:</strong> ~9 days total (with 5k impressions/arm/day)</li>
+                    </ul>
+                </div>
+
+                <h3>2×2 Factorial Test</h3>
+                
+                <div class="highlight-box">
+                    <h4>Main Effects (RevContent, Design)</h4>
+                    <ul>
+                        <li><strong>MDE = +20%</strong></li>
+                        <li><strong>Sample needed:</strong> ~42.7k impressions per cell</li>
+                        <li><strong>Runtime:</strong> ~18–23 days (≈3 weeks)</li>
+                    </ul>
+                </div>
+
+                <div class="highlight-box">
+                    <h4>Interaction Effect (Rev×Design)</h4>
+                    <ul>
+                        <li>With <strong>MDE = +20%</strong>, runtime is <strong>~20–26 days</strong> (≈3–4 weeks)</li>
+                        <li>If true interaction is smaller (e.g., +10%), time grows ~quadratically ⇒ ~6–8 weeks</li>
+                    </ul>
+                </div>
+
+                <h3>Practical Alignment</h3>
+                <div class="highlight-box">
+                    <ul>
+                        <li><strong>Single A/B:</strong> ~1.5 weeks for +20% lift</li>
+                        <li><strong>Factorial (main + interaction):</strong> Plan for <strong>3–4 weeks</strong> to confidently detect +20% lifts</li>
+                        <li><strong>Smaller lifts (<20%):</strong> Require disproportionately longer run times (e.g., ~2–3 months for +10%)</li>
+                    </ul>
+                </div>
+
+                <h3>Test Plan Expectations Summary</h3>
+                <p>This document provides the statistical foundation for the SmartScroll 2x2 factorial A/B test, including:</p>
+                <ul>
+                    <li><strong>Traffic assumptions:</strong> 10,000 daily impressions on on3.com</li>
+                    <li><strong>MDE targets:</strong> 20% lift detection with 80% power</li>
+                    <li><strong>Runtime expectations:</strong> 3-4 weeks for full factorial analysis</li>
+                    <li><strong>Sample size requirements:</strong> ~42.7k impressions per cell</li>
+                </ul>
+            </div>
+        </div>
+
+        <button class="back-to-top" onclick="scrollToTop()" title="Back to top">↑</button>
+    </div>
+
+    <script>
+        function showSection(sectionId) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => section.classList.add('hidden'));
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.remove('hidden');
+            
+            // Update nav items
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Scroll to top of content
+            document.querySelector('.content').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Show back to top button when scrolling
+        window.addEventListener('scroll', function() {
+            const backToTop = document.querySelector('.back-to-top');
+            if (window.pageYOffset > 300) {
+                backToTop.style.display = 'block';
+            } else {
+                backToTop.style.display = 'none';
+            }
+        });
+
+        // Smooth scrolling for internal links
+        document.addEventListener('click', function(e) {
+            if (e.target.tagName === 'A' && e.target.getAttribute('href').startsWith('#')) {
+                e.preventDefault();
+                const targetId = e.target.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+                if (targetElement) {
+                    targetElement.scrollIntoView({ behavior: 'smooth' });
+                }
+            }
+        });
+    </script>
+</body>
+</html>

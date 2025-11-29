@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Widget 8 - Interactive Poll</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", sans-serif;
+            background-color: #f5f5f7;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        h1 {
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 24px;
+        }
+        
+        .container {
+            max-width: 375px; /* iPhone-sized container */
+            width: 100%;
+            padding: 10px;
+        }
+        
+        .return-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 8px 16px 8px 12px;
+            font-family: "SF Pro Text", -apple-system, BlinkMacSystemFont, sans-serif;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: all 0.2s ease;
+            text-decoration: none;
+            z-index: 1000;
+        }
+        
+        .return-button:hover {
+            background: rgba(0, 0, 0, 0.8);
+            transform: translateY(-1px);
+        }
+        
+        .return-button:active {
+            transform: translateY(0);
+        }
+        
+        /* Widget 8 - Interactive Poll */
+        .mula-widget-8 {
+            position: relative;
+            width: 100%;
+            margin: 25px 0;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", sans-serif;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        
+        .mula-poll-container {
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            margin: 0 auto;
+            max-width: 100%;
+            overflow: hidden;
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        
+        .mula-poll-header {
+            padding: 15px 16px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .mula-poll-title {
+            color: #333;
+            font-size: 17px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        
+        .mula-poll-subtitle {
+            color: #888;
+            font-size: 13px;
+            font-weight: 400;
+        }
+        
+        .mula-poll-content {
+            padding: 16px;
+        }
+        
+        .mula-poll-question {
+            font-size: 15px;
+            font-weight: 500;
+            margin-bottom: 16px;
+            color: #333;
+        }
+        
+        .mula-poll-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .mula-poll-option {
+            position: relative;
+            background: #f5f7fa;
+            border-radius: 10px;
+            padding: 14px 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            overflow: hidden;
+            border: 2px solid transparent;
+        }
+        
+        .mula-poll-option:hover {
+            background: #eef0f3;
+        }
+        
+        .mula-poll-option.selected {
+            border-color: #007aff;
+            background: rgba(0, 122, 255, 0.05);
+        }
+        
+        .mula-poll-option-text {
+            font-size: 15px;
+            font-weight: 400;
+            color: #333;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .mula-poll-result-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background: rgba(0, 122, 255, 0.15);
+            width: 0%;
+            transition: width 1s cubic-bezier(0.25, 1, 0.5, 1);
+            z-index: 1;
+            border-radius: 8px;
+        }
+        
+        .mula-poll-result-percent {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 14px;
+            font-weight: 600;
+            color: #007aff;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            z-index: 2;
+        }
+        
+        .mula-poll-option.showing-results .mula-poll-result-percent {
+            opacity: 1;
+        }
+        
+        .mula-poll-footer {
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #f0f0f0;
+        }
+        
+        .mula-poll-vote-count {
+            font-size: 14px;
+            color: #888;
+        }
+        
+        .mula-poll-button {
+            background: #007aff;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 8px 18px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .mula-poll-button:hover {
+            background: #0066d6;
+        }
+        
+        .mula-poll-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .mula-poll-button.reset {
+            background: transparent;
+            color: #007aff;
+            margin-right: 10px;
+        }
+        
+        .mula-poll-button.reset:hover {
+            background: rgba(0, 122, 255, 0.1);
+        }
+        
+        .poll-actions {
+            display: flex;
+            align-items: center;
+        }
+        
+        .debug-info {
+            margin-top: 30px;
+            padding: 15px;
+            background-color: #e8e8e8;
+            border-radius: 8px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            width: 100%;
+            max-width: 500px;
+        }
+    </style>
+</head>
+<body>
+    <a href="playground.html" class="return-button" id="returnButton">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+        Return to Playground
+    </a>
+    
+    <h1>Interactive Poll Widget</h1>
+    
+    <div class="container">
+        <div class="mula-widget-8">
+            <div class="mula-poll-container">
+                <div class="mula-poll-header">
+                    <div class="mula-poll-title">Reader Poll</div>
+                    <div class="mula-poll-subtitle">From our "10 Hidden Travel Gems" listicle</div>
+                </div>
+                <div class="mula-poll-content">
+                    <div class="mula-poll-question">Which of these travel destinations would you most like to visit?</div>
+                    <div class="mula-poll-options">
+                        <div class="mula-poll-option" data-value="santorini">
+                            <div class="mula-poll-option-text">Santorini, Greece</div>
+                            <div class="mula-poll-result-bar"></div>
+                            <div class="mula-poll-result-percent">0%</div>
+                        </div>
+                        <div class="mula-poll-option" data-value="kyoto">
+                            <div class="mula-poll-option-text">Kyoto, Japan</div>
+                            <div class="mula-poll-result-bar"></div>
+                            <div class="mula-poll-result-percent">0%</div>
+                        </div>
+                        <div class="mula-poll-option" data-value="slovenia">
+                            <div class="mula-poll-option-text">Lake Bled, Slovenia</div>
+                            <div class="mula-poll-result-bar"></div>
+                            <div class="mula-poll-result-percent">0%</div>
+                        </div>
+                        <div class="mula-poll-option" data-value="costa-rica">
+                            <div class="mula-poll-option-text">Monteverde, Costa Rica</div>
+                            <div class="mula-poll-result-bar"></div>
+                            <div class="mula-poll-result-percent">0%</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mula-poll-footer">
+                    <div class="mula-poll-vote-count">237 votes so far</div>
+                    <div class="poll-actions">
+                        <button class="mula-poll-button reset" id="resetPoll" style="display: none;">Reset</button>
+                        <button class="mula-poll-button" id="submitPoll" disabled>Submit Vote</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="debug-info">
+            <div id="debug-output">Debug information will appear here</div>
+        </div>
+    </div>
+    
+    <script>
+        // Hide Return to Playground button if inside an iframe (on the playground page)
+        function hideReturnButtonInIframe() {
+            if (window.self !== window.top) {
+                // We're in an iframe, hide the return button
+                const returnButton = document.getElementById('returnButton');
+                if (returnButton) {
+                    returnButton.style.display = 'none';
+                }
+                debugLog('In iframe mode, hiding return button');
+            } else {
+                debugLog('In standalone mode, showing return button');
+            }
+        }
+        
+        // Call on page load
+        hideReturnButtonInIframe();
+
+        // Debug log function - logs appear at the top
+        function debugLog(message) {
+            console.log(message); // Also log to console
+            const debugOutput = document.getElementById('debug-output');
+            const timestamp = new Date().toLocaleTimeString();
+            debugOutput.innerHTML = `[${timestamp}] ${message}\n` + debugOutput.innerHTML;
+        }
+        
+        debugLog('Interactive Poll Widget script loaded');
+        
+        // Poll functionality
+        const options = document.querySelectorAll('.mula-poll-option');
+        const submitButton = document.getElementById('submitPoll');
+        const resetButton = document.getElementById('resetPoll');
+        const voteCountElement = document.querySelector('.mula-poll-vote-count');
+        
+        let selectedOption = null;
+        let hasVoted = false;
+        let voteCount = 237; // Starting vote count
+        
+        // Simulated poll results (would come from backend in real app)
+        const pollResults = {
+            'santorini': 65,
+            'kyoto': 82,
+            'slovenia': 45,
+            'costa-rica': 45
+        };
+        
+        // Handle option selection
+        options.forEach(option => {
+            option.addEventListener('click', () => {
+                if (hasVoted) return;
+                
+                // Remove selected class from all options
+                options.forEach(opt => opt.classList.remove('selected'));
+                
+                // Add selected class to the clicked option
+                option.classList.add('selected');
+                
+                // Update selected option
+                selectedOption = option.dataset.value;
+                
+                // Enable submit button
+                submitButton.disabled = false;
+                
+                debugLog(`Option selected: ${selectedOption}`);
+            });
+        });
+        
+        // Handle submit button click
+        submitButton.addEventListener('click', () => {
+            if (!selectedOption || hasVoted) return;
+            
+            hasVoted = true;
+            voteCount++;
+            voteCountElement.textContent = `${voteCount} votes so far`;
+            
+            // Add selected vote to results (in a real app this would be sent to a server)
+            if (selectedOption === 'santorini') pollResults['santorini']++;
+            if (selectedOption === 'kyoto') pollResults['kyoto']++;
+            if (selectedOption === 'slovenia') pollResults['slovenia']++;
+            if (selectedOption === 'costa-rica') pollResults['costa-rica']++;
+            
+            debugLog(`Vote submitted for: ${selectedOption}`);
+            debugLog(`Current results: ${JSON.stringify(pollResults)}`);
+            
+            // Show results
+            showResults();
+            
+            // Change button text
+            submitButton.textContent = 'Thank You!';
+            submitButton.disabled = true;
+            
+            // Show reset button
+            resetButton.style.display = 'block';
+        });
+        
+        // Handle reset button click
+        resetButton.addEventListener('click', () => {
+            resetPoll();
+        });
+        
+        // Function to show poll results
+        function showResults() {
+            // Calculate total votes for percentages
+            const total = Object.values(pollResults).reduce((sum, count) => sum + count, 0);
+            
+            // Update UI for each option
+            options.forEach(option => {
+                const value = option.dataset.value;
+                const percent = Math.round((pollResults[value] / total) * 100);
+                const resultBar = option.querySelector('.mula-poll-result-bar');
+                const resultPercent = option.querySelector('.mula-poll-result-percent');
+                
+                // Add class to show results styling
+                option.classList.add('showing-results');
+                
+                // Update percent text
+                resultPercent.textContent = `${percent}%`;
+                
+                // Animate the bar width after a small delay
+                setTimeout(() => {
+                    resultBar.style.width = `${percent}%`;
+                }, 100);
+            });
+            
+            debugLog('Poll results displayed');
+        }
+        
+        // Function to reset the poll
+        function resetPoll() {
+            hasVoted = false;
+            selectedOption = null;
+            
+            // Reset UI
+            options.forEach(option => {
+                option.classList.remove('selected', 'showing-results');
+                const resultBar = option.querySelector('.mula-poll-result-bar');
+                resultBar.style.width = '0%';
+            });
+            
+            // Reset buttons
+            submitButton.textContent = 'Submit Vote';
+            submitButton.disabled = true;
+            resetButton.style.display = 'none';
+            
+            debugLog('Poll reset');
+        }
+        
+        // Initialize with a little animation
+        setTimeout(() => {
+            document.querySelector('.mula-poll-container').style.transform = 'translateY(0)';
+            document.querySelector('.mula-poll-container').style.opacity = '1';
+        }, 300);
+    </script>
+</body>
+</html> 
