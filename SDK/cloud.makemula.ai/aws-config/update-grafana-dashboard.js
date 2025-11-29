@@ -4,9 +4,9 @@ const AWS = require('aws-sdk');
 const https = require('https');
 
 // Configuration
-const GRAFANA_URL = 'https://g-e844782f82.grafana-workspace.us-east-1.amazonaws.com';
-const GRAFANA_API_KEY = process.env.GRAFANA_API_KEY || "";
-const DASHBOARD_UID = 'aez8t5wxrwkqof';
+const GRAFANA_URL = process.env.GRAFANA_URL || 'https://g-e844782f82.grafana-workspace.us-east-1.amazonaws.com';
+const GRAFANA_API_KEY = process.env.GRAFANA_API_KEY || '';
+const DASHBOARD_UID = process.env.DASHBOARD_UID || 'aez8t5wxrwkqof';
 
 // Configure AWS
 AWS.config.update({ region: 'us-east-1' });

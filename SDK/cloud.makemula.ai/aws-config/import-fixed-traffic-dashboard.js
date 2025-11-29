@@ -4,8 +4,8 @@ const https = require('https');
 const fs = require('fs');
 
 // Grafana workspace details
-const GRAFANA_ENDPOINT = 'g-e844782f82.grafana-workspace.us-east-1.amazonaws.com';
-const GRAFANA_API_KEY = process.env.GRAFANA_API_KEY || "";
+const GRAFANA_ENDPOINT = process.env.GRAFANA_ENDPOINT || 'g-e844782f82.grafana-workspace.us-east-1.amazonaws.com';
+const GRAFANA_API_KEY = process.env.GRAFANA_API_KEY || '';
 
 // Read the dashboard configuration
 const dashboardConfig = JSON.parse(fs.readFileSync('./grafana-dashboard-realtime-traffic-fixed.json', 'utf8'));
