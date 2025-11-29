@@ -1,315 +1,222 @@
-# Active Context - Granny Intelligence System Complete
+# Active Context - MulaOS Architecture: Granny & Duke Split
 
-## 🎯 **Current Status: PRODUCTION READY**
+## 🎯 **Current Status: ARCHITECTURE REFINED**
 
 **Last Updated:** 2025-11-28  
-**Session:** Granny Intelligence Architecture - Complete
+**Session:** Granny & Duke Split - Sub-Agent Architecture
 
 ---
 
 ## ✅ **What Was Completed**
 
-### **1. Granny Intelligence API (Standalone Service)**
+### **1. Architecture Clarification**
 
-Created a **standalone REST API** that provides contextual intelligence to Sally and other agents.
-
-**Location:** `/Users/loganlorenz/MulaOS/granny-intelligence-api/`
-
-**Features:**
-- Context detection (rivalry week, championships, playoffs, regular season)
-- Affiliate-specific search strategy generation (Fanatics + Amazon)
-- Publisher detection (ON3, EssentiallySports, Bleacher Report)
-- Sports calendar intelligence (CFB, NFL, NBA, CBB)
-- Confidence scoring
-- REST API endpoints
-
-**Endpoints:**
-- `GET /health` - Health check
-- `POST /api/intelligence` - Get contextual intelligence + search strategies
-- `POST /api/intelligence/batch` - Batch intelligence requests
-
-**Running:** `http://localhost:3001`
+**Key Principle**: MulaOS is **NOT integrated into the SDK**. It is a **POC architecture** that informs product strategy. The agents (Granny, Duke) will be sub-agents under the existing "surfers" (Sally, Taka, etc.) and will be subsumed by the engineering/product team.
 
 ---
 
-### **2. Granny Web Dashboard (Enhanced)**
+### **2. Granny & Duke Split**
 
-Updated the web dashboard to call the Granny Intelligence API for contextual intelligence.
+**Granny** = **Publisher Context Engine**
+- Answers: "What does this page mean relative to every other permutation you can think of?"
+- When mobilizing a page, gets context of everything else:
+  - Time of year
+  - What's going on in a season or show
+  - What would a fan of that thing know about
+  - Something that we can market to
+- Complements what we can do on the search side with affiliates
 
-**Location:** `/Users/loganlorenz/MulaOS/granny-web/`
+**Duke** = **Onboarding & Placement Intelligence Agent**
+- Answers: "Where should we place SmartScroll and what pages is it eligible for?"
+- Detection:
+  - Article pages (templated structure)
+  - Clean break at end of content (above footer, below content)
+  - DOM structure analysis
+  - Competitor detection (Taboola, Outbrain)
+  - If competitors running → Ask for beta test against them
+- Accelerates pre-sales and onboarding (2-3 weeks → 2 minutes)
 
-**Features:**
-- Onboarding analysis (SDK health, traffic, patterns)
-- Business intelligence (publisher type, revenue model, tech stack)
-- Competitive intelligence (competitor detection)
-- Monetization maturity scoring
+---
+
+### **3. Duke Agent Created**
+
+**Location:** `/Users/loganlorenz/MulaOS/duke/`
+
+**Capabilities:**
+- ✅ SDK Health Check
+- ✅ Traffic Analysis (sitemap + RSS)
+- ✅ URL Pattern Discovery
+- ✅ **NEW:** SmartScroll Placement Intelligence (DOM analysis, eligibility scoring)
+- ✅ **NEW:** Competitor Detection (Taboola, Outbrain, Revcontent, Content.ad)
+- ✅ Deployment Readiness Assessment
+
+**Files Created:**
+- `duke/src/onboard.js` - Main onboarding orchestrator
+- `duke/src/placement/PlacementDetector.js` - DOM structure analysis
+- `duke/src/placement/CompetitorDetector.js` - Competitor detection
+- `duke/src/index.js` - CLI entry point
+- `duke/README.md` - Documentation
+
+---
+
+### **4. Granny Refocused**
+
+**Location:** `/Users/loganlorenz/MulaOS/granny/`
+
+**Removed:**
+- ❌ Onboarding command (`/granny onboard`) → Moved to Duke
+- ❌ Technical intelligence → Moved to Duke
+
+**Kept:**
+- ✅ Context command (`/granny context`)
+- ✅ Business Intelligence
+- ✅ Contextual Intelligence (sports calendar, rivalry detection)
+- ✅ Affiliate-Specific Search Strategies
+- ✅ Standalone Intelligence API (`granny-intelligence-api/`)
+
+---
+
+## 🏗️ **Architecture**
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    MULA SDK (Production)                     │
+│                                                              │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐  │
+│  │  SALLY   │  │   TAKA   │  │   ANDY   │  │   OCCY   │  │
+│  │  GenAI   │  │  Deploy  │  │ Analytics│  │ Monetize │  │
+│  │ Product  │  │  Control │  │ Reports  │  │ Revenue │  │
+│  └──────────┘  └──────────┘  └──────────┘  └──────────┘  │
+│                                                              │
+│                    "SURFERS" (Main Agents)                    │
+└───────────────────────────┬─────────────────────────────────┘
+                            │
+                            │ Sub-agents inform & enhance
+                            │
+┌───────────────────────────▼─────────────────────────────────┐
+│              MULAOS (POC Architecture)                       │
+│                                                              │
+│  ┌──────────────┐          ┌──────────────┐               │
+│  │    GRANNY    │          │     DUKE     │               │
+│  │   Context    │          │  Onboarding  │               │
+│  │   Engine     │          │  Placement   │               │
+│  │              │          │              │               │
+│  │ Answers:     │          │ Answers:     │               │
+│  │ "What does   │          │ "Where       │               │
+│  │  this page   │          │  should we   │               │
+│  │  mean?"      │          │  place        │               │
+│  │              │          │  SmartScroll │               │
+│  │              │          │  and what    │               │
+│  │              │          │  pages are   │               │
+│  │              │          │  eligible?"  │               │
+│  └──────────────┘          └──────────────┘               │
+└──────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 🔌 **Integration Points**
+
+### **Granny → Sally (Product Selection)**
+- Provides contextual intelligence via REST API
+- Affiliate-specific search strategies (Fanatics + Amazon)
+- Sports calendar intelligence (rivalry week, championships)
+
+### **Duke → Taka (Deployment Control)**
+- Provides placement intelligence (DOM selectors, eligibility)
+- Competitor detection (beta test opportunities)
 - Deployment readiness assessment
-- **NEW:** Contextual intelligence display (from Granny API)
-- **NEW:** Affiliate-specific search strategies display (from Granny API)
 
-**Running:** `http://localhost:3000`
+### **Duke → Pre-sales/Customer Success**
+- Accelerates onboarding (2-3 weeks → 2 minutes)
+- Answers: "Where should we place SmartScroll?"
+- Identifies eligible pages and optimal placement
 
 ---
 
-### **3. Architecture: Standalone Intelligence Service**
+## 📂 **File Structure**
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│         GRANNY INTELLIGENCE API (Port 3001)             │
-│                Standalone Service                        │
-├─────────────────────────────────────────────────────────┤
-│  • Context Detection                                    │
-│  • Strategy Generation (Fanatics + Amazon)              │
-│  • Publisher Intelligence                                │
-│  • Sports Calendar                                       │
-└────────────────────┬────────────────────────────────────┘
-                     │ REST API
-        ┌────────────┴───────────┬──────────────────────┐
-        │                        │                       │
-        ↓                        ↓                       ↓
-  ┌──────────┐          ┌──────────────┐       ┌─────────────┐
-  │  SALLY   │          │ GRANNY WEB   │       │   TAKA      │
-  │  Agent   │          │  Dashboard   │       │   Agent     │
-  └──────────┘          └──────────────┘       └─────────────┘
+/Users/loganlorenz/MulaOS/
+├── granny/                    # Granny Context Engine
+│   ├── src/
+│   │   ├── index.js          # CLI (context command only)
+│   │   ├── context.js        # Business context analysis
+│   │   └── ...
+│   └── README.md
+│
+├── granny-intelligence-api/    # Granny REST API
+│   ├── server.js
+│   ├── src/
+│   │   ├── GrannyIntelligence.js
+│   │   ├── ContextDetector.js
+│   │   └── StrategyGenerator.js
+│   └── README.md
+│
+├── duke/                      # Duke Onboarding Agent
+│   ├── src/
+│   │   ├── index.js          # CLI (onboard command)
+│   │   ├── onboard.js        # Onboarding orchestrator
+│   │   ├── placement/
+│   │   │   ├── PlacementDetector.js
+│   │   │   └── CompetitorDetector.js
+│   │   ├── scrapers/         # Shared with Granny
+│   │   ├── analyzers/        # Shared with Granny
+│   │   └── healthcheck/      # Shared with Granny
+│   └── README.md
+│
+└── memory-bank/
+    └── agents/
+        └── mulaos-architecture.md  # Architecture documentation
 ```
-
-**Key Principle:** Granny is a **standalone intelligence provider** that Sally and other agents **consume** via REST API.
-
----
-
-## 🔌 **Integration Ready**
-
-### **Sally Integration (Next Step)**
-
-```javascript
-// In Sally's searchWorker.js
-
-async function generateProductFeed(domain, url) {
-  // 1. Get targeting rule
-  const rule = await getSiteTargeting(domain, url);
-  
-  // 2. Call Granny Intelligence API
-  const intelligence = await fetch('http://granny-api:3001/api/intelligence', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      domain: domain,
-      url: url,
-      targetingRule: rule
-    })
-  }).then(r => r.json());
-  
-  console.log(`🏄‍♂️ Granny: ${intelligence.context?.event || 'Generic'}`);
-  
-  // 3. Use affiliate-specific strategies
-  if (rule.credentials.impact && intelligence.search_strategies.impact.applicable) {
-    await searchFanatics(
-      intelligence.search_strategies.impact.primary_search,
-      intelligence.search_strategies.impact.filters,
-      rule.credentials.impact
-    );
-  }
-  
-  if (rule.credentials.amazon && intelligence.search_strategies.amazon.applicable) {
-    await searchAmazon(
-      intelligence.search_strategies.amazon.primary_search,
-      intelligence.search_strategies.amazon.keywords,
-      rule.credentials.amazon
-    );
-  }
-}
-```
-
----
-
-## 📊 **Example Output**
-
-### **ON3 Ohio State (Rivalry Week)**
-
-**Request:**
-```json
-{
-  "domain": "on3.com",
-  "url": "/teams/ohio-state-buckeyes/news/michigan-preview",
-  "targetingRule": {
-    "search": "Ohio State Buckeyes merchandise",
-    "credentials": {
-      "impact": "on3-impact",
-      "amazon": null
-    }
-  }
-}
-```
-
-**Response:**
-```json
-{
-  "context": {
-    "type": "rivalry-week",
-    "event": "Ohio State Rivalry Week",
-    "sport": "cfb",
-    "team": "Ohio State",
-    "rival": "Michigan",
-    "urgency": "high",
-    "expected_lift": "3-4x CTR",
-    "confidence": "high"
-  },
-  "search_strategies": {
-    "impact": {
-      "applicable": true,
-      "primary_search": "Beat Michigan",
-      "filters": {
-        "sport": "cfb",
-        "team": "ohio-state",
-        "tags": ["rivalry", "michigan"]
-      },
-      "confidence": 0.92,
-      "reasoning": "Rivalry week detected - Fanatics has specific rivalry merchandise"
-    },
-    "amazon": {
-      "applicable": false,
-      "primary_search": "Ohio State beat Michigan rivalry shirt",
-      "keywords": ["ohio state", "beat michigan", "rivalry", ...],
-      "confidence": 0.88
-    }
-  }
-}
-```
-
----
-
-## 📈 **Expected Impact**
-
-### **Without Granny:**
-- Search: "Ohio State Buckeyes merchandise" (generic)
-- CTR: 1.2%
-- Monthly Revenue: $45K
-
-### **With Granny:**
-- Fanatics: "Beat Michigan" (contextual, rivalry week)
-- Amazon: "Ohio State beat Michigan rivalry shirt"
-- CTR: 4.1% (3.4x lift!)
-- Monthly Revenue: $66K (+$21K = +47%)
-
-### **Annual Impact (per publisher):**
-- **Incremental Revenue:** $252K/year
-- **CTR Lift:** 3-4x during high-context moments
-- **Context Coverage:** 20% of traffic
-- **Manual Work:** Zero (fully automated)
-
----
-
-## 🚀 **Deployment**
-
-### **Services Running:**
-
-1. **Granny Intelligence API:**
-   ```bash
-   cd /Users/loganlorenz/MulaOS/granny-intelligence-api
-   npm start
-   # Running on http://localhost:3001
-   ```
-
-2. **Granny Web Dashboard:**
-   ```bash
-   cd /Users/loganlorenz/MulaOS/granny-web
-   npm start
-   # Running on http://localhost:3000
-   ```
-
----
-
-## 📂 **Files Created/Modified**
-
-### **New:**
-- `granny-intelligence-api/` - Standalone intelligence service
-  - `server.js` - Express API server
-  - `src/GrannyIntelligence.js` - Main orchestrator
-  - `src/ContextDetector.js` - Sports context detection
-  - `src/StrategyGenerator.js` - Affiliate strategy generation
-  - `src/config/sports.json` - Sports calendar
-  - `src/config/teams.json` - Team/rival mappings
-  - `package.json`
-  - `README.md`
-
-### **Modified:**
-- `granny-web/server.js` - Added Granny API integration
-- `granny-web/public/index.html` - Added contextual intelligence + search strategies UI
-- `granny/src/context.js` - Added search strategy generation
-- `memory-bank/activeContext.md` - This file
-- `memory-bank/agents/granny-final-architecture.md` - Architecture documentation
-- `memory-bank/agents/granny-intelligence-api-spec.md` - API specification
-- `memory-bank/agents/granny-credential-architecture.md` - Credential system docs
-- `memory-bank/agents/granny-contextual-to-sally-integration.md` - Sally integration guide
 
 ---
 
 ## 🎯 **Next Steps**
 
-### **Phase 1: Sally Integration (1-2 weeks)**
-1. ⬜ Update Sally's searchWorker to call Granny API
-2. ⬜ Implement affiliate-specific search logic
-3. ⬜ Add logging for A/B testing
-4. ⬜ Deploy to staging environment
+### **Phase 1: Testing (1 week)**
+1. ⬜ Test Duke onboarding on ON3
+2. ⬜ Test Granny context on EssentiallySports
+3. ⬜ Validate placement detection accuracy
+4. ⬜ Validate competitor detection accuracy
 
-### **Phase 2: Validation (1 week)**
-1. ⬜ Deploy to ON3 (pilot publisher)
-2. ⬜ A/B test: Generic vs. Granny-enhanced
-3. ⬜ Measure actual CTR lift
-4. ⬜ Validate 3-4x hypothesis
+### **Phase 2: Integration (2 weeks)**
+1. ⬜ Duke → Taka integration (placement intelligence)
+2. ⬜ Granny → Sally integration (contextual intelligence)
+3. ⬜ Web dashboard updates (show both agents)
 
-### **Phase 3: Scale (2 weeks)**
-1. ⬜ Deploy to all publishers
-2. ⬜ Granny daemon monitors sports calendar
-3. ⬜ Auto-updates intelligence
-4. ⬜ Performance dashboard
-
-### **Phase 4: ESPN API Integration (2 weeks)**
-1. ⬜ Replace date-based detection with real sports calendar
-2. ⬜ Add live game detection
-3. ⬜ Add injury/roster updates
-4. ⬜ Add betting lines integration
+### **Phase 3: Production (Future)**
+1. ⬜ Engineering/product team reviews POC
+2. ⬜ Sub-agents subsumed into main SDK agents
+3. ⬜ Direct integration (no REST API needed)
 
 ---
 
 ## 💡 **Key Insights**
 
-### **Why Separate Service?**
+### **Why Split?**
 
 1. **Separation of Concerns**
-   - Granny = Intelligence provider
-   - Sally = Product search executor
-   - Clean API contract
+   - Granny = Context (what to show)
+   - Duke = Placement (where to show)
+   - Clean boundaries, focused responsibilities
 
-2. **Reusability**
-   - Sally uses it for product search
-   - Taka uses it for placement optimization
-   - Occy uses it for monetization strategy
-   - Andy uses it for performance analysis
+2. **Different Use Cases**
+   - Granny = Real-time intelligence (runs when mobilizing a page)
+   - Duke = Pre-sales/onboarding (runs once per publisher)
 
-3. **Independent Scaling**
-   - Deploy as standalone microservice
-   - Scale independently
-   - Cache intelligence results
-   - Monitor quality separately
+3. **Different Integration Points**
+   - Granny → Sally (product selection)
+   - Duke → Taka (deployment control)
 
-4. **Easy A/B Testing**
-   - Control: Generic search
-   - Treatment: Granny-enhanced search
-   - Compare CTR lift
-
-### **Affiliate-Specific Strategies**
-
-Different affiliates require different search strategies:
-
-- **Fanatics (Impact):** Short phrases + filters (structured catalog)
-- **Amazon:** Long, keyword-rich queries (e-commerce search)
-
-Granny provides **both strategies** for the same context, optimized for each affiliate's search system.
+4. **POC Architecture**
+   - MulaOS is proof-of-concept
+   - Informs product strategy
+   - Will be subsumed by engineering/product team
 
 ---
 
-**Status:** ✅ Complete and Production-Ready!  
-**Next:** Sally Integration  
-**Impact:** $250K+/year per publisher  
-**Confidence:** High - validated architecture, tested API
+**Status:** ✅ Architecture Complete  
+**Next:** Testing & Integration  
+**Impact:** Accelerated onboarding + Context-aware product selection  
+**Confidence:** High - clear separation of concerns, focused responsibilities
