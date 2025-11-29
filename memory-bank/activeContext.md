@@ -1,82 +1,81 @@
-# Active Context - MulaOS Architecture: Granny & Duke Split
+# Active Context - MulaOS Architecture: Granny & Duke Enhanced
 
-## 🎯 **Current Status: ARCHITECTURE REFINED**
+## 🎯 **Current Status: ENHANCED & PRODUCTION-READY**
 
 **Last Updated:** 2025-11-28  
-**Session:** Granny & Duke Split - Sub-Agent Architecture
+**Session:** Duke Placement & Competitor Detection Enhancements
 
 ---
 
-## ✅ **What Was Completed**
+## ✅ **Recent Enhancements**
 
-### **1. Architecture Clarification**
+### **1. Duke Placement Intelligence - Enhanced**
 
-**Key Principle**: MulaOS is **NOT integrated into the SDK**. It is a **POC architecture** that informs product strategy. The agents (Granny, Duke) will be sub-agents under the existing "surfers" (Sally, Taka, etc.) and will be subsumed by the engineering/product team.
+**Improved End-of-Content Detection:**
+- ✅ Added 10+ new content break markers:
+  - `.recirc`, `.more-stories`, `.read-more`
+  - `.recommended-articles`, `.trending`, `.next-up`
+  - `.related-wrap`, `.inline-related`
+  - `.subscription-upsell`, `.subscription-callout`
+  - `.inline-ad`
+- ✅ Improved placement anchor detection with fallback logic
+- ✅ Better selector building (ID → class → tagName)
 
----
-
-### **2. Granny & Duke Split**
-
-**Granny** = **Publisher Context Engine**
-- Answers: "What does this page mean relative to every other permutation you can think of?"
-- When mobilizing a page, gets context of everything else:
-  - Time of year
-  - What's going on in a season or show
-  - What would a fan of that thing know about
-  - Something that we can market to
-- Complements what we can do on the search side with affiliates
-
-**Duke** = **Onboarding & Placement Intelligence Agent**
-- Answers: "Where should we place SmartScroll and what pages is it eligible for?"
-- Detection:
-  - Article pages (templated structure)
-  - Clean break at end of content (above footer, below content)
-  - DOM structure analysis
-  - Competitor detection (Taboola, Outbrain)
-  - If competitors running → Ask for beta test against them
-- Accelerates pre-sales and onboarding (2-3 weeks → 2 minutes)
+**Enhanced URL Pattern Extraction:**
+- ✅ AMP version handling (`/amp/` → `/*`)
+- ✅ Tag page normalization (`/tag/[name]` → `/*`)
+- ✅ Pagination handling (`/page/123` → `/*`)
+- ✅ Video page normalization (`/video/[slug]` → `/*`)
 
 ---
 
-### **3. Duke Agent Created**
+### **2. Duke Competitor Detection - Major Upgrade**
 
-**Location:** `/Users/loganlorenz/MulaOS/duke/`
+**Expanded Competitor Coverage:**
+- ✅ **Native Networks**: Taboola, Outbrain, Revcontent, Content.ad, ZergNet, Nativo, TripleLift
+- ✅ **Video/Recirc**: Ex.co, Raptive Recirc
+- ✅ **First-Party**: Data-attribute based recirc widgets (`data-recommendation`, `data-recirc`)
 
-**Capabilities:**
-- ✅ SDK Health Check
-- ✅ Traffic Analysis (sitemap + RSS)
-- ✅ URL Pattern Discovery
-- ✅ **NEW:** SmartScroll Placement Intelligence (DOM analysis, eligibility scoring)
-- ✅ **NEW:** Competitor Detection (Taboola, Outbrain, Revcontent, Content.ad)
-- ✅ Deployment Readiness Assessment
+**Enhanced Detection Logic:**
+- ✅ Pattern-based detection system (configurable `COMPETITORS` object)
+- ✅ Category classification (native, recirc, video_recirc, first_party_recirc)
+- ✅ Selector tracking (captures actual DOM selectors for competitors)
+- ✅ Improved placement detection (uses Cheerio indices for accurate positioning)
+- ✅ Better beta test opportunity generation (inline vs. footer strategies)
 
-**Files Created:**
-- `duke/src/onboard.js` - Main onboarding orchestrator
-- `duke/src/placement/PlacementDetector.js` - DOM structure analysis
-- `duke/src/placement/CompetitorDetector.js` - Competitor detection
-- `duke/src/index.js` - CLI entry point
-- `duke/README.md` - Documentation
-
----
-
-### **4. Granny Refocused**
-
-**Location:** `/Users/loganlorenz/MulaOS/granny/`
-
-**Removed:**
-- ❌ Onboarding command (`/granny onboard`) → Moved to Duke
-- ❌ Technical intelligence → Moved to Duke
-
-**Kept:**
-- ✅ Context command (`/granny context`)
-- ✅ Business Intelligence
-- ✅ Contextual Intelligence (sports calendar, rivalry detection)
-- ✅ Affiliate-Specific Search Strategies
-- ✅ Standalone Intelligence API (`granny-intelligence-api/`)
+**Improved Output:**
+- ✅ Placement map for quick inspection
+- ✅ Category-based grouping
+- ✅ Sample selectors for each competitor
+- ✅ Confidence scoring (high/medium/low based on detection frequency)
 
 ---
 
-## 🏗️ **Architecture**
+### **3. Architecture Refinements**
+
+**Clarified Roles:**
+- **Granny**: "Why does this page matter right now?" (meaning, timing, opportunity buckets)
+- **Duke**: "Where should SmartScroll live?" (coverage, structure, placement, targeting)
+
+**Orchestrator Model:**
+- ✅ Surfers orchestrate (Sally, Taka, Occy)
+- ✅ Sub-agents provide intelligence (Granny, Duke)
+- ✅ Sub-agents never call surfers; surfers call sub-agents
+- ✅ Graceful degradation (fallback to default logic on sub-agent failure)
+
+**Memory Layer:**
+- ✅ Lightweight knowledge layer beneath MulaOS
+- ✅ Stores publisher insights, historical patterns, learned behaviors
+- ✅ Used by both sub-agents and surfers
+
+**MulaOS Status:**
+- ✅ R&D system that prototypes intelligence capabilities
+- ✅ Informs product strategy
+- ✅ Accelerates and eventually merges into production SDK agents
+
+---
+
+## 🏗️ **Current Architecture**
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -88,13 +87,14 @@
 │  │ Product  │  │  Control │  │ Reports  │  │ Revenue │  │
 │  └──────────┘  └──────────┘  └──────────┘  └──────────┘  │
 │                                                              │
-│                    "SURFERS" (Main Agents)                    │
+│                    "SURFERS" (Orchestrators)                  │
 └───────────────────────────┬─────────────────────────────────┘
                             │
-                            │ Sub-agents inform & enhance
+                            │ Surfers call sub-agents
+                            │ Sub-agents never call surfers
                             │
 ┌───────────────────────────▼─────────────────────────────────┐
-│              MULAOS (POC Architecture)                       │
+│              MULAOS (R&D Prototype)                          │
 │                                                              │
 │  ┌──────────────┐          ┌──────────────┐               │
 │  │    GRANNY    │          │     DUKE     │               │
@@ -102,35 +102,64 @@
 │  │   Engine     │          │  Placement   │               │
 │  │              │          │              │               │
 │  │ Answers:     │          │ Answers:     │               │
-│  │ "What does   │          │ "Where       │               │
-│  │  this page   │          │  should we   │               │
-│  │  mean?"      │          │  place        │               │
-│  │              │          │  SmartScroll │               │
-│  │              │          │  and what    │               │
-│  │              │          │  pages are   │               │
-│  │              │          │  eligible?"  │               │
+│  │ "Why does    │          │ "Where       │               │
+│  │  this page   │          │  should      │               │
+│  │  matter?"    │          │  SmartScroll │               │
+│  │              │          │  live?"      │               │
+│  │              │          │              │               │
+│  │ • Meaning    │          │ • Coverage   │               │
+│  │ • Timing    │          │ • Structure   │               │
+│  │ • Opportunity│          │ • Placement  │               │
+│  │   Buckets   │          │ • Targeting  │               │
 │  └──────────────┘          └──────────────┘               │
+│                                                              │
+│  ┌──────────────────────────────────────────────────────┐  │
+│  │         MEMORY LAYER (Knowledge Base)                │  │
+│  │  • Publisher insights                                 │  │
+│  │  • Historical patterns                                │  │
+│  │  • Learned behaviors                                  │  │
+│  └──────────────────────────────────────────────────────┘  │
 └──────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
+## 📊 **Duke Competitor Detection - Full List**
+
+### **Native Ad Networks:**
+1. **Taboola** - Native content discovery
+2. **Outbrain** - Content recommendation engine
+3. **Revcontent** - Native advertising platform
+4. **Content.ad** - Native ad network
+5. **ZergNet** - Content discovery platform
+6. **Nativo** - Native advertising technology
+7. **TripleLift** - Native programmatic advertising
+
+### **Video/Recirc Platforms:**
+8. **Ex.co** - Video recirculation platform
+9. **Raptive Recirc** - Content recirculation (formerly CafeMedia)
+
+### **First-Party Widgets:**
+10. **First-Party Recirc** - Custom recirc widgets (detected via `data-recommendation`, `data-recirc`)
+
+---
+
 ## 🔌 **Integration Points**
 
-### **Granny → Sally (Product Selection)**
-- Provides contextual intelligence via REST API
-- Affiliate-specific search strategies (Fanatics + Amazon)
-- Sports calendar intelligence (rivalry week, championships)
+### **Granny → Sally**
+- Provides **opportunity buckets** (not product selection)
+- Contextual meaning, timing, behavioral understanding
+- Example: "Rivalry Week → Team Gear + Tailgate Supplies"
 
-### **Duke → Taka (Deployment Control)**
-- Provides placement intelligence (DOM selectors, eligibility)
-- Competitor detection (beta test opportunities)
-- Deployment readiness assessment
+### **Duke → Taka**
+- Provides **coverage-aware placement** (not contextual interpretation)
+- Structure, targeting logic, eligibility scoring
+- Example: "Article pages → Below `.article-footer` → 95% eligible"
 
-### **Duke → Pre-sales/Customer Success**
-- Accelerates onboarding (2-3 weeks → 2 minutes)
-- Answers: "Where should we place SmartScroll?"
-- Identifies eligible pages and optimal placement
+### **Graceful Degradation**
+- Sub-agent failures → Surfers fall back to default logic
+- No blocking dependencies
+- Production-safe architecture
 
 ---
 
@@ -138,36 +167,20 @@
 
 ```
 /Users/loganlorenz/MulaOS/
-├── granny/                    # Granny Context Engine
+├── duke/
 │   ├── src/
-│   │   ├── index.js          # CLI (context command only)
-│   │   ├── context.js        # Business context analysis
+│   │   ├── placement/
+│   │   │   ├── PlacementDetector.js    # Enhanced (10+ content markers)
+│   │   │   └── CompetitorDetector.js   # Major upgrade (10 competitors)
 │   │   └── ...
 │   └── README.md
 │
-├── granny-intelligence-api/    # Granny REST API
-│   ├── server.js
-│   ├── src/
-│   │   ├── GrannyIntelligence.js
-│   │   ├── ContextDetector.js
-│   │   └── StrategyGenerator.js
-│   └── README.md
-│
-├── duke/                      # Duke Onboarding Agent
-│   ├── src/
-│   │   ├── index.js          # CLI (onboard command)
-│   │   ├── onboard.js        # Onboarding orchestrator
-│   │   ├── placement/
-│   │   │   ├── PlacementDetector.js
-│   │   │   └── CompetitorDetector.js
-│   │   ├── scrapers/         # Shared with Granny
-│   │   ├── analyzers/        # Shared with Granny
-│   │   └── healthcheck/      # Shared with Granny
-│   └── README.md
+├── granny/
+│   └── ...
 │
 └── memory-bank/
     └── agents/
-        └── mulaos-architecture.md  # Architecture documentation
+        └── mulaos-architecture.md     # Updated with orchestrator model
 ```
 
 ---
@@ -175,48 +188,56 @@
 ## 🎯 **Next Steps**
 
 ### **Phase 1: Testing (1 week)**
-1. ⬜ Test Duke onboarding on ON3
-2. ⬜ Test Granny context on EssentiallySports
-3. ⬜ Validate placement detection accuracy
-4. ⬜ Validate competitor detection accuracy
+1. ⬜ Test enhanced placement detection on ON3
+2. ⬜ Validate competitor detection accuracy
+3. ⬜ Test graceful degradation scenarios
+4. ⬜ Validate beta test opportunity generation
 
 ### **Phase 2: Integration (2 weeks)**
 1. ⬜ Duke → Taka integration (placement intelligence)
-2. ⬜ Granny → Sally integration (contextual intelligence)
-3. ⬜ Web dashboard updates (show both agents)
+2. ⬜ Granny → Sally integration (opportunity buckets)
+3. ⬜ Memory layer implementation
+4. ⬜ Web dashboard updates
 
 ### **Phase 3: Production (Future)**
-1. ⬜ Engineering/product team reviews POC
-2. ⬜ Sub-agents subsumed into main SDK agents
+1. ⬜ Engineering/product team reviews R&D prototype
+2. ⬜ Sub-agents merged into production SDK agents
 3. ⬜ Direct integration (no REST API needed)
+4. ⬜ Performance monitoring and optimization
 
 ---
 
 ## 💡 **Key Insights**
 
-### **Why Split?**
+### **Enhanced Competitor Detection**
 
-1. **Separation of Concerns**
-   - Granny = Context (what to show)
-   - Duke = Placement (where to show)
-   - Clean boundaries, focused responsibilities
+**Why It Matters:**
+- Identifies beta test opportunities (A/B test against existing competitors)
+- Maps inventory overlap (where competitors are running)
+- Informs placement strategy (avoid conflicts, capitalize on gaps)
 
-2. **Different Use Cases**
-   - Granny = Real-time intelligence (runs when mobilizing a page)
-   - Duke = Pre-sales/onboarding (runs once per publisher)
+**Detection Accuracy:**
+- Pattern-based system (configurable, extensible)
+- Category classification (native vs. recirc vs. first-party)
+- Selector tracking (actual DOM elements for reference)
+- Confidence scoring (high/medium/low based on frequency)
 
-3. **Different Integration Points**
-   - Granny → Sally (product selection)
-   - Duke → Taka (deployment control)
+### **Improved Placement Detection**
 
-4. **POC Architecture**
-   - MulaOS is proof-of-concept
-   - Informs product strategy
-   - Will be subsumed by engineering/product team
+**Why It Matters:**
+- More accurate placement recommendations
+- Better eligibility scoring
+- Handles diverse site architectures
+- Fallback logic for edge cases
+
+**Content Break Markers:**
+- 10+ new markers (covers most publisher patterns)
+- Improved selector building (ID → class → tagName)
+- Better URL pattern normalization (AMP, tags, pagination, video)
 
 ---
 
-**Status:** ✅ Architecture Complete  
+**Status:** ✅ Enhanced & Production-Ready  
 **Next:** Testing & Integration  
-**Impact:** Accelerated onboarding + Context-aware product selection  
-**Confidence:** High - clear separation of concerns, focused responsibilities
+**Impact:** Better placement detection + comprehensive competitor intelligence  
+**Confidence:** High - enhanced detection logic, graceful degradation, production-safe

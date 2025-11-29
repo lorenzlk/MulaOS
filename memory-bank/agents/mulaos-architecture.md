@@ -7,7 +7,7 @@
 
 ## Core Principle
 
-**MulaOS is NOT integrated into the SDK.** It is a **POC architecture** that informs product strategy. The agents (Granny, Duke) will be sub-agents under the existing "surfers" (Sally, Taka, etc.) and will be subsumed by the engineering/product team.
+**MulaOS is not part of the SDK today.** It is an R&D system that prototypes intelligence capabilities and informs product strategy. Its purpose is to accelerate and eventually merge into the production SDK agents (“surfers”).
 
 ---
 
@@ -31,6 +31,8 @@
 │                                                              │
 │                    "SURFERS" (Main Agents)                    │
 └───────────────────────────┬─────────────────────────────────┘
+                            │
+                            │ Surfers remain the orchestrators. Sub-agents never call surfers; surfers call sub-agents.
                             │
                             │ Sub-agents inform & enhance
                             │
@@ -61,6 +63,7 @@
 │  │  • Sports Calendar                                     │  │
 │  │  • Rivalry Detection                                   │  │
 │  │  • Seasonal Opportunities                             │  │
+│  │  • Offer Strategy Layer (maps context to recommended affiliate category or product line) │  │
 │  └──────────────────────────────────────────────────────┘  │
 │                                                              │
 │  ┌──────────────────────────────────────────────────────┐  │
@@ -82,21 +85,28 @@
 
 ---
 
+### Memory Layer
+Beneath MulaOS sits the **Memory Bank**, a lightweight knowledge layer used by sub-agents and surfers to store publisher insights, historical patterns, and learned behaviors.
+
+---
+
 ## Agent Responsibilities
 
 ### **Granny - Publisher Context Engine**
 
-**Role**: Understands what a page means relative to:
-- Time of year
-- What's going on in a season or show
-- What would a fan of that thing know about
-- Something that we can market to
+**Role**: Answers the question: “Why does this page matter right now?” Granny provides temporal, contextual, and behavioral meaning so surfers understand what the audience cares about at this moment.
 
 **Capabilities:**
-- ✅ Contextual Intelligence (sports calendar, rivalry detection, seasonal trends)
-- ✅ Business Intelligence (revenue model, publisher type, market position)
-- ✅ Affiliate-Specific Search Strategies (Fanatics + Amazon)
-- ✅ Sports Calendar Intelligence (CFB, NFL, NBA, CBB)
+- Contextual Meaning (what the page represents to the reader)
+- Temporal Intelligence (seasons, cycles, holidays, sports calendars)
+- Behavioral Understanding (what a fan or reader interprets from the content)
+- Business Intelligence (publisher type, model, audience patterns)
+- Affiliate Opportunity Mapping (context → opportunity buckets such as Team Gear, Tailgate Supplies, Beauty Restock, Holiday Gifts)
+- Sports & Entertainment Timing (CFB, NFL, NBA, CBB, episodes, premieres)
+
+Granny does not select products or SKUs; she provides opportunity buckets that Sally uses during feed generation.
+
+This separation of meaning (Granny) and structure (Duke) keeps the system clean, predictable, and production-aligned.
 
 **Integration:**
 - Provides contextual intelligence to **Sally** (product selection)
@@ -109,15 +119,20 @@
 
 ### **Duke - Onboarding & Placement Intelligence Agent**
 
-**Role**: Answers "Where should we place SmartScroll and what pages is it eligible for?"
+**Role**: Answers the question: “Where should SmartScroll live to maximize coverage, eligibility, and valid targeting based on how the publisher’s site is actually built?”
 
 **Capabilities:**
-- ✅ SDK Health Check (verifies `cdn.makemula.ai` deployment)
-- ✅ Traffic Analysis (sitemap + RSS feed analysis)
-- ✅ URL Pattern Discovery (automatic targeting rules)
-- ✅ SmartScroll Placement Intelligence (DOM analysis, eligibility scoring)
-- ✅ Competitor Detection (Taboola, Outbrain, Revcontent)
-- ✅ Deployment Readiness Assessment (scoring, timeline, critical path)
+- Coverage Intelligence (which URL patterns represent real content)
+- Site Architecture Mapping (DOM, recirc, competitors, layouts)
+- Targeting Map Generation (URL → rule mappings for maximum coverage)
+- Placement Recommendation (best injection point, not just valid ones)
+- Competitor & Recirc Detection (native widgets, recirc modules, footers)
+- Eligibility Scoring (structural health, scroll-depth viability)
+- Deployment Readiness Assessment
+
+Duke does not select products or interpret contextual meaning; he focuses strictly on coverage, structure, placement, and targeting logic.
+
+This separation of meaning (Granny) and structure (Duke) keeps the system clean, predictable, and production-aligned.
 
 **Integration:**
 - Provides placement intelligence to **Taka** (deployment control)
@@ -130,6 +145,8 @@
 ## Integration Pattern
 
 ### **Granny → Sally (Product Selection)**
+
+Granny informs Sally by providing meaning, timing, and opportunity buckets—not product selection.
 
 ```javascript
 // In Sally's searchWorker.js
@@ -169,8 +186,11 @@ async function generateProductFeed(domain, url) {
   }
 }
 ```
+Sub-agent failures must degrade gracefully; surfers fall back to default logic when intelligence is unavailable.
 
 ### **Duke → Taka (Deployment Control)**
+
+Duke informs Taka by providing coverage-aware placement and targeting logic—not contextual interpretation.
 
 ```javascript
 // In Taka's deployment worker
@@ -193,6 +213,7 @@ async function deploySmartScroll(domain, url) {
   }
 }
 ```
+Sub-agent failures must degrade gracefully; surfers fall back to default logic when intelligence is unavailable.
 
 ---
 
@@ -219,12 +240,17 @@ async function deploySmartScroll(domain, url) {
 
 ---
 
+### Orchestrator Model
+Sally orchestrates product generation, Taka orchestrates deployment, and Occy orchestrates monetization. Sub-agents provide intelligence; surfers make decisions.
+
+---
+
 ## Key Principles
 
-1. **POC First**: MulaOS is a proof-of-concept that informs product strategy
-2. **Sub-Agent Pattern**: Granny and Duke are sub-agents, not replacements
-3. **Separation of Concerns**: Context (Granny) vs. Placement (Duke)
-4. **Integration Ready**: REST APIs enable easy integration with surfers
+1. **POC First**: MulaOS is a proof-of-concept that informs product strategy  
+2. **Sub-Agent Pattern**: Granny and Duke extend surfers but do not override surfer orchestration.  
+3. **Separation of Concerns**: Context (Granny) vs. Placement (Duke)  
+4. **Integration Ready**: REST APIs enable easy integration with surfers  
 5. **Product Strategy**: Architecture guides engineering/product decisions
 
 ---
@@ -265,4 +291,3 @@ async function deploySmartScroll(domain, url) {
 
 **Last Updated**: 2025-11-28  
 **Status**: ✅ Architecture Complete
-

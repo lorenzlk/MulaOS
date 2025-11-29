@@ -92,7 +92,18 @@ class PlacementDetector {
         '.author-box',
         '.related-posts',
         '.comments',
-        '#comments'
+        '#comments',
+        '.recirc',
+        '.more-stories',
+        '.read-more',
+        '.recommended-articles',
+        '.trending',
+        '.next-up',
+        '.related-wrap',
+        '.inline-related',
+        '.subscription-upsell',
+        '.subscription-callout',
+        '.inline-ad'
       ];
       
       let contentBreak = null;
@@ -138,14 +149,21 @@ class PlacementDetector {
       
       const eligible = score >= 60;
       
-      // Determine placement selector
+      // Improved placement anchor detection
       let placementSelector = null;
+
       if (contentBreak && contentBreak.selector !== 'footer') {
-        placementSelector = contentBreak.selector;
-      } else if (article.length) {
-        placementSelector = 'article';
-      } else if (mainContent.length) {
-        placementSelector = mainContent.attr('class') || mainContent.attr('id') || 'main';
+        placementSelector = `${contentBreak.selector}`;
+      } else {
+        // fallback to last meaningful content element
+        const lastBlock = content.find('p, figure, img, blockquote, section').last();
+        if (lastBlock.length) {
+          placementSelector = this.buildSelector(lastBlock);
+        } else if (article.length) {
+          placementSelector = 'article';
+        } else if (mainContent.length) {
+          placementSelector = mainContent.attr('class') || mainContent.attr('id') || 'main';
+        }
       }
       
       return {
@@ -187,6 +205,36 @@ class PlacementDetector {
     if ($('[id*="contentad"], [class*="contentad"], script[src*="contentad"]').length) {
       competitors.push({ name: 'Content.ad', detected: true });
     }
+
+    // ZergNet
+    if ($('script[src*="zergnet"], [data-zergnet], div[id*="zergnet"], div[class*="zergnet"]').length) {
+      competitors.push({ name: 'ZergNet', detected: true });
+    }
+
+    // Ex.co
+    if ($('script[src*="exco"], [data-exco], div[id*="exco"], div[class*="exco"]').length) {
+      competitors.push({ name: 'Ex.co', detected: true });
+    }
+
+    // Raptive Recirc
+    if ($('[data-raptive], script[src*="raptive"], div[class*="raptive"]').length) {
+      competitors.push({ name: 'Raptive Recirc', detected: true });
+    }
+
+    // Nativo
+    if ($('script[src*="nativo"], [data-nativo], div[class*="nativo"]').length) {
+      competitors.push({ name: 'Nativo', detected: true });
+    }
+
+    // TripleLift
+    if ($('script[src*="triplelift"], [data-triplelift]').length) {
+      competitors.push({ name: 'TripleLift', detected: true });
+    }
+
+    // Zeta / Sponsored modules
+    if ($('[data-recommendation], [data-recirc]').length) {
+      competitors.push({ name: 'First-Party Recirc', detected: true });
+    }
     
     return competitors;
   }
@@ -201,6 +249,10 @@ class PlacementDetector {
       .replace(/\/[a-f0-9]{8,}/g, '/*')  // UUIDs/hashes
       .replace(/\/\d{4}\/\d{2}\/\d{2}\//g, '/*/*/*/')  // Dates
       .replace(/\/[^\/]+-[^\/]+-[^\/]+/g, '/*')  // Slugs with multiple dashes
+      .replace(/\/amp\/?/g, '/*')               // AMP versions
+      .replace(/\/tag\/[^\/]+/g, '/*')          // tag pages
+      .replace(/\/page\/\d+/g, '/*')            // paginated pages
+      .replace(/\/video\/[^\/]+/g, '/*')        // video pages
     
     return pattern;
   }
@@ -261,7 +313,14 @@ class PlacementDetector {
     
     return recommendations;
   }
+
+  buildSelector(element) {
+    const id = element.attr('id');
+    if (id) return `#${id}`;
+    const classes = element.attr('class');
+    if (classes) return `.${classes.split(' ')[0]}`;
+    return element[0]?.tagName || 'div';
+  }
 }
 
 module.exports = PlacementDetector;
-
