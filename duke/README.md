@@ -21,18 +21,21 @@ Duke automates the technical discovery that currently takes 2-3 weeks of manual 
 **Answers:**
 - Where should we place SmartScroll?
 - What pages is it eligible for?
-- What's the optimal DOM placement?
+- What's the optimal DOM anchor point at the bottom?
+
+**IMPORTANT:** SmartScroll is **always placed at the bottom of the page** and **loads dynamically** (not in static HTML).
 
 **Detection:**
 - ✅ Article pages (templated structure)
 - ✅ Clean break at end of content (above footer, below content)
-- ✅ DOM structure analysis (content → footer gap)
-- ✅ Mobile vs. desktop placement strategies
+- ✅ DOM structure analysis (finds best anchor point at bottom)
+- ✅ Identifies last meaningful content element before footer
 
 **Output:**
-- Placement recommendations with DOM selectors
+- Placement recommendations with DOM selectors (always at bottom)
 - Eligibility scoring per page type
 - Ready-to-deploy targeting rules
+- Note: SmartScroll loads dynamically via SDK
 
 ---
 
@@ -59,8 +62,10 @@ Duke automates the technical discovery that currently takes 2-3 weeks of manual 
 
 **SDK Health Check:**
 - Verifies `cdn.makemula.ai` deployment
-- Checks homepage and article pages
+- Checks homepage and article pages (static HTML)
 - Detects GTM dynamic loading
+- **Note:** Mula SDK (SmartScroll) loads dynamically at bottom of page
+- Static HTML parsing may not detect it - requires scrolling to bottom to see in browser console
 
 **Traffic Analysis:**
 - Sitemap + RSS feed analysis

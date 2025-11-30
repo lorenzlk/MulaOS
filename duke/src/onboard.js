@@ -23,11 +23,15 @@ const path = require('path');
 class DukeOnboarding {
   async analyze(domain, options = {}) {
     const maxUrls = options.maxUrls || 15000;
+    const testUrl = options.testUrl || null;
     
     console.log(`\n${'='.repeat(60)}`);
     console.log(`🏄‍♂️ DUKE ONBOARDING & PLACEMENT INTELLIGENCE`);
     console.log(`${'='.repeat(60)}\n`);
     console.log(`Domain: ${domain}`);
+    if (testUrl) {
+      console.log(`Test URL: ${testUrl}`);
+    }
     console.log(`Started: ${new Date().toISOString()}\n`);
     
     const results = {
@@ -48,7 +52,8 @@ class DukeOnboarding {
     console.log(`${'─'.repeat(60)}\n`);
     
     const healthChecker = new SdkHealthCheck();
-    results.health_check = await healthChecker.check(domain);
+    // If specific URL provided, use it for SDK check
+    results.health_check = await healthChecker.check(domain, { testUrl: testUrl });
     
     const healthStatus = healthChecker.generateStatus(results.health_check);
     console.log(`\n  Status: ${healthStatus}\n`);
@@ -65,82 +70,145 @@ class DukeOnboarding {
       console.log('');
     }
     
-    // Phase 2: Traffic Analysis
+    // Phase 2: Traffic Analysis (skip for specific URLs)
     console.log(`${'─'.repeat(60)}`);
     console.log(`PHASE 2: TRAFFIC DISTRIBUTION ANALYSIS`);
     console.log(`${'─'.repeat(60)}\n`);
     
-    const sitemapScraper = new SitemapScraper();
-    const rssScraper = new RssScraper();
-    
     let urls = [];
-    let sources = [];
+    let sitemapData = null;
+    let rssData = null;
     
-    // Try sitemap
-    try {
-      const sitemapData = await sitemapScraper.scrape(domain);
+    // If testing a specific URL, skip site-wide traffic analysis
+    if (testUrl && testUrl.includes('/') && testUrl !== `https://${domain}` && testUrl !== `http://${domain}`) {
+      console.log(`  ℹ️  Specific URL provided - skipping site-wide traffic analysis`);
+      console.log(`  📍 Focusing analysis on: ${testUrl}\n`);
+      results.traffic_estimate = {
+        status: 'skipped',
+        message: 'Traffic analysis skipped for specific URL - use domain-level analysis (e.g., on3.com) for site-wide insights',
+        total_urls: 0,
+        distribution: {},
+        sources: [],
+        confidence: 0
+      };
+    } else {
+      // Full domain analysis
+      const sitemapScraper = new SitemapScraper();
+      const rssScraper = new RssScraper();
+      let sources = [];
+    
+      // Try sitemap
+      try {
+        sitemapData = await sitemapScraper.scrape(domain);
       if (sitemapData && sitemapData.total_urls > 0) {
-        // Extract URLs from sitemap distribution
-        for (const [category, data] of Object.entries(sitemapData.distribution || {})) {
-          if (data.sample_urls) {
-            urls = urls.concat(data.sample_urls);
+        // Use all URLs from sitemap (not just samples) for better pattern analysis
+        if (sitemapData.all_urls && sitemapData.all_urls.length > 0) {
+          urls = urls.concat(sitemapData.all_urls.slice(0, 5000)); // Limit to 5000 for performance
+        } else {
+          // Fallback: extract from distribution if all_urls not available
+          for (const [category, data] of Object.entries(sitemapData.distribution || {})) {
+            if (data.sample_urls) {
+              urls = urls.concat(data.sample_urls);
+            }
           }
         }
         sources.push('sitemap');
-        console.log(`  ✅ Sitemap analyzed (${sitemapData.total_urls} URLs)\n`);
+        console.log(`  ✅ Sitemap analyzed (${sitemapData.total_urls} URLs, using ${Math.min(urls.length, 5000)} for analysis)\n`);
       }
     } catch (error) {
       console.log(`  ⚠️  Sitemap not accessible: ${error.message}\n`);
     }
     
-    // Try RSS
-    let rssData = null;
-    try {
-      rssData = await rssScraper.scrape(domain);
-      sources.push('rss');
+      // Try RSS
+      try {
+        rssData = await rssScraper.scrape(domain);
+      if (rssData && rssData.distribution) {
+        sources.push('rss');
+        // Extract URLs from RSS distribution for pattern analysis
+        const rssUrls = Object.values(rssData.distribution).flatMap(d => d.sample_urls || []);
+        urls = urls.concat(rssUrls);
+        console.log(`  ✅ RSS feed analyzed (${rssData.total_items || 0} items)\n`);
+      }
     } catch (error) {
       console.log(`  ⚠️  RSS feed not found\n`);
     }
     
-    if (urls.length === 0 && !rssData) {
-      console.log(`  ❌ Unable to gather traffic data (no sitemap or RSS)\n`);
-      results.traffic_estimate = {
-        status: 'failed',
-        message: 'No data sources available'
-      };
-    } else {
-      results.traffic_estimate = this.analyzeTraffic(urls, rssData);
-      this.printTrafficSummary(results.traffic_estimate);
+    // Also try to get all URLs from sitemap (not just samples)
+    if (sitemapData && sitemapData.all_urls && sitemapData.all_urls.length > 0) {
+      // Add more URLs from sitemap if available
+      const additionalUrls = sitemapData.all_urls.slice(0, 1000); // Limit to 1000 for performance
+      urls = urls.concat(additionalUrls);
     }
     
-    // Phase 3: URL Pattern Discovery
+      if (urls.length === 0 && !rssData) {
+        console.log(`  ❌ Unable to gather traffic data (no sitemap or RSS)\n`);
+        results.traffic_estimate = {
+          status: 'failed',
+          message: 'No data sources available',
+          total_urls: 0,
+          distribution: {},
+          sources: [],
+          confidence: 0
+        };
+      } else {
+        results.traffic_estimate = this.analyzeTraffic(urls, rssData);
+        this.printTrafficSummary(results.traffic_estimate);
+      }
+    }
+    
+    // Phase 3: URL Targeting Pattern Discovery
     console.log(`\n${'─'.repeat(60)}`);
-    console.log(`PHASE 3: URL PATTERN DISCOVERY`);
-    console.log(`${'─'.repeat(60)}\n`);
-    
-    if (urls.length === 0 && rssData) {
-      // Use RSS URLs if sitemap failed
-      console.log(`  📡 Using RSS URLs for pattern analysis...\n`);
-      urls = rssData.distribution ? 
-        Object.values(rssData.distribution).flatMap(d => d.sample_urls || []) : [];
-    }
+    console.log(`PHASE 3: URL TARGETING PATTERN DISCOVERY`);
+    console.log(`${'─'.repeat(60)}`);
+    console.log(`  ℹ️  Targeting patterns identify which pages SmartScroll should appear on`);
+    console.log(`  📋 Patterns are used in Slack commands: /mula target <pattern> <search-phrase>\n`);
     
     let discoveredPatterns = [];
-    if (urls.length > 0) {
+    let patternUrls = [];
+    
+    // Get URLs for pattern analysis (skip if specific URL provided)
+    if (testUrl && testUrl.includes('/') && testUrl !== `https://${domain}` && testUrl !== `http://${domain}`) {
+      console.log(`  ℹ️  Using specific URL for pattern/placement analysis: ${testUrl}`);
+      patternUrls = [testUrl];
+      discoveredPatterns = [testUrl];
+    } else {
+      // URLs already collected from Phase 2 traffic analysis
+      patternUrls = urls; // Use URLs from Phase 2
+    }
+    
+    if (patternUrls.length > 0) {
+      console.log(`  📊 Analyzing ${patternUrls.length} URLs for patterns...`);
       const patternAnalyzer = new PatternAnalyzer();
-      const patterns = patternAnalyzer.analyze(urls);
+      const patterns = patternAnalyzer.analyze(patternUrls);
       
-      results.url_patterns = this.formatPatterns(patterns);
-      this.printPatternSummary(results.url_patterns);
+      console.log(`  📋 Pattern analyzer returned: ${typeof patterns}, keys: ${Object.keys(patterns || {}).length}`);
       
-      // Extract sample URLs for placement analysis
-      discoveredPatterns = results.url_patterns.flatMap(p => p.sample_urls || []);
+      if (patterns && Object.keys(patterns).length > 0) {
+        results.url_patterns = this.formatPatterns(patterns);
+        this.printPatternSummary(results.url_patterns);
+        
+        // Extract sample URLs for placement analysis
+        discoveredPatterns = results.url_patterns.flatMap(p => p.sample_urls || []);
+        console.log(`  ✅ Extracted ${discoveredPatterns.length} sample URLs for placement analysis`);
+      } else {
+        console.log(`  ⚠️  Pattern analyzer returned no patterns - generating patterns from URL structure...`);
+        // Generate basic patterns from URLs even if sport detection failed
+        const basicPatterns = this.generateBasicPatterns(urls);
+        if (basicPatterns.length > 0) {
+          results.url_patterns = basicPatterns;
+          console.log(`  ✅ Generated ${basicPatterns.length} basic patterns from URL structure`);
+          discoveredPatterns = basicPatterns.flatMap(p => p.sample_urls || []);
+        } else {
+        // Still try to use URLs directly for placement
+        discoveredPatterns = patternUrls.slice(0, 10); // Use first 10 URLs
+          results.url_patterns = [];
+          console.log(`  📝 Using ${discoveredPatterns.length} URLs directly for placement analysis`);
+        }
+      }
     } else {
       console.log(`  ❌ No URLs available for pattern analysis\n`);
-      results.url_patterns = {
-        status: 'failed',
-        message: 'No URLs available'
-      };
+      results.url_patterns = [];
+      discoveredPatterns = [];
     }
     
     // Phase 4: SmartScroll Placement Intelligence (NEW!)
@@ -149,14 +217,50 @@ class DukeOnboarding {
     console.log(`${'─'.repeat(60)}\n`);
     
     if (discoveredPatterns.length > 0) {
+      if (testUrl && testUrl.includes('/')) {
+        console.log(`  📍 Analyzing specific page for placement: ${testUrl}`);
+      } else {
+        console.log(`  📍 Analyzing ${discoveredPatterns.length} URLs for placement...`);
+      }
       const placementDetector = new PlacementDetector();
       results.placement_intelligence = await placementDetector.analyze(domain, discoveredPatterns);
       this.printPlacementIntelligence(results.placement_intelligence);
+      
+      // Extract patterns from placement intelligence if URL patterns are empty
+      if ((!results.url_patterns || results.url_patterns.length === 0) && 
+          results.placement_intelligence.eligible_pages &&
+          results.placement_intelligence.eligible_pages.length > 0) {
+        console.log(`  🔄 Extracting URL patterns from placement intelligence...`);
+        const placementPatterns = results.placement_intelligence.eligible_pages.map(page => ({
+          sport: 'general',
+          pattern: page.pattern,
+          confidence: page.eligibility_score,
+          url_count: 1,
+          sample_urls: page.sample_urls || [page.url],
+          search_phrase: this.generateSearchPhrase('general'),
+          source: 'placement_analysis'
+        }));
+        
+        // Deduplicate patterns
+        const uniquePatterns = [];
+        const seenPatterns = new Set();
+        for (const p of placementPatterns) {
+          if (!seenPatterns.has(p.pattern)) {
+            seenPatterns.add(p.pattern);
+            uniquePatterns.push(p);
+          }
+        }
+        
+        if (uniquePatterns.length > 0) {
+          results.url_patterns = uniquePatterns;
+          console.log(`  ✅ Extracted ${uniquePatterns.length} patterns from placement analysis`);
+        }
+      }
     } else {
       console.log(`  ⚠️  No sample URLs available for placement analysis\n`);
       results.placement_intelligence = {
         status: 'failed',
-        message: 'No sample URLs available'
+        message: 'No sample URLs available - need URLs from sitemap/RSS or manual input'
       };
     }
     
@@ -166,6 +270,11 @@ class DukeOnboarding {
     console.log(`${'─'.repeat(60)}\n`);
     
     if (discoveredPatterns.length > 0) {
+      if (testUrl && testUrl.includes('/')) {
+        console.log(`  🔍 Analyzing specific page for competitors: ${testUrl}`);
+      } else {
+        console.log(`  🔍 Analyzing ${discoveredPatterns.length} URLs for competitors...`);
+      }
       const competitorDetector = new CompetitorDetector();
       results.competitor_intelligence = await competitorDetector.analyze(domain, discoveredPatterns);
       this.printCompetitorIntelligence(results.competitor_intelligence);
@@ -173,7 +282,7 @@ class DukeOnboarding {
       console.log(`  ⚠️  No sample URLs available for competitor analysis\n`);
       results.competitor_intelligence = {
         status: 'failed',
-        message: 'No sample URLs available'
+        message: 'No sample URLs available - need URLs from sitemap/RSS or manual input'
       };
     }
     
@@ -285,6 +394,126 @@ class DukeOnboarding {
     return formatted;
   }
   
+  generateBasicPatterns(urls) {
+    // Generate basic patterns from URL structure when sport detection fails
+    const patterns = [];
+    const patternMap = {};
+    
+    for (const url of urls) {
+      try {
+        const urlObj = new URL(url);
+        const path = urlObj.pathname;
+        
+        // Extract pattern by replacing dynamic segments
+        // e.g., /teams/michigan-wolverines/news/article-title -> /teams/*/news/*
+        let pattern = path
+          .replace(/\/[^\/]+-[^\/]+-[^\/]+/g, '/*')  // Long slugs
+          .replace(/\/\d{4}\/\d{2}\/\d{2}\//g, '/*/*/*/')  // Dates
+          .replace(/\/[a-f0-9]{8,}/g, '/*')  // Hashes/IDs
+          .replace(/\/[^\/]+$/g, '/*');  // Last segment
+        
+        // Clean up multiple wildcards
+        pattern = pattern.replace(/\*\/\*/g, '*').replace(/\*+/g, '*');
+        
+        if (!patternMap[pattern]) {
+          patternMap[pattern] = {
+            pattern: pattern,
+            url_count: 0,
+            sample_urls: [],
+            confidence: 0
+          };
+        }
+        
+        patternMap[pattern].url_count++;
+        if (patternMap[pattern].sample_urls.length < 3) {
+          patternMap[pattern].sample_urls.push(url);
+        }
+      } catch (error) {
+        continue;
+      }
+    }
+    
+    // Convert to array and calculate confidence
+    for (const [pattern, data] of Object.entries(patternMap)) {
+      if (data.url_count >= 2) {  // At least 2 URLs match
+        const confidence = Math.min(100, Math.round((data.url_count / urls.length) * 100));
+        patterns.push({
+          sport: 'general',  // Generic pattern
+          pattern: pattern,
+          confidence: confidence,
+          url_count: data.url_count,
+          sample_urls: data.sample_urls,
+          search_phrase: this.generateSearchPhrase('general')
+        });
+      }
+    }
+    
+    // Sort by confidence
+    patterns.sort((a, b) => b.confidence - a.confidence);
+    
+    return patterns;
+  }
+  
+  generateBasicPatterns(urls) {
+    // Generate basic patterns from URL structure when sport detection fails
+    const patterns = [];
+    const patternMap = {};
+    
+    for (const url of urls) {
+      try {
+        const urlObj = new URL(url);
+        const path = urlObj.pathname;
+        
+        // Extract pattern by replacing dynamic segments
+        // e.g., /teams/michigan-wolverines/news/article-title -> /teams/*/news/*
+        let pattern = path
+          .replace(/\/[^\/]+-[^\/]+-[^\/]+/g, '/*')  // Long slugs
+          .replace(/\/\d{4}\/\d{2}\/\d{2}\//g, '/*/*/*/')  // Dates
+          .replace(/\/[a-f0-9]{8,}/g, '/*')  // Hashes/IDs
+          .replace(/\/[^\/]+$/g, '/*');  // Last segment
+        
+        // Clean up multiple wildcards
+        pattern = pattern.replace(/\*\/\*/g, '*').replace(/\*+/g, '*');
+        
+        if (!patternMap[pattern]) {
+          patternMap[pattern] = {
+            pattern: pattern,
+            url_count: 0,
+            sample_urls: [],
+            confidence: 0
+          };
+        }
+        
+        patternMap[pattern].url_count++;
+        if (patternMap[pattern].sample_urls.length < 3) {
+          patternMap[pattern].sample_urls.push(url);
+        }
+      } catch (error) {
+        continue;
+      }
+    }
+    
+    // Convert to array and calculate confidence
+    for (const [pattern, data] of Object.entries(patternMap)) {
+      if (data.url_count >= 2) {  // At least 2 URLs match
+        const confidence = Math.min(100, Math.round((data.url_count / urls.length) * 100));
+        patterns.push({
+          sport: 'general',  // Generic pattern
+          pattern: pattern,
+          confidence: confidence,
+          url_count: data.url_count,
+          sample_urls: data.sample_urls,
+          search_phrase: this.generateSearchPhrase('general')
+        });
+      }
+    }
+    
+    // Sort by confidence
+    patterns.sort((a, b) => b.confidence - a.confidence);
+    
+    return patterns;
+  }
+  
   generateSearchPhrase(sport) {
     const phrases = {
       'nfl': 'NFL merchandise',
@@ -298,7 +527,8 @@ class DukeOnboarding {
       'ufc': 'UFC and MMA merchandise',
       'nascar': 'NASCAR racing merchandise',
       'soccer': 'Soccer equipment and apparel',
-      'wrestling': 'WWE wrestling merchandise'
+      'wrestling': 'WWE wrestling merchandise',
+      'general': 'Sports merchandise'
     };
     
     return phrases[sport] || `${sport.toUpperCase()} merchandise`;
@@ -349,15 +579,16 @@ class DukeOnboarding {
       }
     }
     
-    // Competitor Opportunities
-    if (results.competitor_intelligence && results.competitor_intelligence.beta_test_opportunities) {
-      const opportunities = results.competitor_intelligence.beta_test_opportunities;
-      if (opportunities.length > 0) {
+    // Competitor Detection
+    if (results.competitor_intelligence && results.competitor_intelligence.competitors) {
+      const competitors = results.competitor_intelligence.competitors;
+      if (competitors.length > 0) {
+        const competitorNames = competitors.map(c => c.name).join(', ');
         recs.push({
-          priority: '🎯 OPPORTUNITY',
-          category: 'Beta Test',
-          message: `${opportunities.length} competitor(s) detected - ideal for A/B test`,
-          action: 'Propose beta test against existing competitors'
+          priority: 'ℹ️ INFO',
+          category: 'Competitors',
+          message: `Competitor(s) detected: ${competitorNames}`,
+          action: 'Review competitor placement and consider A/B testing opportunities'
         });
       }
     }
@@ -377,22 +608,22 @@ class DukeOnboarding {
       }
     }
     
-    // URL Patterns
+    // URL Targeting Patterns
     if (results.url_patterns && Array.isArray(results.url_patterns) && results.url_patterns.length > 0) {
       const highConfidence = results.url_patterns.filter(p => p.confidence >= 70);
       
       if (highConfidence.length > 0) {
         recs.push({
           priority: '✅ READY',
-          category: 'URL Patterns',
-          message: `${highConfidence.length} high-confidence patterns discovered`,
-          action: 'Use discovered patterns for precise targeting'
+          category: 'Targeting Patterns',
+          message: `${highConfidence.length} high-confidence targeting pattern(s) discovered`,
+          action: 'Use patterns to target which pages SmartScroll appears on (e.g., /mula target <pattern> <search-phrase>)'
         });
       } else {
         recs.push({
           priority: '⚠️ MEDIUM',
-          category: 'URL Patterns',
-          message: 'URL patterns found but confidence is low',
+          category: 'Targeting Patterns',
+          message: 'Targeting patterns found but confidence is low',
           action: 'Manual review recommended before deployment'
         });
       }
@@ -401,7 +632,8 @@ class DukeOnboarding {
     results.recommendations = recs;
   }
   
-  calculateDeploymentReadiness(results) {
+  calculateDeploymentReadiness(results, options = {}) {
+    const isSpecificUrl = options.isSpecificUrl || false;
     const checks = {};
     let total = 0;
     const blockers = [];
@@ -417,21 +649,25 @@ class DukeOnboarding {
     }
     total += checks.sdk_deployment;
     
-    // URL Patterns (25 points)
+    // URL Targeting Patterns (25 points) - adjust for specific URL analysis
     const patternCount = Array.isArray(results.url_patterns) ? results.url_patterns.length : 
                         Object.keys(results.url_patterns || {}).length;
-    if (patternCount >= 5) {
+    if (isSpecificUrl) {
+      // For specific URLs, patterns are less relevant - give partial credit
+      checks.url_patterns = 15;
+      quickWins.push('ℹ️ Analyzing specific page - targeting patterns extracted from page structure');
+    } else if (patternCount >= 5) {
       checks.url_patterns = 25;
-      quickWins.push(`✅ ${patternCount} URL patterns discovered`);
+      quickWins.push(`✅ ${patternCount} targeting patterns discovered`);
     } else if (patternCount >= 3) {
       checks.url_patterns = 20;
-      quickWins.push(`✅ ${patternCount} URL patterns discovered (good start)`);
+      quickWins.push(`✅ ${patternCount} targeting patterns discovered (good start)`);
     } else if (patternCount >= 1) {
       checks.url_patterns = 10;
-      blockers.push(`🟡 Only ${patternCount} URL pattern(s) - need manual pattern input`);
+      blockers.push(`🟡 Only ${patternCount} targeting pattern(s) - need manual pattern input`);
     } else {
       checks.url_patterns = 0;
-      blockers.push('🔴 No URL patterns detected - manual pattern input required');
+      blockers.push('🔴 No targeting patterns detected - manual pattern input required');
     }
     total += checks.url_patterns;
     
@@ -454,8 +690,10 @@ class DukeOnboarding {
     }
     total += checks.placement;
     
-    // Traffic Data Quality (15 points)
-    if (results.traffic_estimate && results.traffic_estimate.confidence >= 70) {
+    // Traffic Data Quality (15 points) - skip for specific URL analysis
+    if (isSpecificUrl) {
+      checks.traffic_data = 0; // Not applicable for specific URL
+    } else if (results.traffic_estimate && results.traffic_estimate.confidence >= 70) {
       checks.traffic_data = 15;
     } else if (results.traffic_estimate && results.traffic_estimate.confidence >= 50) {
       checks.traffic_data = 10;
@@ -477,7 +715,8 @@ class DukeOnboarding {
       const competitors = results.competitor_intelligence.competitors;
       if (competitors.length > 0) {
         checks.competitive_landscape = 5; // Opportunity for beta test
-        quickWins.push(`🎯 ${competitors.length} competitor(s) detected - beta test opportunity`);
+        const competitorNames = competitors.map(c => c.name).join(', ');
+        quickWins.push(`🎯 ${competitors.length} competitor(s) detected: ${competitorNames}`);
       } else {
         checks.competitive_landscape = 5; // No competition = easier deployment
       }
@@ -526,7 +765,7 @@ class DukeOnboarding {
     const patternCount = Array.isArray(results.url_patterns) ? results.url_patterns.length : 
                         Object.keys(results.url_patterns || {}).length;
     if (patternCount < 3) {
-      path.push('2. Add manual URL patterns or refine pattern detection (2-4 hours)');
+      path.push('2. Add manual targeting patterns or refine pattern detection (2-4 hours)');
     }
     
     if (results.placement_intelligence && results.placement_intelligence.eligible_pages) {
@@ -578,7 +817,53 @@ class DukeOnboarding {
     }
   }
   
-  printCompetitorIntelligence(competitors) {
+  printCompetitorIntelligence(competitorIntelligence) {
+    if (!competitorIntelligence || !competitorIntelligence.competitors) {
+      console.log(`  ⚠️  No competitor data available\n`);
+      return;
+    }
+    
+    const competitors = competitorIntelligence.competitors;
+    
+    if (competitors.length === 0) {
+      console.log(`  ✅ No competitors detected - clean deployment opportunity\n`);
+      return;
+    }
+    
+    console.log(`  🎯 Competitors Detected: ${competitors.length}\n`);
+    
+    for (const competitor of competitors) {
+      console.log(`  📊 ${competitor.name}`);
+      console.log(`     Category: ${competitor.category}`);
+      console.log(`     Pages: ${competitor.page_count}`);
+      console.log(`     Where: ${competitor.where_on_page || competitor.placement || 'unknown'}`);
+      if (competitor.placement_details && competitor.placement_details.location !== 'unknown') {
+        console.log(`     Location: ${competitor.placement_details.location}`);
+        if (competitor.placement_details.common_locations && competitor.placement_details.common_locations.length > 0) {
+          const locations = competitor.placement_details.common_locations.map(l => `${l.location} (${l.count}x)`).join(', ');
+          console.log(`     Common locations: ${locations}`);
+        }
+      }
+      if (competitor.sample_selectors && competitor.sample_selectors.length > 0) {
+        console.log(`     Selectors: ${competitor.sample_selectors.join(', ')}`);
+      }
+      if (competitor.sample_pages && competitor.sample_pages.length > 0) {
+        console.log(`     Sample pages: ${competitor.sample_pages.slice(0, 2).join(', ')}`);
+      }
+      console.log(`     Confidence: ${competitor.confidence}\n`);
+    }
+    
+    if (competitorIntelligence.beta_test_opportunities && competitorIntelligence.beta_test_opportunities.length > 0) {
+      console.log(`  🎯 Beta Test Opportunities:\n`);
+      for (const opp of competitorIntelligence.beta_test_opportunities) {
+        console.log(`  ${opp.competitor}`);
+        console.log(`    ${opp.message}`);
+        console.log(`    → ${opp.action}\n`);
+      }
+    }
+  }
+  
+  printCompetitorIntelligence_OLD(competitors) {
     if (!competitors || !competitors.competitors) {
       console.log(`  ❌ No competitor intelligence available\n`);
       return;
@@ -650,6 +935,28 @@ class DukeOnboarding {
   
   printPatternSummary(patterns) {
     if (!patterns || patterns.length === 0) {
+      console.log(`  ❌ No targeting patterns discovered\n`);
+      return;
+    }
+    
+    console.log(`  ✅ Found ${patterns.length} targeting pattern(s)\n`);
+    
+    for (const pattern of patterns) {
+      console.log(`  📋 Pattern: ${pattern.pattern}`);
+      console.log(`     Sport: ${pattern.sport || 'general'}`);
+      console.log(`     Confidence: ${pattern.confidence}%`);
+      console.log(`     URLs: ${pattern.url_count || 0}`);
+      console.log(`     Search phrase: ${pattern.search_phrase || 'N/A'}`);
+      if (pattern.sample_urls && pattern.sample_urls.length > 0) {
+        console.log(`     Sample: ${pattern.sample_urls[0]}`);
+      }
+      console.log(`     → Use for targeting: /mula target ${pattern.pattern} "${pattern.search_phrase || 'sports merchandise'}"`);
+      console.log('');
+    }
+  }
+  
+  printPatternSummary_OLD(patterns) {
+    if (!patterns || patterns.length === 0) {
       console.log(`  ❌ No patterns discovered\n`);
       return;
     }
@@ -692,7 +999,13 @@ class DukeOnboarding {
     const outputDir = path.join(__dirname, '../output');
     await fs.mkdir(outputDir, { recursive: true });
     
-    const outputPath = path.join(outputDir, `${results.domain}-duke-analysis.json`);
+    // Sanitize domain for filename (remove protocol, paths, etc.)
+    const sanitizedDomain = results.domain
+      .replace(/^https?:\/\//, '')
+      .replace(/\/.*$/, '')
+      .replace(/[^a-zA-Z0-9.-]/g, '_');
+    
+    const outputPath = path.join(outputDir, `${sanitizedDomain}-duke-analysis.json`);
     await fs.writeFile(outputPath, JSON.stringify(results, null, 2));
     
     console.log(`\n💾 Full results saved to: ${outputPath}`);

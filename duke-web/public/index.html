@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Duke - Onboarding & Placement Intelligence</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <style>
+    [x-cloak] { display: none !important; }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-purple-50 to-indigo-50 min-h-screen" x-data="dukeApp()" x-init="init()">
+  
+  <!-- Header -->
+  <div class="bg-white shadow-sm border-b border-gray-200">
+    <div class="max-w-6xl mx-auto px-6 py-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <div class="text-4xl">🏄‍♂️</div>
+          <div>
+            <h1 class="text-2xl font-bold text-gray-900">Duke</h1>
+            <p class="text-sm text-gray-500">Onboarding & Placement Intelligence Agent</p>
+          </div>
+        </div>
+        <div class="text-sm text-gray-500">
+          Technical onboarding in ~2 minutes
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="max-w-6xl mx-auto px-6 py-12">
+    
+    <!-- Search Input -->
+    <div class="bg-white rounded-2xl shadow-lg p-8 mb-8">
+      <h2 class="text-xl font-semibold text-gray-900 mb-4">Analyze a Publisher</h2>
+      
+      <div class="flex space-x-4">
+        <input 
+          type="text" 
+          x-model="domain"
+          @keyup.enter="analyze()"
+          placeholder="Enter domain or full URL (e.g., on3.com or https://www.on3.com/teams/...)"
+          class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+          :disabled="loading"
+        />
+        <button 
+          @click="analyze()"
+          :disabled="loading || !domain"
+          class="px-8 py-3 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <span x-show="!loading">Analyze</span>
+          <span x-show="loading">Analyzing...</span>
+        </button>
+      </div>
+      
+      <!-- Quick Examples -->
+      <div class="mt-4 flex items-center space-x-2 text-sm">
+        <span class="text-gray-500">Quick examples:</span>
+        <button @click="domain = 'on3.com'" class="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700 transition">
+          ON3
+        </button>
+        <button @click="domain = 'essentiallysports.com'" class="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700 transition">
+          EssentiallySports
+        </button>
+        <button @click="domain = 'bleacherreport.com'" class="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700 transition">
+          Bleacher Report
+        </button>
+      </div>
+    </div>
+    
+    <!-- Loading State -->
+    <div x-show="loading" class="text-center py-12">
+      <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+      <p class="mt-4 text-gray-600">Analyzing <span x-text="domain"></span>...</p>
+      <p class="text-sm text-gray-500 mt-2">This takes about 30-60 seconds</p>
+    </div>
+    
+    <!-- Error State -->
+    <div x-show="error" class="bg-red-50 border border-red-200 rounded-lg p-6 mb-8">
+      <div class="flex items-start">
+        <div class="text-2xl mr-3">❌</div>
+        <div>
+          <h3 class="font-semibold text-red-900">Analysis Failed</h3>
+          <p class="text-red-700 mt-1" x-text="error"></p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Results Section -->
+    <div x-show="results && !loading" x-cloak>
+      
+      <!-- Header with Domain -->
+      <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-2xl font-bold text-gray-900" x-text="results.domain"></h2>
+            <p class="text-sm text-gray-500 mt-1">
+              Analyzed at <span x-text="new Date(results.analyzed_at).toLocaleString()"></span>
+            </p>
+          </div>
+          <div class="flex space-x-2">
+            <button 
+              @click="downloadJSON()"
+              class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition text-sm"
+            >
+              📥 Download JSON
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Deployment Readiness -->
+      <div class="bg-gradient-to-r from-green-50 to-blue-50 rounded-2xl shadow-lg p-6 mb-6" x-show="results.deployment_readiness">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-xl font-semibold text-gray-900">🚀 Deployment Readiness</h3>
+          <div class="text-right">
+            <div class="text-3xl font-bold" :class="results.deployment_readiness.percentage >= 80 ? 'text-green-600' : results.deployment_readiness.percentage >= 60 ? 'text-blue-600' : 'text-orange-600'" x-text="results.deployment_readiness.percentage + '%'"></div>
+            <div class="text-sm text-gray-600" x-text="results.deployment_readiness.level"></div>
+          </div>
+        </div>
+        
+        <!-- Progress Bar -->
+        <div class="w-full bg-gray-200 rounded-full h-4 mb-4">
+          <div 
+            class="h-4 rounded-full transition-all duration-500"
+            :class="results.deployment_readiness.percentage >= 80 ? 'bg-green-500' : results.deployment_readiness.percentage >= 60 ? 'bg-blue-500' : 'bg-orange-500'"
+            :style="`width: ${results.deployment_readiness.percentage}%`"
+          ></div>
+        </div>
+        
+        <!-- Timeline -->
+        <div class="mb-4">
+          <p class="text-sm text-gray-600">
+            <span class="font-semibold">Estimated Timeline:</span> 
+            <span x-text="results.deployment_readiness.timeline"></span>
+          </p>
+        </div>
+        
+        <!-- Quick Wins -->
+        <div x-show="results.deployment_readiness.quick_wins && results.deployment_readiness.quick_wins.length > 0" class="mb-4">
+          <h4 class="text-sm font-semibold text-gray-700 mb-2">✅ Ready:</h4>
+          <ul class="list-disc list-inside text-sm text-gray-600 space-y-1">
+            <template x-for="win in results.deployment_readiness.quick_wins" :key="win">
+              <li x-text="win"></li>
+            </template>
+          </ul>
+        </div>
+        
+        <!-- Blockers -->
+        <div x-show="results.deployment_readiness.blockers && results.deployment_readiness.blockers.length > 0" class="mb-4">
+          <h4 class="text-sm font-semibold text-gray-700 mb-2">⚠️ Needs Attention:</h4>
+          <ul class="list-disc list-inside text-sm text-gray-600 space-y-1">
+            <template x-for="blocker in results.deployment_readiness.blockers" :key="blocker">
+              <li x-text="blocker"></li>
+            </template>
+          </ul>
+        </div>
+        
+        <!-- Critical Path -->
+        <div x-show="results.deployment_readiness.critical_path && results.deployment_readiness.critical_path.length > 0">
+          <h4 class="text-sm font-semibold text-gray-700 mb-2">🎯 Critical Path to Launch:</h4>
+          <ol class="list-decimal list-inside text-sm text-gray-600 space-y-1">
+            <template x-for="step in results.deployment_readiness.critical_path" :key="step">
+              <li x-text="step"></li>
+            </template>
+          </ol>
+        </div>
+      </div>
+      
+      <!-- SDK Health Check -->
+      <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
+        <h3 class="text-xl font-semibold text-gray-900 mb-4">🏥 SDK Health Check</h3>
+        
+        <div class="flex items-center space-x-3 mb-4">
+          <div class="text-3xl" :class="results.health_check && results.health_check.sdk_present ? 'text-green-500' : 'text-red-500'">
+            <span x-show="results.health_check && results.health_check.sdk_present">✅</span>
+            <span x-show="!results.health_check || !results.health_check.sdk_present">❌</span>
+          </div>
+          <div>
+            <div class="font-semibold" x-text="results.health_check && results.health_check.sdk_present ? 'DEPLOYED' : 'NOT DEPLOYED'"></div>
+            <div class="text-sm text-gray-600" x-text="results.health_check && results.health_check.sdk_present ? 'Mula SDK is live' : 'Mula SDK not found'"></div>
+          </div>
+        </div>
+        
+        <div x-show="results.health_check && results.health_check.errors && results.health_check.errors.length > 0" class="mt-4">
+          <h4 class="text-sm font-semibold text-red-700 mb-2">Errors:</h4>
+          <ul class="list-disc list-inside text-sm text-red-600 space-y-1">
+            <template x-for="error in results.health_check.errors" :key="error">
+              <li x-text="error"></li>
+            </template>
+          </ul>
+        </div>
+        
+        <div x-show="results.health_check && results.health_check.warnings && results.health_check.warnings.length > 0" class="mt-4">
+          <h4 class="text-sm font-semibold text-yellow-700 mb-2">Warnings:</h4>
+          <ul class="list-disc list-inside text-sm text-yellow-600 space-y-1">
+            <template x-for="warning in results.health_check.warnings" :key="warning">
+              <li x-text="warning"></li>
+            </template>
+          </ul>
+        </div>
+      </div>
+      
+      <!-- Site-Wide Traffic Analysis -->
+      <div class="bg-white rounded-2xl shadow-lg p-6 mb-6" x-show="results.traffic_estimate">
+        <h3 class="text-xl font-semibold text-gray-900 mb-2">📊 Site-Wide Traffic Analysis</h3>
+        <p class="text-sm text-gray-600 mb-4">
+          Analyzes sitemap/RSS to understand which content categories get the most traffic. Helps prioritize which pages to target first.
+        </p>
+        
+        <div x-show="results.traffic_estimate.status === 'skipped'" class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+          <p class="text-sm text-blue-800">
+            <strong>ℹ️ Skipped:</strong> Traffic analysis skipped for specific URL. Enter just the domain (e.g., <code class="bg-blue-100 px-1 rounded">on3.com</code>) to see site-wide traffic distribution.
+          </p>
+        </div>
+        
+        <div x-show="results.traffic_estimate.status !== 'skipped'" class="mb-4">
+          <p class="text-sm text-gray-600">
+            <span class="font-semibold">Confidence:</span> 
+            <span x-text="results.traffic_estimate.confidence + '%'"></span>
+            <span class="text-gray-500">• Sources: <span x-text="(results.traffic_estimate.sources || []).join(', ')"></span></span>
+          </p>
+          <p class="text-sm text-gray-600 mt-1">
+            <span class="font-semibold">Total URLs Found:</span> 
+            <span x-text="results.traffic_estimate.total_urls || 0"></span>
+          </p>
+        </div>
+        
+        <div x-show="results.traffic_estimate.distribution" class="space-y-3">
+          <template x-for="[sport, data] in Object.entries(results.traffic_estimate.distribution)" :key="sport">
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-sm font-medium text-gray-700" x-text="sport.toUpperCase()"></span>
+                <span class="text-sm text-gray-600" x-text="data.percentage + '%'"></span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-2">
+                <div 
+                  class="bg-purple-500 h-2 rounded-full transition-all duration-500"
+                  :style="`width: ${data.percentage}%`"
+                ></div>
+              </div>
+            </div>
+          </template>
+        </div>
+      </div>
+      
+      <!-- URL Targeting Patterns -->
+      <div class="bg-white rounded-2xl shadow-lg p-6 mb-6" x-show="results.url_patterns && Array.isArray(results.url_patterns) && results.url_patterns.length > 0">
+        <h3 class="text-xl font-semibold text-gray-900 mb-2">🎯 Which Pages to Target</h3>
+        <p class="text-sm text-gray-600 mb-4">
+          <strong>Targeting Patterns</strong> identify which pages SmartScroll should appear on. These URL patterns (like <code class="bg-gray-100 px-1 rounded">/teams/*/news/*/</code>) match multiple pages. Use them in Slack commands: <code class="bg-gray-100 px-2 py-1 rounded">/mula target /teams/*/news/*/ "Michigan merchandise"</code>
+        </p>
+        
+        <div class="space-y-4">
+          <template x-for="(pattern, index) in results.url_patterns.slice(0, 10)" :key="index">
+            <div class="border border-gray-200 rounded-lg p-4" :class="pattern.manual ? 'bg-blue-50 border-blue-200' : ''">
+              <div class="flex items-start justify-between mb-2">
+                <div class="flex-1">
+                  <div class="flex items-center space-x-2 mb-3">
+                    <span class="text-sm font-semibold text-gray-900" x-text="pattern.sport ? pattern.sport.toUpperCase() : 'GENERAL'"></span>
+                    <span x-show="pattern.manual" class="text-xs bg-blue-200 text-blue-800 px-2 py-0.5 rounded">MANUAL</span>
+                    <span class="text-xs text-gray-500" x-text="'Confidence: ' + pattern.confidence + '%'"></span>
+                  </div>
+                  <div class="mb-3">
+                    <div class="text-xs text-gray-500 mb-1">URL Pattern (matches multiple pages):</div>
+                    <div class="text-sm font-mono bg-gray-100 px-3 py-2 rounded border border-gray-300" x-text="pattern.pattern"></div>
+                  </div>
+                  <div class="mb-3">
+                    <div class="text-xs text-gray-500 mb-1">Search Phrase (for product discovery):</div>
+                    <div class="text-sm text-gray-700" x-text="'\"" + (pattern.search_phrase || 'N/A') + "\"'"></div>
+                  </div>
+                  <div class="mt-3 pt-3 border-t border-gray-200">
+                    <div class="text-xs text-gray-500 mb-1">Slack Command:</div>
+                    <code class="text-xs bg-gray-100 px-2 py-1 rounded font-mono block">
+                      <span x-text="'/mula target ' + pattern.pattern + ' \"' + (pattern.search_phrase || 'sports merchandise') + '\"'"></span>
+                    </code>
+                  </div>
+                  <div x-show="pattern.url_count" class="text-xs text-gray-500 mt-2" x-text="'Matches ' + pattern.url_count + ' page(s)'"></div>
+                </div>
+              </div>
+            </div>
+          </template>
+        </div>
+      </div>
+      
+      <!-- Placement Intelligence -->
+      <div class="bg-white rounded-2xl shadow-lg p-6 mb-6" x-show="results.placement_intelligence && results.placement_intelligence.eligible_pages">
+        <h3 class="text-xl font-semibold text-gray-900 mb-2">📍 Where on the Page</h3>
+        <p class="text-sm text-gray-600 mb-4">
+          <strong>Placement</strong> = Where SmartScroll appears on each page (DOM selector, position). SmartScroll loads dynamically at the bottom of the page. The selector (like <code class="bg-gray-100 px-1 rounded">p</code>) tells the SDK where to inject SmartScroll.
+        </p>
+        
+        <div x-show="results.placement_intelligence.eligible_pages.length === 0" class="text-gray-500 text-sm">
+          No eligible pages detected for SmartScroll placement
+        </div>
+        
+        <div x-show="results.placement_intelligence.eligible_pages.length > 0" class="space-y-4">
+          <template x-for="(page, index) in results.placement_intelligence.eligible_pages.slice(0, 5)" :key="index">
+            <div class="border border-gray-200 rounded-lg p-4">
+              <div class="flex items-start justify-between mb-2">
+                <div class="flex-1">
+                  <div class="mb-2">
+                    <div class="text-xs text-gray-500 mb-1">Page URL:</div>
+                    <div class="text-sm">
+                      <a :href="page.url || page.sample_urls?.[0]" target="_blank" class="text-blue-600 hover:underline font-mono break-all" x-text="page.url || page.sample_urls?.[0] || page.pattern"></a>
+                    </div>
+                  </div>
+                  <div class="mb-2" x-show="page.pattern && page.pattern !== page.url">
+                    <div class="text-xs text-gray-500 mb-1">Page Pattern:</div>
+                    <div class="text-sm font-mono text-gray-700" x-text="page.pattern"></div>
+                  </div>
+                  <div class="flex items-center space-x-4 text-sm mb-3">
+                    <div>
+                      <span class="text-gray-600">Eligibility Score:</span>
+                      <span class="font-semibold ml-1" :class="page.eligibility_score >= 80 ? 'text-green-600' : page.eligibility_score >= 60 ? 'text-blue-600' : 'text-orange-600'" x-text="page.eligibility_score + '%'"></span>
+                    </div>
+                    <div>
+                      <span class="text-gray-600">Mobile Ready:</span>
+                      <span class="font-semibold ml-1" :class="page.mobile_ready ? 'text-green-600' : 'text-gray-400'" x-text="page.mobile_ready ? 'Yes' : 'No'"></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div x-show="page.dom_placement" class="mt-3 pt-3 border-t border-gray-200 bg-gray-50 rounded p-3">
+                <div class="text-xs font-semibold text-gray-700 mb-2">DOM Selector (where to inject):</div>
+                <div class="mb-3">
+                  <code class="text-sm font-mono bg-white px-2 py-1 rounded border border-gray-300" x-text="page.dom_placement.selector || 'N/A'"></code>
+                </div>
+                
+                <div x-show="page.dom_placement.context" class="mb-3">
+                  <div class="text-xs font-semibold text-gray-700 mb-1">Element Description:</div>
+                  <div class="text-xs text-gray-600" x-text="page.dom_placement.context.element_description || 'N/A'"></div>
+                </div>
+                
+                <div class="mb-3">
+                  <div class="text-xs font-semibold text-gray-700 mb-1">Position:</div>
+                  <div class="text-xs text-gray-600">
+                    <span x-text="page.dom_placement.position || 'N/A'"></span>
+                    <span class="text-gray-500 ml-2">(SmartScroll will be inserted after this element)</span>
+                  </div>
+                </div>
+                
+                <div x-show="page.dom_placement.visual_description" class="mt-3 pt-3 border-t border-gray-200">
+                  <div class="text-xs font-semibold text-gray-700 mb-1">Visual Guide:</div>
+                  <div class="text-xs text-gray-600 leading-relaxed" x-text="page.dom_placement.visual_description"></div>
+                </div>
+                
+                <div x-show="page.dom_placement.context && page.dom_placement.context.insertion_point" class="mt-2">
+                  <div class="text-xs font-semibold text-gray-700 mb-1">Insertion Point:</div>
+                  <div class="text-xs text-gray-600" x-text="page.dom_placement.context.insertion_point"></div>
+                </div>
+                
+                <!-- Sales Enablement Tool Integration -->
+                <div class="mt-4 pt-3 border-t border-blue-200 bg-blue-50 rounded p-3">
+                  <div class="text-xs font-semibold text-blue-900 mb-2">🧪 Test This Placement</div>
+                  <div class="text-xs text-blue-800 mb-3">
+                    Use the Sales Enablement Tool to visually test this placement on the actual page:
+                  </div>
+                  <div class="space-y-2">
+                    <div class="mb-2 flex gap-2">
+                      <a 
+                        :href="page.url || (page.sample_urls && page.sample_urls[0]) || '#'"
+                        target="_blank"
+                        class="inline-block text-xs bg-gray-600 hover:bg-gray-700 text-white px-3 py-2 rounded font-medium transition-colors"
+                      >
+                        🔗 Open Page
+                      </a>
+                      <button 
+                        @click="openSalesTool(page.url || (page.sample_urls && page.sample_urls[0]) || '')"
+                        class="inline-block text-xs bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded font-medium transition-colors"
+                      >
+                        🚀 Launch Sales Tool
+                      </button>
+                    </div>
+                    <div class="text-xs text-blue-700">
+                      <div class="font-semibold mb-1">Or copy this bookmarklet (works on any page):</div>
+                      <code class="block bg-white px-2 py-1 rounded border border-blue-300 text-xs break-all font-mono" id="bookmarklet-code">
+                        javascript:(function(){var script=document.createElement('script');script.src='https://app.makemula.ai/sales-enablement/page?url='+encodeURIComponent(window.location.href);script.async=true;document.head.appendChild(script);})();
+                      </code>
+                      <button 
+                        onclick="navigator.clipboard.writeText(document.getElementById('bookmarklet-code').textContent); this.textContent='✓ Copied!'; setTimeout(() => this.textContent='📋 Copy to clipboard', 2000);"
+                        class="mt-1 text-xs text-blue-600 hover:text-blue-800 underline"
+                      >
+                        📋 Copy to clipboard
+                      </button>
+                    </div>
+                    <div class="text-xs text-blue-600 mt-2 pt-2 border-t border-blue-200">
+                      <strong>Tip:</strong> Once the Sales Tool is open, look for the element with selector <code class="bg-white px-1 rounded" x-text="page.dom_placement.selector"></code> and click it to insert SmartScroll there.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </template>
+        </div>
+      </div>
+      
+      <!-- Competitor Intelligence -->
+      <div class="bg-white rounded-2xl shadow-lg p-6 mb-6" x-show="results.competitor_intelligence">
+        <h3 class="text-xl font-semibold text-gray-900 mb-4">🔍 Competitor Intelligence</h3>
+        
+        <div x-show="!results.competitor_intelligence.competitors || results.competitor_intelligence.competitors.length === 0" class="text-gray-500 text-sm">
+          ✅ No competitors detected - clean deployment opportunity
+        </div>
+        
+        <div x-show="results.competitor_intelligence.competitors && results.competitor_intelligence.competitors.length > 0" class="space-y-4">
+          <div class="mb-4">
+            <p class="text-sm text-gray-600">
+              <span class="font-semibold">Competitors Detected:</span> 
+              <span x-text="results.competitor_intelligence.competitors.length"></span>
+            </p>
+          </div>
+          
+          <template x-for="(competitor, index) in results.competitor_intelligence.competitors" :key="index">
+            <div class="border border-gray-200 rounded-lg p-4">
+              <div class="flex items-start justify-between mb-2">
+                <div class="flex-1">
+                  <div class="text-lg font-semibold text-gray-900 mb-2" x-text="competitor.name"></div>
+                  
+                  <div class="grid grid-cols-2 gap-3 text-sm mb-3">
+                    <div>
+                      <span class="text-gray-600">Category:</span>
+                      <span class="font-semibold ml-1 text-gray-700" x-text="competitor.category || 'unknown'"></span>
+                    </div>
+                    <div>
+                      <span class="text-gray-600">Pages:</span>
+                      <span class="font-semibold ml-1 text-gray-700" x-text="competitor.page_count || 0"></span>
+                    </div>
+                    <div>
+                      <span class="text-gray-600">Where:</span>
+                      <span class="ml-1 px-2 py-0.5 bg-blue-100 text-blue-800 rounded text-xs font-semibold" x-text="competitor.where_on_page || competitor.placement || 'unknown'"></span>
+                    </div>
+                    <div>
+                      <span class="text-gray-600">Confidence:</span>
+                      <span class="font-semibold ml-1" :class="competitor.confidence === 'high' ? 'text-green-600' : competitor.confidence === 'medium' ? 'text-blue-600' : 'text-orange-600'" x-text="competitor.confidence || 'unknown'"></span>
+                    </div>
+                  </div>
+                  
+                  <div x-show="competitor.placement_details && competitor.placement_details.location && competitor.placement_details.location !== 'unknown'" class="mt-2 pt-2 border-t border-gray-200">
+                    <div class="text-xs text-gray-500 mb-1">Location Details:</div>
+                    <div class="text-sm text-gray-700">
+                      <span x-text="competitor.placement_details.location"></span>
+                      <span x-show="competitor.placement_details.common_locations && competitor.placement_details.common_locations.length > 1" class="ml-2 text-xs text-gray-500">
+                        (also seen: <span x-text="competitor.placement_details.common_locations.slice(1).map(l => l.location).join(', ')"></span>)
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div x-show="competitor.sample_selectors && competitor.sample_selectors.length > 0" class="mt-2 pt-2 border-t border-gray-200">
+                    <div class="text-xs text-gray-500 mb-1">DOM Selectors:</div>
+                    <div class="flex flex-wrap gap-2">
+                      <template x-for="(selector, idx) in competitor.sample_selectors" :key="idx">
+                        <code class="text-xs bg-gray-100 px-2 py-1 rounded font-mono" x-text="selector"></code>
+                      </template>
+                    </div>
+                  </div>
+                  
+                  <div x-show="competitor.sample_pages && competitor.sample_pages.length > 0" class="mt-2 pt-2 border-t border-gray-200">
+                    <div class="text-xs text-gray-500 mb-1">Sample Page:</div>
+                    <a :href="competitor.sample_pages[0]" target="_blank" class="text-xs text-blue-600 hover:underline break-all" x-text="competitor.sample_pages[0]"></a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </template>
+          
+          <!-- Beta Test Opportunities -->
+          <div x-show="results.competitor_intelligence.beta_test_opportunities && results.competitor_intelligence.beta_test_opportunities.length > 0" class="mt-6 pt-6 border-t border-gray-200">
+            <h4 class="text-sm font-semibold text-gray-900 mb-3">🎯 Beta Test Opportunities</h4>
+            <template x-for="(opp, index) in results.competitor_intelligence.beta_test_opportunities" :key="index">
+              <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-2">
+                <div class="text-sm font-semibold text-blue-900 mb-1" x-text="opp.competitor"></div>
+                <div class="text-sm text-blue-700 mb-1" x-text="opp.message"></div>
+                <div class="text-xs text-blue-600" x-text="'→ ' + opp.action"></div>
+              </div>
+            </template>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Recommendations -->
+      <div class="bg-white rounded-2xl shadow-lg p-6 mb-6" x-show="results.recommendations && results.recommendations.length > 0">
+        <h3 class="text-xl font-semibold text-gray-900 mb-4">💡 Recommendations</h3>
+        
+        <div class="space-y-3">
+          <template x-for="(rec, index) in results.recommendations" :key="index">
+            <div class="border-l-4 rounded p-3" :class="rec.priority.includes('CRITICAL') ? 'border-red-500 bg-red-50' : rec.priority.includes('HIGH') ? 'border-orange-500 bg-orange-50' : rec.priority.includes('READY') ? 'border-green-500 bg-green-50' : 'border-blue-500 bg-blue-50'">
+              <div class="flex items-start">
+                <div class="text-lg mr-2" x-text="rec.priority"></div>
+                <div class="flex-1">
+                  <div class="text-sm font-semibold text-gray-900 mb-1" x-text="rec.category"></div>
+                  <div class="text-sm text-gray-700 mb-1" x-text="rec.message"></div>
+                  <div class="text-xs text-gray-600" x-text="'→ ' + rec.action"></div>
+                </div>
+              </div>
+            </div>
+          </template>
+        </div>
+      </div>
+      
+    </div>
+    
+  </div>
+  
+  <script>
+    function dukeApp() {
+      return {
+        domain: '',
+        loading: false,
+        error: null,
+        results: null,
+        
+        init() {
+          // Check for domain in URL params
+          const params = new URLSearchParams(window.location.search);
+          if (params.get('domain')) {
+            this.domain = params.get('domain');
+            this.analyze();
+          }
+        },
+        
+        openSalesTool(url) {
+          if (!url) return;
+          // Open the page in a new tab
+          const newWindow = window.open(url, '_blank');
+          if (newWindow) {
+            // Wait a moment for page to load, then inject the Sales Tool script
+            setTimeout(() => {
+              try {
+                const script = newWindow.document.createElement('script');
+                script.src = `https://app.makemula.ai/sales-enablement/page?url=${encodeURIComponent(url)}`;
+                script.async = true;
+                newWindow.document.head.appendChild(script);
+              } catch (e) {
+                // Cross-origin restriction - show instructions instead
+                alert('Please copy the bookmarklet below and run it on the opened page:\n\n' + 
+                      'javascript:(function(){var script=document.createElement(\'script\');script.src=\'https://app.makemula.ai/sales-enablement/page?url=\'+encodeURIComponent(window.location.href);script.async=true;document.head.appendChild(script);})();');
+              }
+            }, 2000);
+          }
+        },
+        
+        async analyze() {
+          if (!this.domain) return;
+          
+          this.loading = true;
+          this.error = null;
+          this.results = null;
+          
+          try {
+            // Check if user provided a full URL
+            const isFullUrl = this.domain.includes('http') && this.domain.includes('/');
+            const domainToAnalyze = isFullUrl ? this.domain : this.domain;
+            
+            const response = await fetch('/api/analyze', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                domain: domainToAnalyze,
+                maxUrls: 15000,
+                testUrl: isFullUrl ? this.domain : null  // Pass full URL if provided
+              })
+            });
+            
+            if (!response.ok) {
+              const errorData = await response.json();
+              throw new Error(errorData.error || `Server error: ${response.statusText}`);
+            }
+            
+            const data = await response.json();
+            this.results = data;
+            
+            // Update URL without reload
+            const url = new URL(window.location);
+            url.searchParams.set('domain', this.domain);
+            window.history.pushState({}, '', url);
+            
+          } catch (err) {
+            console.error('Analysis error:', err);
+            this.error = err.message || 'Analysis failed';
+          } finally {
+            this.loading = false;
+          }
+        },
+        
+        downloadJSON() {
+          if (!this.results) return;
+          
+          const dataStr = JSON.stringify(this.results, null, 2);
+          const dataBlob = new Blob([dataStr], { type: 'application/json' });
+          const url = URL.createObjectURL(dataBlob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = `${this.results.domain}-duke-analysis.json`;
+          link.click();
+          URL.revokeObjectURL(url);
+        }
+      };
+    }
+  </script>
+  
+</body>
+</html>
+

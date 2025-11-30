@@ -1,0 +1,198 @@
+{
+  "domain": "on3.com",
+  "analyzed_at": "2025-11-30T06:04:53.445Z",
+  "health_check": {
+    "sdk_present": false,
+    "sdk_version": null,
+    "cdn_url": null,
+    "load_time_ms": null,
+    "checked_pages": [
+      {
+        "url": "https://on3.com",
+        "type": "homepage"
+      },
+      {
+        "url": "https://www.on3.com/sites/golden-bear-report/news/late-touchdown-helps-cal-stun-no-21-smu/",
+        "type": "article"
+      },
+      {
+        "url": "https://www.on3.com/teams/michigan-state-spartans/news/3out-michigan-state-gets-a-much-deserved-win-over-maryland-that-it-couldnt-against-iowa-or-minnesota/",
+        "type": "article"
+      },
+      {
+        "url": "https://www.on3.com/sites/bulls-insider/news/golesh-addresses-coaching-rumors-after-usf-win-over-rice/",
+        "type": "article"
+      }
+    ],
+    "detection_method": "gtm_suspected",
+    "deployment_date": null,
+    "errors": [],
+    "warnings": [
+      "Mula SDK loads dynamically at bottom of page - scroll to bottom and check browser console for MulaSDK object",
+      "Browser automation failed - dynamic SDK detection unavailable. SDK may still be deployed via GTM.",
+      "To verify SDK: Open page in browser, scroll to bottom, check DevTools Console for MulaSDK object or Network tab for cdn.makemula.ai requests",
+      "SDK not found in static HTML but GTM detected - SDK is likely deployed via GTM",
+      "To verify: Check GTM container for Mula SDK tag, or scroll to bottom of page and check browser console"
+    ],
+    "note": "Mula SDK loads dynamically at bottom of page - may not appear in static HTML",
+    "gtm_detected": true
+  },
+  "traffic_estimate": {
+    "total_urls": 6,
+    "distribution": {
+      "nfl": {
+        "count": 3,
+        "percentage": 50,
+        "rank": 1
+      }
+    },
+    "sources": [
+      "sitemap",
+      "rss"
+    ],
+    "confidence": 60
+  },
+  "url_patterns": [
+    {
+      "sport": "nfl",
+      "pattern": "/news/*",
+      "confidence": 75,
+      "url_count": 3,
+      "sample_urls": [
+        "https://www.on3.com/news/lane-kiffin-decision-espn-gives-latest-following-iron-bowl-result-reveals-status-for-coaching-college-football-playoff/",
+        "https://www.on3.com/news/jon-sumrall-laments-goofy-college-football-calendar-amid-florida-reports-i-want-tonight-to-be-about-this-team/",
+        "https://www.on3.com/news/college-football-top-10-ranking-where-does-texas-am-fall/"
+      ],
+      "search_phrase": "NFL merchandise"
+    }
+  ],
+  "placement_intelligence": {
+    "eligible_pages": [],
+    "placement_recommendations": [
+      {
+        "priority": "HIGH",
+        "category": "Placement",
+        "message": "No eligible pages found for SmartScroll placement",
+        "action": "Manual DOM analysis required - SmartScroll loads dynamically at bottom of page"
+      }
+    ],
+    "dom_analysis": {},
+    "competitor_placements": {}
+  },
+  "competitor_intelligence": {
+    "competitors": [
+      {
+        "name": "Raptive Recirc",
+        "category": "recirc",
+        "detected": true,
+        "page_count": 3,
+        "sample_pages": [
+          "https://www.on3.com/news/lane-kiffin-decision-espn-gives-latest-following-iron-bowl-result-reveals-status-for-coaching-college-football-playoff/",
+          "https://www.on3.com/news/jon-sumrall-laments-goofy-college-football-calendar-amid-florida-reports-i-want-tonight-to-be-about-this-team/",
+          "https://www.on3.com/news/college-football-top-10-ranking-where-does-texas-am-fall/"
+        ],
+        "placement": "unknown",
+        "placement_details": {
+          "location": "bottom",
+          "common_locations": [
+            {
+              "location": "bottom",
+              "count": 3
+            }
+          ],
+          "total_samples": 3
+        },
+        "where_on_page": "bottom",
+        "sample_selectors": [
+          "script"
+        ],
+        "element_ids": [],
+        "element_classes": [],
+        "confidence": "high"
+      }
+    ],
+    "placement_map": {
+      "Raptive Recirc": {
+        "placement": "unknown",
+        "category": "recirc",
+        "sample_pages": [
+          "https://www.on3.com/news/lane-kiffin-decision-espn-gives-latest-following-iron-bowl-result-reveals-status-for-coaching-college-football-playoff/",
+          "https://www.on3.com/news/jon-sumrall-laments-goofy-college-football-calendar-amid-florida-reports-i-want-tonight-to-be-about-this-team/",
+          "https://www.on3.com/news/college-football-top-10-ranking-where-does-texas-am-fall/"
+        ]
+      }
+    },
+    "beta_test_opportunities": [
+      {
+        "competitor": "Raptive Recirc",
+        "category": "recirc",
+        "opportunity": "A/B Test",
+        "message": "Raptive Recirc detected on 3 pages - ideal for beta test",
+        "action": "Propose A/B test: Mula SmartScroll vs. Raptive Recirc in unknown slot",
+        "placement": "unknown",
+        "confidence": "high"
+      }
+    ],
+    "inventory_overlap": {
+      "total_pages": 3,
+      "competitor_pages": 3,
+      "available_inventory": 3,
+      "overlap_percentage": 100
+    }
+  },
+  "deployment_ready": false,
+  "recommendations": [
+    {
+      "priority": "🔴 CRITICAL",
+      "category": "SDK Deployment",
+      "message": "Mula SDK is not deployed. Cannot proceed with targeting configuration.",
+      "action": "Deploy SDK via GTM or direct script tag"
+    },
+    {
+      "priority": "ℹ️ INFO",
+      "category": "Competitors",
+      "message": "Competitor(s) detected: Raptive Recirc",
+      "action": "Review competitor placement and consider A/B testing opportunities"
+    },
+    {
+      "priority": "✅ READY",
+      "category": "Traffic Intelligence",
+      "message": "Top sports identified: NFL (50%)",
+      "action": "Deploy targeting for top 3 sports first"
+    },
+    {
+      "priority": "✅ READY",
+      "category": "Targeting Patterns",
+      "message": "1 high-confidence targeting pattern(s) discovered",
+      "action": "Use patterns to target which pages SmartScroll appears on (e.g., /mula target <pattern> <search-phrase>)"
+    }
+  ],
+  "deployment_readiness": {
+    "score": 40,
+    "percentage": 40,
+    "level": "Needs Work",
+    "timeline": "2-4 weeks",
+    "checks": {
+      "sdk_deployment": 0,
+      "url_patterns": 10,
+      "placement": 0,
+      "traffic_data": 10,
+      "tech_stack": 10,
+      "content_structure": 5,
+      "competitive_landscape": 5
+    },
+    "blockers": [
+      "🔴 SDK not deployed (1-2 days to deploy)",
+      "🟡 Only 1 targeting pattern(s) - need manual pattern input",
+      "🔴 No eligible pages for SmartScroll placement"
+    ],
+    "quick_wins": [
+      "🎯 1 competitor(s) detected: Raptive Recirc"
+    ],
+    "critical_path": [
+      "1. Deploy Mula SDK via GTM or direct script tag (1-2 days)",
+      "2. Add manual targeting patterns or refine pattern detection (2-4 hours)",
+      "3. Review DOM structure and placement options (1 day)"
+    ]
+  }
+}

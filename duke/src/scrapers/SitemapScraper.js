@@ -71,7 +71,9 @@ class SitemapScraper {
     }
     
     console.log(`  ✅ Analyzed ${allUrls.length} URLs from sitemap`);
-    return this.analyzeUrls(allUrls);
+    const result = this.analyzeUrls(allUrls);
+    result.all_urls = allUrls; // Include all URLs for pattern analysis
+    return result;
   }
   
   parseUrlSet(urlset) {
@@ -113,6 +115,7 @@ class SitemapScraper {
       source: 'sitemap',
       total_urls: total,
       distribution: distribution,
+      all_urls: urls, // Include all URLs for pattern analysis
       confidence: 75 // Sitemap is best free signal
     };
   }

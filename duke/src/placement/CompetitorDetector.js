@@ -107,9 +107,30 @@ class CompetitorDetector {
           if (competitor.placement) {
             competitorCounts[competitor.name].placements.push(competitor.placement);
           }
+          
+          if (competitor.placement_details) {
+            if (!competitorCounts[competitor.name].placement_details) {
+              competitorCounts[competitor.name].placement_details = [];
+            }
+            competitorCounts[competitor.name].placement_details.push(competitor.placement_details);
+          }
 
           if (competitor.selector) {
             competitorCounts[competitor.name].selectors.push(competitor.selector);
+          }
+          
+          if (competitor.element_id) {
+            if (!competitorCounts[competitor.name].element_ids) {
+              competitorCounts[competitor.name].element_ids = [];
+            }
+            competitorCounts[competitor.name].element_ids.push(competitor.element_id);
+          }
+          
+          if (competitor.element_class) {
+            if (!competitorCounts[competitor.name].element_classes) {
+              competitorCounts[competitor.name].element_classes = [];
+            }
+            competitorCounts[competitor.name].element_classes.push(competitor.element_class);
           }
         }
       } catch (error) {
@@ -121,6 +142,12 @@ class CompetitorDetector {
     results.competitors = Object.entries(competitorCounts).map(([name, data]) => {
       const placement = this.determinePlacement(data.placements);
       const confidence = data.count >= 3 ? 'high' : data.count >= 1 ? 'medium' : 'low';
+      
+      // Aggregate placement details
+      const placementDetails = this.aggregatePlacementDetails(data.placement_details || []);
+      const commonSelectors = Array.from(new Set(data.selectors)).slice(0, 3);
+      const commonIds = Array.from(new Set(data.element_ids || [])).filter(Boolean).slice(0, 3);
+      const commonClasses = Array.from(new Set(data.element_classes || [])).filter(Boolean).slice(0, 3);
 
       return {
         name,
@@ -128,8 +155,12 @@ class CompetitorDetector {
         detected: true,
         page_count: data.count,
         sample_pages: data.pages.slice(0, 3),
-        placement,
-        sample_selectors: Array.from(new Set(data.selectors)).slice(0, 3),
+        placement: placement || 'unknown', // Legacy field
+        placement_details: placementDetails,
+        where_on_page: placementDetails.location || placement || 'unknown',
+        sample_selectors: commonSelectors,
+        element_ids: commonIds,
+        element_classes: commonClasses,
         confidence,
       };
     });
@@ -182,12 +213,18 @@ class CompetitorDetector {
         const placement = this.findPlacement(content, element);
         const selector = this.buildSelector(element);
 
+        // Get more detailed placement info
+        const placementDetails = this.getPlacementDetails($, element, content);
+        
         competitors.push({
           name,
           category: def.category,
           detected: true,
-          placement,
+          placement: placement || 'unknown',
+          placement_details: placementDetails,
           selector,
+          element_id: element.attr('id') || null,
+          element_class: element.attr('class') || null,
         });
       }
 
@@ -359,9 +396,159 @@ class CompetitorDetector {
     return element[0].tagName || 'div';
   }
 
+  getPlacementDetails($, element, contentRoot) {
+    const details = {
+      location: 'unknown',
+      position: 'unknown',
+      selector: null,
+      context: null
+    };
+    
+    // Determine position relative to content
+    const elementIndex = element.index();
+    const contentChildren = contentRoot.children();
+    const totalChildren = contentChildren.length;
+    
+    if (elementIndex >= totalChildren * 0.8) {
+      details.location = 'bottom';
+      details.position = 'near-bottom';
+    } else if (elementIndex >= totalChildren * 0.5) {
+      details.location = 'middle';
+      details.position = 'mid-content';
+    } else {
+      details.location = 'top';
+      details.position = 'near-top';
+    }
+    
+    // Get selector
+    details.selector = this.buildSelector(element);
+    
+    // Get context (parent element)
+    const parent = element.parent();
+    if (parent.length) {
+      details.context = parent.get(0).tagName.toLowerCase();
+      if (parent.attr('class')) {
+        details.context += `.${parent.attr('class').split(' ')[0]}`;
+      }
+    }
+    
+    // Check if it's within article content or sidebar
+    const isInArticle = contentRoot.find(element).length > 0;
+    const isInSidebar = element.closest('aside, .sidebar, .widget-area').length > 0;
+    
+    if (isInSidebar) {
+      details.location = 'sidebar';
+    } else if (isInArticle) {
+      details.location = details.location === 'bottom' ? 'end-of-article' : details.location;
+    }
+    
+    return details;
+  }
+  
+  aggregatePlacementDetails(placements) {
+    if (!placements || placements.length === 0) {
+      return { location: 'unknown', common_locations: [] };
+    }
+    
+    const locationCounts = {};
+    placements.forEach(p => {
+      if (p && typeof p === 'object' && p.location) {
+        locationCounts[p.location] = (locationCounts[p.location] || 0) + 1;
+      } else if (typeof p === 'string') {
+        locationCounts[p] = (locationCounts[p] || 0) + 1;
+      }
+    });
+    
+    const sorted = Object.entries(locationCounts).sort((a, b) => b[1] - a[1]);
+    const mostCommon = sorted[0] ? sorted[0][0] : 'unknown';
+    
+    return {
+      location: mostCommon,
+      common_locations: sorted.slice(0, 3).map(([loc, count]) => ({ location: loc, count })),
+      total_samples: placements.length
+    };
+  }
+  
   getCompetitorCategory(name) {
     const def = COMPETITORS[name];
     return def ? def.category : 'native';
+  }
+  
+  getPlacementDetails($, element, contentRoot) {
+    const details = {
+      location: 'unknown',
+      position: 'unknown',
+      selector: null,
+      context: null
+    };
+    
+    // Determine position relative to content
+    const elementIndex = element.index();
+    const contentChildren = contentRoot.children();
+    const totalChildren = contentChildren.length;
+    
+    if (totalChildren > 0) {
+      const positionRatio = elementIndex / totalChildren;
+      
+      if (positionRatio >= 0.8) {
+        details.location = 'bottom';
+        details.position = 'near-bottom';
+      } else if (positionRatio >= 0.5) {
+        details.location = 'middle';
+        details.position = 'mid-content';
+      } else {
+        details.location = 'top';
+        details.position = 'near-top';
+      }
+    }
+    
+    // Get selector
+    details.selector = this.buildSelector(element);
+    
+    // Get context (parent element)
+    const parent = element.parent();
+    if (parent.length) {
+      details.context = parent.get(0).tagName.toLowerCase();
+      if (parent.attr('class')) {
+        details.context += `.${parent.attr('class').split(' ')[0]}`;
+      }
+    }
+    
+    // Check if it's within article content or sidebar
+    const isInArticle = contentRoot.find(element).length > 0;
+    const isInSidebar = element.closest('aside, .sidebar, .widget-area').length > 0;
+    
+    if (isInSidebar) {
+      details.location = 'sidebar';
+    } else if (isInArticle) {
+      details.location = details.location === 'bottom' ? 'end-of-article' : details.location;
+    }
+    
+    return details;
+  }
+  
+  aggregatePlacementDetails(placements) {
+    if (!placements || placements.length === 0) {
+      return { location: 'unknown', common_locations: [] };
+    }
+    
+    const locationCounts = {};
+    placements.forEach(p => {
+      if (p && typeof p === 'object' && p.location) {
+        locationCounts[p.location] = (locationCounts[p.location] || 0) + 1;
+      } else if (typeof p === 'string') {
+        locationCounts[p] = (locationCounts[p] || 0) + 1;
+      }
+    });
+    
+    const sorted = Object.entries(locationCounts).sort((a, b) => b[1] - a[1]);
+    const mostCommon = sorted[0] ? sorted[0][0] : 'unknown';
+    
+    return {
+      location: mostCommon,
+      common_locations: sorted.slice(0, 3).map(([loc, count]) => ({ location: loc, count })),
+      total_samples: placements.length
+    };
   }
 }
 

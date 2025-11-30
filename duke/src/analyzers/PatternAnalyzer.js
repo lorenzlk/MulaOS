@@ -31,8 +31,8 @@ class PatternAnalyzer {
       }
     }
     
-    // NEW: Try to discover patterns by URL structure analysis
-    if (Object.keys(patterns).length === 0 && urls.length > 10) {
+    // NEW: Try to discover patterns by URL structure analysis (lowered threshold)
+    if (Object.keys(patterns).length === 0 && urls.length >= 3) {
       console.log(`  🔄 No sport-specific patterns found, trying structural analysis...`);
       const structuralPatterns = this.findStructuralPatterns(urls, sportKeywords);
       Object.assign(patterns, structuralPatterns);

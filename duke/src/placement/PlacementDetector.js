@@ -6,11 +6,14 @@ const cheerio = require('cheerio');
  * 
  * Answers: "Where should we place SmartScroll and what pages is it eligible for?"
  * 
+ * IMPORTANT: SmartScroll is ALWAYS placed at the bottom of the page and loads dynamically.
+ * This detector finds the best anchor point at the bottom of content (before footer).
+ * 
  * Detection Criteria:
  * - Article pages (templated structure)
  * - Clean break at end of content (above footer, below content)
  * - DOM structure analysis (content → footer gap)
- * - Mobile vs. desktop placement strategies
+ * - SmartScroll loads dynamically (not in static HTML)
  */
 class PlacementDetector {
   async analyze(domain, sampleUrls = []) {
@@ -38,14 +41,16 @@ class PlacementDetector {
         const pageAnalysis = await this.analyzePage(fullUrl);
         
         if (pageAnalysis.eligible) {
+          const fullUrl = url.startsWith('http') ? url : `https://${domain}${url}`;
           results.eligible_pages.push({
-            url: url,
+            url: fullUrl,
             pattern: this.extractPattern(url),
             eligibility_score: pageAnalysis.score,
             dom_placement: pageAnalysis.placement,
             mobile_ready: pageAnalysis.mobile_ready,
             content_break: pageAnalysis.content_break,
-            sample_urls: [url]
+            sample_urls: [fullUrl],
+            sales_tool_url: fullUrl // For Sales Enablement Tool integration
           });
         }
       } catch (error) {
@@ -149,30 +154,53 @@ class PlacementDetector {
       
       const eligible = score >= 60;
       
-      // Improved placement anchor detection
+      // SmartScroll is ALWAYS at the bottom - find the best anchor point
+      // Look for the last meaningful content element before footer
       let placementSelector = null;
-
+      let placementPosition = 'after'; // Always after the anchor element
+      
+      // Priority 1: Content break markers (article-footer, post-footer, etc.)
       if (contentBreak && contentBreak.selector !== 'footer') {
         placementSelector = `${contentBreak.selector}`;
-      } else {
-        // fallback to last meaningful content element
-        const lastBlock = content.find('p, figure, img, blockquote, section').last();
+      } 
+      // Priority 2: Last meaningful content block (paragraph, figure, etc.)
+      else {
+        const lastBlock = content.find('p, figure, img, blockquote, section, div.entry-content, div.post-content').last();
         if (lastBlock.length) {
           placementSelector = this.buildSelector(lastBlock);
-        } else if (article.length) {
+        } 
+        // Priority 3: Article or main content container
+        else if (article.length) {
           placementSelector = 'article';
         } else if (mainContent.length) {
-          placementSelector = mainContent.attr('class') || mainContent.attr('id') || 'main';
+          placementSelector = mainContent.attr('class') ? `.${mainContent.attr('class').split(' ')[0]}` : 
+                             (mainContent.attr('id') ? `#${mainContent.attr('id')}` : 'main');
+        }
+        // Priority 4: Footer (SmartScroll goes before footer)
+        else if (footer.length) {
+          placementSelector = footer.attr('class') ? `.${footer.attr('class').split(' ')[0]}` : 
+                             (footer.attr('id') ? `#${footer.attr('id')}` : 'footer');
+          placementPosition = 'before'; // Before footer if no content found
+        }
+        // Fallback: body (always works)
+        else {
+          placementSelector = 'body';
         }
       }
+      
+      // Get more context about the placement
+      const placementContext = this.getPlacementContext($, placementSelector, contentBreak, article, mainContent, footer);
       
       return {
         eligible: eligible,
         score: score,
         placement: {
           selector: placementSelector || 'body',
-          position: 'after',
-          method: 'insertAfter'
+          position: placementPosition,
+          method: placementPosition === 'before' ? 'insertBefore' : 'insertAfter',
+          note: 'SmartScroll loads dynamically at bottom of page',
+          context: placementContext,
+          visual_description: this.getVisualDescription(placementSelector, placementPosition, contentBreak, footer)
         },
         content_break: contentBreak,
         mobile_ready: viewport > 0,
@@ -265,7 +293,7 @@ class PlacementDetector {
         priority: 'HIGH',
         category: 'Placement',
         message: 'No eligible pages found for SmartScroll placement',
-        action: 'Manual DOM analysis required'
+        action: 'Manual DOM analysis required - SmartScroll loads dynamically at bottom of page'
       });
       return recommendations;
     }
@@ -274,11 +302,12 @@ class PlacementDetector {
     const mediumScore = eligiblePages.filter(p => p.eligibility_score >= 60 && p.eligibility_score < 80);
     
     if (highScore.length > 0) {
+      const samplePlacement = highScore[0].dom_placement;
       recommendations.push({
         priority: '✅ READY',
         category: 'Placement',
         message: `${highScore.length} page(s) with high eligibility score (80%+)`,
-        action: 'Deploy SmartScroll using recommended DOM selectors'
+        action: `Deploy SmartScroll at bottom of page using selector: ${samplePlacement.selector} (${samplePlacement.position})`
       });
     }
     
@@ -287,7 +316,7 @@ class PlacementDetector {
         priority: '⚠️ MEDIUM',
         category: 'Placement',
         message: `${mediumScore.length} page(s) with medium eligibility score (60-79%)`,
-        action: 'Review DOM structure and test placement before full deployment'
+        action: 'Review DOM structure - SmartScroll will load dynamically at bottom of page'
       });
     }
     

@@ -146,6 +146,7 @@
 - ✅ Automated daily manifest refresh (5 AM cron)
 - ✅ Metadata extraction (title, excerpt, hero image, reading time)
 - ✅ Site targeting integration
+- ✅ Sales enablement tool for visual widget placement
 
 **Dynamic Deployment**:
 - ✅ S3-based manifest system for widget configuration
@@ -278,6 +279,38 @@
 - ⏳ Automated regression testing
 - ⏳ Load testing for scale validation
 - **Current**: Manual QA, production monitoring
+
+---
+
+### MulaOS (R&D Intelligence System) ✅
+
+#### Recent Completions
+
+**Duke - Onboarding & Placement Intelligence Agent:**
+- ✅ SDK health check with Playwright/Puppeteer dynamic detection
+- ✅ Traffic analysis via sitemap/RSS scraping
+- ✅ URL pattern discovery and analysis
+- ✅ SmartScroll placement detection (DOM structure analysis)
+- ✅ Competitor detection (10+ networks: Taboola, Outbrain, Raptive, etc.)
+- ✅ Deployment readiness scoring
+- ✅ Web dashboard (`duke-web/`) for visual analysis
+- ✅ **Sales Enablement Tool integration** - Visual placement testing directly from placement recommendations
+- ✅ Full URL support for specific page analysis
+- ✅ Placement intelligence with DOM selectors and positioning
+
+**Granny - Publisher Context Engine:**
+- ✅ Business intelligence (publisher type, revenue model, tech stack)
+- ✅ Contextual intelligence (sports context, seasonal trends, rivalry detection)
+- ✅ Affiliate-specific search strategies (Fanatics/Impact, Amazon Associates)
+- ✅ Known domain intelligence (hardcoded data for major publishers)
+- ✅ REST API (`granny-intelligence-api/`) for integration with other agents
+- ✅ Web dashboard (`granny-web/`) for visual analysis
+
+**Architecture:**
+- ✅ Sub-agent pattern (Granny and Duke inform surfers, don't override)
+- ✅ Graceful degradation (sub-agent failures don't break surfers)
+- ✅ REST API integration points
+- ✅ Memory bank documentation
 
 ---
 
